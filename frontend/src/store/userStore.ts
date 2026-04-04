@@ -2,7 +2,7 @@ import { User } from "@/types/Types";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-interface UserStoreTypes {
+export interface UserStoreTypes {
   user: User | null;
   setUser: (user: User) => void;
   clearUser: () => void;

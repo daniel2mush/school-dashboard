@@ -1,33 +1,58 @@
 import Link from "next/link";
-import { NAV_CONFIG, getDashboardHref, type AppRole } from "../constants/navigation";
+import {
+  NAV_CONFIG,
+  getDashboardHref,
+  type AppRole,
+} from "../constants/navigation";
 import { SCHOOL } from "../data/mockData";
-import type { AuthUser } from "../lib/demoAuth";
 import { Avatar } from "./ui";
+import { UserStoreTypes } from "@/store/UserStore";
+import { User } from "@/types/Types";
 
 type SidebarProps = {
-  role: AppRole;
   currentSection: string;
-  user: AuthUser;
+  user: User;
 };
 
-export default function Sidebar({ role, currentSection, user }: SidebarProps) {
-  const nav = NAV_CONFIG[role];
+export default function Sidebar({ currentSection, user }: SidebarProps) {
+  const nav = NAV_CONFIG["principal"];
 
   return (
     <aside className="dashboard-sidebar">
-      <div style={{ padding: "20px 18px", borderBottom: "1px solid var(--border-light)" }}>
-        <div style={{ fontSize: 11, color: "var(--text-secondary)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+      <div
+        style={{
+          padding: "20px 18px",
+          borderBottom: "1px solid var(--border-light)",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            color: "var(--text-secondary)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}
+        >
           School Dashboard
         </div>
-        <div style={{ fontSize: 18, fontWeight: 600, color: "var(--text-primary)", marginTop: 8 }}>
+        <div
+          style={{
+            fontSize: 18,
+            fontWeight: 600,
+            color: "var(--text-primary)",
+            marginTop: 8,
+          }}
+        >
           {SCHOOL.name}
         </div>
-        <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 6 }}>
+        <div
+          style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 6 }}
+        >
           {SCHOOL.term}
         </div>
       </div>
 
-      <nav style={{ flex: 1, paddingTop: 12 }}>
+      {/* <nav style={{ flex: 1, paddingTop: 12 }}>
         {nav.map((item, i) =>
           "section" in item ? (
             <div
@@ -47,11 +72,11 @@ export default function Sidebar({ role, currentSection, user }: SidebarProps) {
               key={item.id}
               item={item}
               active={currentSection === item.id}
-              href={getDashboardHref(role, item.id)}
+              href={getDashboardHref(user.role, item.id)}
             />
           ),
         )}
-      </nav>
+      </nav> */}
 
       <div
         style={{
@@ -62,18 +87,49 @@ export default function Sidebar({ role, currentSection, user }: SidebarProps) {
           gap: 10,
         }}
       >
-        <Avatar initials={user.initials} color={user.color} size={34} fontSize={12} />
+        {/* <Avatar
+          initials={user.initials}
+          color={user.color}
+          size={34}
+          fontSize={12}
+        />
         <div style={{ minWidth: 0 }}>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "var(--text-primary)",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             {user.name}
           </div>
-          <div style={{ fontSize: 10, color: "var(--text-secondary)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <div
+            style={{
+              fontSize: 10,
+              color: "var(--text-secondary)",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             {user.subtitle}
           </div>
-          <div style={{ fontSize: 10, color: "var(--text-tertiary)", marginTop: 4, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          <div
+            style={{
+              fontSize: 10,
+              color: "var(--text-tertiary)",
+              marginTop: 4,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
             {user.email}
           </div>
-        </div>
+        </div> */}
       </div>
     </aside>
   );
@@ -104,7 +160,9 @@ function NavItem({ item, active, href }: any) {
         if (!active) e.currentTarget.style.background = "transparent";
       }}
     >
-      <span style={{ width: 16, textAlign: "center", fontSize: 13 }}>{item.icon}</span>
+      <span style={{ width: 16, textAlign: "center", fontSize: 13 }}>
+        {item.icon}
+      </span>
       {item.label}
     </Link>
   );

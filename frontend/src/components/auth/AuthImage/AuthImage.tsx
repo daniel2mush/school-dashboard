@@ -15,6 +15,7 @@ export default function AuthImage() {
           src={"/authImage.svg"}
           alt="Auth Image"
           fill
+          loading="eager"
         />
         <div className={styles.texts}>
           <h1>Sunridge Academy</h1>

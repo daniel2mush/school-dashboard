@@ -73,9 +73,14 @@ export function isValidSection(role: AppRole, section: string) {
 }
 
 export function getSectionLabel(role: AppRole, section: string) {
-  return getRolePages(role).find((item) => item.id === section)?.label ?? "Dashboard";
+  return (
+    getRolePages(role).find((item) => item.id === section)?.label ?? "Dashboard"
+  );
 }
 
-export function getDashboardHref(role: AppRole, section = ROLE_DEFAULT_PAGE[role]) {
-  return `/dashboard/${role}/${section}`;
+export function getDashboardHref(
+  role: AppRole,
+  section = ROLE_DEFAULT_PAGE[role],
+) {
+  return `/dashboard/${section}`;
 }

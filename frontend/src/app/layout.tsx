@@ -1,6 +1,6 @@
 import { Toaster } from "sonner";
 import "./globals.scss";
-import { Providers } from "./client/QueryClient";
+import { Providers } from "../client/QueryClient";
 import { ThemeProvider } from "../theme/ThemeProvider";
 
 export const metadata = {

@@ -11,7 +11,7 @@ export default function AuthLayout({
     <section className={styles.container}>
       <div className={styles.content}>
         <AuthImage />
-        {children}d
+        {children}
       </div>
     </section>
   );

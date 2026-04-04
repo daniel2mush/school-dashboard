@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return redirect("/login");
+  return redirect("/dashboard");
 }

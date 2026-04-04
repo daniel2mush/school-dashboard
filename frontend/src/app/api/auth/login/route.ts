@@ -53,11 +53,19 @@ export async function POST(req: Request) {
 
     return NextResponse.json(newdata, { status: 200 });
   } catch (error) {
-    console.error("Login Error:", error);
+    console.error("Fetch User Error:", error);
 
     if (isAxiosError(error)) {
-      return NextResponse.json(error.response?.data, { status: 500 });
+      // 3. Forward the exact status code from your backend (e.g., 404, 403),
+      // falling back to 500 only if the status is missing.
+      const statusCode = error.response?.status || 500;
+
+      return NextResponse.json(
+        error.response?.data || { error: "Failed to fetch user" },
+        { status: statusCode },
+      );
     }
+
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },
