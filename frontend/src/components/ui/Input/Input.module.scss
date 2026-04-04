@@ -1,0 +1,83 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: auto;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  display: block;
+}
+
+.inputWrapper {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--border-mid);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-bg);
+    transform: translateY(-1px);
+  }
+
+  &:hover:not(:focus) {
+    border-color: var(--border-hover);
+    background: var(--bg-secondary);
+  }
+
+  &::placeholder {
+    color: var(--text-tertiary);
+    opacity: 0.7;
+  }
+
+  &.hasError {
+    border-color: var(--red);
+    &:focus {
+      box-shadow: 0 0 0 4px var(--red-bg);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: var(--bg-tertiary);
+  }
+}
+
+.errorText {
+  font-size: 11px;
+  color: var(--red);
+  font-weight: 500;
+  margin-top: 4px;
+  min-height: 1.25em;
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

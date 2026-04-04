@@ -1,6 +1,7 @@
+import { Toaster } from "sonner";
 import "./globals.scss";
-import { AuthProvider } from "../providers/AuthProvider";
-import { SchoolDataProvider } from "../providers/SchoolDataProvider";
+import { Providers } from "./client/QueryClient";
+import { ThemeProvider } from "../theme/ThemeProvider";
 
 export const metadata = {
   title: "Sunridge Academy",
@@ -14,25 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              try {
-                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                  document.documentElement.classList.add('dark');
-                } else {
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (_) {}
-            `,
-          }}
-        />
-      </head>
       <body>
-        <AuthProvider>
-          <SchoolDataProvider>{children}</SchoolDataProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <Providers>{children}</Providers>
+        </ThemeProvider>
+        <Toaster richColors={true} />
       </body>
     </html>
   );

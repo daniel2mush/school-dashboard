@@ -65,7 +65,7 @@
 }
 
 /* Dark Mode Overrides */
-html.dark {
+:root[data-theme="dark"] {
   --bg-primary: #0F1115;
   --bg-secondary: #17191E;
   --bg-tertiary: #08090A;

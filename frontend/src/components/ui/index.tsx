@@ -199,3 +199,5 @@ export function SelectInput({ options, style, value, onChange }: any) {
     </select>
   );
 }
+export * from "./Input/Input";
+export * from "./Button/Button";

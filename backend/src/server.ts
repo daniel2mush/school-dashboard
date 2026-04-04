@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import "dotenv/config";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
 import { globalErrorHandler } from "./utils/globalErrorHandler.js";
@@ -11,6 +12,7 @@ const app = express();
 
 // Middlewares
 app.use(helmet());
+app.use(cookieParser());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
