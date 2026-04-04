@@ -5,19 +5,35 @@ import { useRouter } from "next/navigation";
 import { Avatar, Input, Button } from "../../ui";
 import { SCHOOL } from "../../../data/mockData";
 import styles from "./LoginScreen.module.scss";
+import { useForm } from "react-hook-form";
+import { LoginFormData, loginSchema } from "@/validation/authValidation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useLoginUser } from "@/query/AuthQuery";
+import { toast } from "sonner";
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const { mutateAsync: loginUser, isPending: loading, error } = useLoginUser();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true);
-    // Simulate login delay
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
+  const handleLoginSubmit = (data: LoginFormData) => {
+    loginUser(data)
+      .then((data) => {
+        router.push("/dashboard");
+      })
+      .finally(() => {});
   };
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitted },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
   return (
     <div className={styles.container}>
@@ -31,20 +47,25 @@ export default function LoginScreen() {
             <p>School Dashboard</p>
           </div>
         </div>
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <form
+          onSubmit={handleSubmit(handleLoginSubmit)}
+          className={styles.form}
+        >
           <Input
             label="Email"
             type="email"
             placeholder="Enter your email"
-            required
             fullWidth
+            {...register("email")}
+            error={errors.email?.message}
           />
           <Input
             label="Password"
             type="password"
             placeholder="Enter your password"
-            required
             fullWidth
+            {...register("password")}
+            error={errors.password?.message}
           />
           <Button
             type="submit"
