@@ -8,6 +8,58 @@ import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
 import styles from "./Dashboard.module.scss";
 import Loading from "@/components/Loading/Loading";
+import { User } from "@/types/Types";
+import {
+  AdminAnalytics,
+  AdminAnnouncements,
+  AdminFees,
+  AdminOverview,
+  AdminTimetable,
+  AdminUsers,
+  AdminYearGroups,
+} from "@/components/dashboard/views/Admin";
+import {
+  StudentAttendance,
+  StudentDashboard,
+  StudentFeesStatus,
+  StudentReportCard,
+  StudentSubjects,
+  StudentTimetable,
+} from "@/components/dashboard/views/Student";
+import {
+  TeachAnnouncements,
+  TeachAttendance,
+  TeachGrading,
+  TeachMyYearGroups,
+  TeachSubjectsContent,
+} from "@/components/dashboard/views/Teach";
+
+const VIEW_MAP: Record<User["role"], Record<string, React.ReactNode>> = {
+  ADMIN: {
+    overview: <AdminOverview />,
+    yeargroups: <AdminYearGroups />,
+    users: <AdminUsers />,
+    fees: <AdminFees />,
+    timetable: <AdminTimetable />,
+    announcements: <AdminAnnouncements />,
+    analytics: <AdminAnalytics />,
+  },
+  TEACHER: {
+    tmy: <TeachMyYearGroups />,
+    tsubjects: <TeachSubjectsContent />,
+    tgrades: <TeachGrading />,
+    tattend: <TeachAttendance />,
+    tann: <TeachAnnouncements />,
+  },
+  STUDENT: {
+    sdash: <StudentDashboard />,
+    ssubjects: <StudentSubjects />,
+    sreport: <StudentReportCard />,
+    satt: <StudentAttendance />,
+    stimetable: <StudentTimetable />,
+    sfees: <StudentFeesStatus />,
+  },
+};
 
 export default function DashboardRolePage() {
   const userStore = useUserStore();
@@ -26,10 +78,10 @@ export default function DashboardRolePage() {
     return <Loading />;
   }
   return (
-    <div>
-      <div>
+    <div className={styles.page}>
+      <div className={styles.layout}>
         <Sidebar />
-        <main>
+        <main className={styles.main}>
           <DashboardHeader
             role={user.role}
             sectionLabel={getSectionLabel(user.role, sectionPath)}
@@ -40,7 +92,9 @@ export default function DashboardRolePage() {
               logout();
             }}
           />
-          'Hello world'
+          <section className={styles.content}>
+            {VIEW_MAP[user.role][sectionPath]}
+          </section>
         </main>
       </div>
 

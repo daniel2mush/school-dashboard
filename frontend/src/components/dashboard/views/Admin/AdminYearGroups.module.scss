@@ -1,0 +1,8 @@
+.view, .list { display: flex; flex-direction: column; gap: 16px; }
+.header, .row { padding: 22px; border-radius: 22px; background: var(--bg-primary); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+.header { background: linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.03)), var(--bg-primary); }
+.eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--green); }
+.title { margin-top: 10px; font-size: 1.8rem; color: var(--text-primary); letter-spacing: -0.04em; }
+.row { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 12px; align-items: center; color: var(--text-secondary); }
+.row strong { color: var(--text-primary); }
+@media (max-width: 900px) { .row { grid-template-columns: 1fr; } }

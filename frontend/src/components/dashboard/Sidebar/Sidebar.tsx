@@ -5,7 +5,7 @@ import { SCHOOL } from "../../../data/mockData";
 import { Avatar } from "../../ui";
 import useUserStore from "@/store/UserStore";
 import { usePathname } from "next/navigation";
-import { NavItem } from "../../NavItems/NavItems";
+import { NavItem } from "../NavItems/NavItems";
 
 export default function Sidebar() {
   const pathName = usePathname();

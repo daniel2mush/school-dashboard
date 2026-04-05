@@ -1,0 +1,10 @@
+.view { display: flex; flex-direction: column; gap: 18px; }
+.hero, .band { padding: 22px; border-radius: 22px; background: var(--bg-primary); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+.hero { background: linear-gradient(135deg, rgba(79, 70, 229, 0.12), rgba(5, 150, 105, 0.05)), var(--bg-primary); }
+.eyebrow, .band span { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+.eyebrow { color: var(--accent); }
+.title { margin-top: 10px; font-size: 1.9rem; letter-spacing: -0.04em; color: var(--text-primary); }
+.bands { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.band span { color: var(--text-tertiary); }
+.band strong { display: block; margin-top: 10px; color: var(--text-primary); font-size: 1.1rem; }
+@media (max-width: 900px) { .bands { grid-template-columns: 1fr; } }
