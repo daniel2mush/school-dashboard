@@ -1,12 +1,24 @@
 "use client";
 
-import Sidebar from "@/components/Sidebar";
+import DashboardHeader from "@/components/dashboard/DashboardHeader/DashboardHeader";
+import Sidebar from "@/components/dashboard/Sidebar/Sidebar";
+import { getSectionLabel } from "@/constants/navigation";
 import useUserStore from "@/store/UserStore";
+import { useTheme } from "next-themes";
+import { usePathname } from "next/navigation";
 
 export default function DashboardRolePage() {
   const userStore = useUserStore();
+  const pathName = usePathname();
+  const { theme, setTheme } = useTheme();
+
+  const isDark = theme === "dark";
+
+  const sectionPath = pathName.split("/")[2];
 
   const { user } = userStore;
+
+  async function logout() {}
 
   if (!user) {
     return (
@@ -41,19 +53,18 @@ export default function DashboardRolePage() {
   return (
     <div className="dashboard-shell">
       <div className="dashboard-layout">
-        <Sidebar currentSection={""} user={user} />
+        <Sidebar />
         <main className="dashboard-main">
-          {/* <DashboardHeader
-              role={role}
-              sectionLabel={getSectionLabel(role, section)}
-              user={user}
-              isDark={isDark}
-              onToggleTheme={toggleTheme}
-              onLogout={() => {
-                logout();
-                router.replace("/login");
-              }}
-            /> */}
+          <DashboardHeader
+            role={user.role}
+            sectionLabel={getSectionLabel(user.role, sectionPath)}
+            user={user}
+            isDark={isDark}
+            onToggleTheme={() => setTheme(isDark ? "light" : "dark")}
+            onLogout={() => {
+              logout();
+            }}
+          />
 
           {/* <PageComponent
               onNavigate={(targetSection: string) =>
