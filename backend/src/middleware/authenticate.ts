@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import logger from "../utils/logger.js";
 import { sendJson } from "../utils/sendJson.js";
 import { User } from "../types/Types.js";
+import { prisma } from "../clients/prismaClient.js";
 
 export const AuthenticateRequest = asyncHandler(async (req, res, next) => {
   const headers = req.headers["authorization"];
@@ -17,13 +18,31 @@ export const AuthenticateRequest = asyncHandler(async (req, res, next) => {
     );
   }
 
-  logger.error(token);
-
   try {
-    const decode = jwt.verify(token, process.env.JWT_ACCESS_SECRET!);
+    const decode = jwt.verify(
+      token,
+      process.env.JWT_ACCESS_SECRET!,
+    ) as User & { userId: number };
     req.user = decode as User;
+
+    const account = await prisma.user.findUnique({
+      where: { id: decode.userId },
+      select: { status: true },
+    });
+    if (!account) {
+      throw new AppError("User no longer exists", 401);
+    }
+    if (account.status !== "Active") {
+      throw new AppError(
+        "Your account has been restricted. Contact an administrator.",
+        403,
+      );
+    }
+
     next();
   } catch (err) {
+    if (err instanceof AppError) throw err;
+
     if (err instanceof jwt.TokenExpiredError) {
       logger.warn("Access token expired");
       return sendJson(

@@ -6,35 +6,53 @@ import {
   PageHeader,
 } from "@/components/ui";
 import styles from "./StudentDashboard.module.scss";
-import { PERIODS } from "@/data/mockData";
-import useUserStore from "@/store/UserStore";
+import useCurrentStudent from "@/hooks/useCurrentStudent";
+import { useGetAnnouncements } from "@/query/AuthQuery";
 
-export default function StudentDashboard() {
-  // const {
-  //   student,
-  //   yearGroup,
-  //   teachers,
-  //   studentAnnouncements,
-  //   studentGrades,
-  //   studentTimetable,
-  // } = useCurrentStudent();
-  // const feePct = Math.round((student.fees.paid / student.fees.total) * 100);
-  // const todayLessons = Object.values(studentTimetable)[0] || [];
-  // const strongestSubject = [...studentGrades].sort(
-  //   (left, right) => right.score - left.score,
-  // )[0];
-  const student = useUserStore().user;
+const PERIODS = [
+  { label: "Period 1", time: "7:30 – 8:30" },
+  { label: "Period 2", time: "8:30 – 9:30" },
+  { label: "Period 3", time: "9:30 – 10:30" },
+  { label: "Break",    time: "10:30 – 11:00", isBreak: true },
+  { label: "Period 4", time: "11:00 – 12:00" },
+  { label: "Period 5", time: "12:00 – 13:00" },
+];
 
-  if (!student) return;
+interface StudentDashboardProps {
+  onNavigate?: (page: string) => void;
+}
+
+export default function StudentDashboard({ onNavigate }: StudentDashboardProps) {
+  const currentData = useCurrentStudent();
+  const { data: announcements } = useGetAnnouncements();
+
+  if (!currentData) return null;
+
+  const {
+    student,
+    yearGroup,
+    teachers,
+    studentAnnouncements,
+    studentGrades,
+    studentTimetable,
+  } = currentData;
+
+  const feePct = Math.round((student.fees.paid / student.fees.total) * 100);
+  const todayLessons = Object.values(studentTimetable)[0] as string[] || [];
+  const strongestSubject = [...studentGrades].sort(
+    (left, right) => right.score - left.score,
+  )[0];
 
   return (
     <>
       <PageHeader title={`Good morning, ${student.name.split(" ")[0]}`} />
-      <div
-        className="metrics-grid"
-        style={{ gridTemplateColumns: "repeat(4, minmax(0,1fr))" }}
-      >
-        {/* <MetricCard label="Year group" value={student.enrollmentDate} />
+      
+      <div className={styles.metricsGrid}>
+        <MetricCard
+          label="Year group"
+          value={yearGroup.name}
+          sub={yearGroup.level}
+        />
         <MetricCard
           label="Attendance"
           value={`${student.att}%`}
@@ -49,19 +67,17 @@ export default function StudentDashboard() {
         <MetricCard
           label="Best subject"
           value={strongestSubject?.subject || "Waiting"}
-          sub={
-            strongestSubject ? `${strongestSubject.score}%` : "No grades yet"
-          }
+          sub={strongestSubject ? `${strongestSubject.score}%` : "No grades yet"}
           valueColor="var(--accent)"
-        /> */}
+        />
       </div>
 
-      <div className="two-col">
+      <div className={styles.twoCol}>
         <Card>
-          {/* <CardHeader
+          <CardHeader
             title={`My subjects – ${yearGroup.name}`}
             action="View all"
-            onAction={() => onNavigate("ssubjects")}
+            onAction={() => onNavigate?.("ssubjects")}
           />
           {yearGroup.subjects.map((subject) => {
             const teacher = teachers.find((candidate) =>
@@ -71,21 +87,10 @@ export default function StudentDashboard() {
               (entry) => entry.subject === subject,
             );
             return (
-              <div
-                key={subject}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  padding: "7px 0",
-                  borderBottom: "0.5px solid var(--border-light)",
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: 12 }}>{subject}</div>
-                  <div style={{ fontSize: 10, color: "var(--text-secondary)" }}>
-                    {teacher ? teacher.name : "Teacher to be assigned"}
-                  </div>
+              <div key={subject} className={styles.subjectRow}>
+                <div className={styles.subjectInfo}>
+                  <div className={styles.subjectName}>{subject}</div>
+                  <div className={styles.subjectName}>{teacher ? teacher.name : "Teacher to be assigned"}</div>
                 </div>
                 {gradeEntry ? (
                   <Badge variant="blue">{gradeEntry.grade}</Badge>
@@ -94,71 +99,49 @@ export default function StudentDashboard() {
                 )}
               </div>
             );
-          })} */}
+          })}
         </Card>
 
-        <div>
+        <div className={styles.sidebar}>
           <Card>
-            {/* <CardHeader title="School announcements" />
-            {studentAnnouncements.slice(0, 3).map((announcement) => (
-              <div
-                key={announcement.id}
-                style={{
-                  display: "flex",
-                  gap: 8,
-                  padding: "8px 0",
-                  borderBottom: "0.5px solid var(--border-light)",
-                }}
-              >
+            <CardHeader title="School announcements" />
+            {announcements?.slice(0, 4).map((ann) => (
+              <div key={ann.id} className={styles.announcementRow}>
                 <div
-                  style={{
-                    width: 7,
-                    height: 7,
-                    borderRadius: "50%",
-                    background: announcement.urgent
-                      ? "var(--red)"
-                      : "var(--accent)",
-                    marginTop: 5,
-                    flexShrink: 0,
-                  }}
+                  className={`${styles.announcementDot} ${
+                    ann.priority === "Urgent" ? styles.urgent : styles.normal
+                  }`}
                 />
-                <div>
-                  <div style={{ fontSize: 12 }}>{announcement.title}</div>
-                  <div
-                    style={{
-                      fontSize: 10,
-                      color: "var(--text-secondary)",
-                      marginTop: 1,
-                    }}
-                  >
-                    {announcement.from} · {announcement.date}
+                <div className={styles.announcementInfo}>
+                  <div className={styles.announcementTitle}>{ann.title}</div>
+                  <div className={styles.announcementMeta}>
+                    {ann.author?.name} · {new Date(ann.createdAt).toLocaleDateString()}
                   </div>
                 </div>
               </div>
-            ))} */}
+            ))}
+            {(!announcements || announcements.length === 0) && (
+              <div style={{ padding: 20, textAlign: "center", fontSize: "0.85rem", color: "var(--text-tertiary)" }}>
+                No active announcements
+              </div>
+            )}
           </Card>
+          
           <Card>
-            {/* <CardHeader title="Next classes" />
+            <CardHeader title="Next classes" />
             {todayLessons.slice(0, 4).map((subject, index) => (
-              <div
-                key={`${subject}-${index}`}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  padding: "7px 0",
-                  borderBottom: "0.5px solid var(--border-light)",
-                }}
-              >
-                <span style={{ fontSize: 12 }}>{subject}</span>
-                <span style={{ fontSize: 10, color: "var(--text-secondary)" }}>
+              <div key={`${subject}-${index}`} className={styles.classRow}>
+                <span className={styles.className}>{subject}</span>
+                <span className={styles.classTime}>
                   {PERIODS[index]?.time}
                 </span>
               </div>
             ))}
           </Card>
+          
           <Card>
             <CardHeader title="Quick actions" />
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <div className={styles.actionsList}>
               {[
                 ["sreport", "View my report card"],
                 ["stimetable", "View class timetable"],
@@ -166,14 +149,13 @@ export default function StudentDashboard() {
               ].map(([page, label]) => (
                 <button
                   key={page}
-                  className="btn"
-                  style={{ textAlign: "left" }}
-                  onClick={() => onNavigate(page)}
+                  className={styles.actionButton}
+                  onClick={() => onNavigate?.(page)}
                 >
-                  {label} →
+                  {label} <span>→</span>
                 </button>
               ))}
-            </div> */}
+            </div>
           </Card>
         </div>
       </div>

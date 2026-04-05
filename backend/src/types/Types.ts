@@ -26,3 +26,12 @@ export interface User {
 export interface UserResponse {
   data: User;
 }
+
+export interface Subject {
+  id: number;
+  name: string;
+  description: string | null;
+  createdAt: string; // ISO Date string
+  updatedAt: string; // ISO Date string
+  _count: { yearGroups: number; grades: number; timetable: number };
+}

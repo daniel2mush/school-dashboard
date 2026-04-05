@@ -1,7 +1,6 @@
 "use client";
 import styles from "./Sidebar.module.scss";
 import { NAV_CONFIG, getDashboardHref } from "../../../constants/navigation";
-import { SCHOOL } from "../../../data/mockData";
 import { Avatar } from "../../ui";
 import useUserStore from "@/store/UserStore";
 import { usePathname } from "next/navigation";
@@ -22,8 +21,8 @@ export default function Sidebar() {
     <aside className={styles.sidebar}>
       <div className={styles.brandCard}>
         <div className={styles.brandEyebrow}>School Dashboard</div>
-        <div className={styles.brandTitle}>{SCHOOL.name}</div>
-        <div className={styles.brandMeta}>{SCHOOL.term}</div>
+        <div className={styles.brandTitle}>Sunridge Academy</div>
+        <div className={styles.brandMeta}>Term 2 - 2026</div>
       </div>
 
       <nav className={styles.nav}>

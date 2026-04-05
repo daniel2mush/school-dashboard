@@ -15,6 +15,7 @@ import {
 } from "../validations/authValidations.js";
 
 import bcrypt from "bcrypt";
+import logger from "../utils/logger.js";
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
@@ -104,6 +105,29 @@ export const Register = asyncHandler(async (req, res) => {
   return sendJson(res, 201, true, "User registration successful", data);
 });
 
+const studentInclude = {
+  enrolledYearGroup: {
+    include: {
+      subjects: true,
+      fees: true,
+    },
+  },
+  grades: {
+    include: {
+      subject: true,
+      teacher: {
+        select: { id: true, name: true, email: true },
+      },
+    },
+    take: 10,
+    orderBy: { date: "desc" as const },
+  },
+  attendance: {
+    take: 30,
+    orderBy: { date: "desc" as const },
+  },
+};
+
 export const Login = asyncHandler(async (req, res) => {
   const { success, data, error } = ValidateLogin(req.body);
 
@@ -120,13 +144,7 @@ export const Login = asyncHandler(async (req, res) => {
     where: {
       email: data.email,
     },
-    select: {
-      password: true,
-      id: true,
-      role: true,
-      email: true,
-      name: true,
-    },
+    include: studentInclude,
   });
 
   if (!validUser) {
@@ -138,6 +156,13 @@ export const Login = asyncHandler(async (req, res) => {
 
   if (!validPassword) {
     throw new AppError("Invalid email or password", 401);
+  }
+
+  if (validUser.status !== "Active") {
+    throw new AppError(
+      "This account is not active. Contact your administrator.",
+      403,
+    );
   }
 
   // generate tokens
@@ -167,14 +192,11 @@ export const Login = asyncHandler(async (req, res) => {
   // Set HTTP-only cookie
   res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
 
+  const { password: _, ...userWithoutPassword } = validUser;
+
   const responseData = {
     accessToken,
-    user: {
-      id: validUser.id,
-      role: validUser.role,
-      email: validUser.email,
-      name: validUser.name,
-    },
+    user: userWithoutPassword,
   };
 
   return sendJson(res, 200, true, "User login successful", responseData);
@@ -205,6 +227,8 @@ export const Logout = asyncHandler(async (req, res) => {
 export const GenerateRefreshToken = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
+  logger.warn(refreshToken, "This is the refresh token");
+
   if (!refreshToken) {
     throw new AppError("No refresh token found", 401);
   }
@@ -226,7 +250,11 @@ export const GenerateRefreshToken = asyncHandler(async (req, res) => {
 
   const tokenRecord = await prisma.refreshToken.findUnique({
     where: { hashedToken },
-    include: { user: true },
+    include: {
+      user: {
+        include: studentInclude,
+      },
+    },
   });
 
   if (!tokenRecord || tokenRecord.expiresAt < new Date()) {
@@ -235,6 +263,15 @@ export const GenerateRefreshToken = asyncHandler(async (req, res) => {
   }
 
   const { user } = tokenRecord;
+
+  if (user.status !== "Active") {
+    res.clearCookie("refreshToken", COOKIE_OPTIONS);
+    await prisma.refreshToken.deleteMany({ where: { userId: user.id } });
+    throw new AppError(
+      "This account is not active. Contact your administrator.",
+      403,
+    );
+  }
 
   // 3. Generate NEW tokens
   const newAccessToken = generateAccessToken(
@@ -267,14 +304,11 @@ export const GenerateRefreshToken = asyncHandler(async (req, res) => {
   // 5. Set new cookie
   res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS);
 
+  const { password: _, ...userWithoutPassword } = user;
+
   const responseData = {
     accessToken: newAccessToken,
-    user: {
-      id: user.id,
-      role: user.role,
-      email: user.email,
-      name: user.name,
-    },
+    user: userWithoutPassword,
   };
 
   return sendJson(

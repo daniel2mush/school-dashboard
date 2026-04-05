@@ -3,24 +3,18 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Avatar, Input, Button } from "../../ui";
-import { SCHOOL } from "../../../data/mockData";
 import styles from "./LoginScreen.module.scss";
 import { useForm } from "react-hook-form";
 import { LoginFormData, loginSchema } from "@/validation/authValidation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginUser } from "@/query/AuthQuery";
-import { toast } from "sonner";
 
 export default function LoginScreen() {
   const router = useRouter();
   const { mutateAsync: loginUser, isPending: loading, error } = useLoginUser();
 
   const handleLoginSubmit = (data: LoginFormData) => {
-    loginUser(data)
-      .then((data) => {
-        router.push("/dashboard");
-      })
-      .finally(() => {});
+    loginUser(data);
   };
 
   const {
@@ -39,11 +33,9 @@ export default function LoginScreen() {
     <div className={styles.container}>
       <div className={styles.content}>
         <div className={styles.header}>
-          <div className={styles.logo}>
-            <Avatar size="lg" alt={`${SCHOOL.name} Logo`} />
-          </div>
+          <div className={styles.logo}>SA</div>
           <div className={styles.title}>
-            <h1>{SCHOOL.name}</h1>
+            <h1>Sunridge Academy</h1>
             <p>School Dashboard</p>
           </div>
         </div>

@@ -14,6 +14,15 @@ export const axiosClient = axios.create({
   },
 });
 
+axiosClient.interceptors.request.use(async (config) => {
+  const cookieStore = await cookies();
+  const accessToken = cookieStore.get("accessToken")?.value;
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
+
 /**
  * Response Interceptor: Token Rotation
  * Catches 401 Unauthorized errors, attempts to refresh the access token
@@ -49,7 +58,6 @@ axiosClient.interceptors.response.use(
             headers: {
               Cookie: `refreshToken=${refreshToken}`, // Manually attach server-side cookie
             },
-            withCredentials: true,
           },
         );
 

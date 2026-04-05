@@ -9,7 +9,7 @@ export interface User {
   name: string;
   initials: string | null;
   gender: Gender; // Or just 'string' if you don't want to be strict
-  dateOfBirth: string; // ISO Date string
+  dateOfBirth: string | null; // ISO Date string
   phoneNumber: string | null;
   address: string | null;
   avatarUrl: string | null;
@@ -20,6 +20,48 @@ export interface User {
   createdAt: string; // ISO Date string
   updatedAt: string; // ISO Date string
   enrolledYearGroupId: number | null;
+
+  // Relationships (Enriched from backend)
+  enrolledYearGroup?: YearGroup;
+  grades?: Grade[];
+  attendance?: Attendance[];
+}
+
+export interface YearGroup {
+  id: number;
+  name: string;
+  level: "Primary" | "JuniorSecondary" | "SeniorSecondary" | "University";
+  roomNumber?: string;
+  subjects?: Subject[];
+  fees?: Fee[];
+}
+
+export interface Subject {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+export interface Grade {
+  id: number;
+  score: number;
+  grade: string;
+  subject?: Subject;
+  teacher?: User;
+  date: string;
+}
+
+export interface Attendance {
+  id: number;
+  status: "P" | "A" | "T" | "H";
+  date: string;
+}
+
+export interface Fee {
+  id: number;
+  amount: number;
+  paid: number;
+  yearGroupId: number;
 }
 
 // If this is part of your login response, you can use a wrapper type like this:
@@ -52,4 +94,34 @@ export interface LoginResponse {
 export interface LoginResponseData {
   accessToken: string;
   user: User;
+}
+
+export interface Timetable {
+  id: number;
+  day: string;
+  yearGroupId: number;
+  periodId: number;
+  subjectId: number | null;
+  period: Period;
+  subject: Subject | null;
+}
+
+export interface Period {
+  id: number;
+  label: string;
+  startTime: string;
+  endTime: string;
+  isBreak: boolean;
+}
+
+export interface Announcement {
+  id: number;
+  title: string;
+  content: string;
+  priority: "Normal" | "Important" | "Urgent";
+  authorId: number;
+  targetType: "ALL" | "YEAR_GROUP" | "TEACHERS_ONLY";
+  targetYearGroupId: number | null;
+  createdAt: string;
+  author?: { name: string; role: string };
 }

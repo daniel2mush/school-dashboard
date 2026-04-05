@@ -1,10 +1,12 @@
 import useUserStore from "@/store/UserStore";
-import { LoginResponse, User, UserResponse } from "@/types/Types";
+import { Announcement, LoginResponse, User, UserResponse } from "@/types/Types";
 import { LoginFormData } from "@/validation/authValidation";
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export const useLoginUser = () => {
+  const router = useRouter();
   const { setUser } = useUserStore();
   return useMutation({
     mutationKey: ["auth", "login"],
@@ -42,10 +44,27 @@ export const useLoginUser = () => {
       const { data: userData } = responseData as UserResponse;
 
       setUser(userData);
+      router.push("/dashboard/");
     },
 
     onError: (data) => {
       toast.error(data.message);
+    },
+  });
+};
+
+export const useGetAnnouncements = () => {
+  return useQuery({
+    queryKey: ["announcements"],
+    queryFn: async () => {
+      const res = await fetch("/api/user/announcements");
+      const responseData = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          responseData.message || "Failed to fetch announcements",
+        );
+      }
+      return responseData.data as Announcement[];
     },
   });
 };

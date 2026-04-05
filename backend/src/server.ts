@@ -8,6 +8,8 @@ import { globalErrorHandler } from "./utils/globalErrorHandler.js";
 import logger from "./utils/logger.js";
 import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";
+import teacherRoute from "./routes/teacherRoute.js";
+import adminRoute from "./routes/adminRoute.js";
 
 const app = express();
 
@@ -39,6 +41,8 @@ app.get("/health", (req: Request, res: Response) => {
 // Placeholder for API routes
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.use("/api/teacher", teacherRoute);
+app.use("/api/admin", adminRoute);
 
 // Global Error Handler (must be at the end)
 app.use(globalErrorHandler);
