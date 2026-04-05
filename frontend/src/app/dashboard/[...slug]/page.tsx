@@ -6,6 +6,8 @@ import { getSectionLabel } from "@/constants/navigation";
 import useUserStore from "@/store/UserStore";
 import { useTheme } from "next-themes";
 import { usePathname } from "next/navigation";
+import styles from "./Dashboard.module.scss";
+import Loading from "@/components/Loading/Loading";
 
 export default function DashboardRolePage() {
   const userStore = useUserStore();
@@ -21,40 +23,13 @@ export default function DashboardRolePage() {
   async function logout() {}
 
   if (!user) {
-    return (
-      <div className="loading-screen">
-        <div className="loading-card">
-          <div
-            style={{
-              fontSize: 12,
-              color: "var(--text-secondary)",
-              letterSpacing: "0.08em",
-              textTransform: "uppercase",
-            }}
-          >
-            Loading workspace
-          </div>
-          <div style={{ fontSize: 24, fontWeight: 600, marginTop: 8 }}>
-            Bringing your dashboard online
-          </div>
-          <div
-            style={{
-              fontSize: 13,
-              color: "var(--text-secondary)",
-              marginTop: 8,
-            }}
-          >
-            Checking your session and matching you to the right dashboard.
-          </div>
-        </div>
-      </div>
-    );
+    return <Loading />;
   }
   return (
-    <div className="dashboard-shell">
-      <div className="dashboard-layout">
+    <div>
+      <div>
         <Sidebar />
-        <main className="dashboard-main">
+        <main>
           <DashboardHeader
             role={user.role}
             sectionLabel={getSectionLabel(user.role, sectionPath)}
@@ -65,13 +40,7 @@ export default function DashboardRolePage() {
               logout();
             }}
           />
-
-          {/* <PageComponent
-              onNavigate={(targetSection: string) =>
-                router.push(getDashboardHref(role, targetSection))
-              }
-              onOpenModal={setModal}
-            /> */}
+          'Hello world'
         </main>
       </div>
 
