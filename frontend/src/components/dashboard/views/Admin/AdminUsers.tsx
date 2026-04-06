@@ -603,7 +603,7 @@ function UserProfileDrawer({
                 <select
                   value={gender}
                   onChange={(e) => {
-                    setGender(e.target.value);
+                    setGender(()=> e.target.value as 'Male' | 'Female' | 'Other');
                     setHasChanges(true);
                   }}
                 >

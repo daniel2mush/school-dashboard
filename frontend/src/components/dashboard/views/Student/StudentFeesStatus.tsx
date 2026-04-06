@@ -14,12 +14,12 @@ export default function StudentFeesStatus() {
   const percentagePaid = total > 0 ? Math.round((paid / total) * 100) : 100;
   
   // Format currency
-  const formatGHS = (amount: number) => {
-    return new Intl.NumberFormat("en-GH", {
+  const formatCFA = (amount: number) => {
+    return new Intl.NumberFormat("fr-FR", {
       style: "currency",
-      currency: "GHS",
+      currency: "XOF",
       minimumFractionDigits: 0,
-    }).format(amount);
+    }).format(amount).replace("F CFA", "CFA").replace("FCFA", "CFA");
   };
 
   return (
@@ -35,11 +35,11 @@ export default function StudentFeesStatus() {
       <div className={styles.feeCards}>
         <div className={styles.card}>
           <div className={styles.cardLabel}>Total Billed</div>
-          <div className={styles.cardValue}>{formatGHS(total)}</div>
+          <div className={styles.cardValue}>{formatCFA(total)}</div>
           
           <div className={styles.progressContainer}>
             <div className={styles.progressLabel}>
-              <span>Amount Paid: {formatGHS(paid)}</span>
+              <span>Amount Paid: {formatCFA(paid)}</span>
               <span>{percentagePaid}%</span>
             </div>
             <div className={styles.progressBar}>
@@ -54,7 +54,7 @@ export default function StudentFeesStatus() {
         <div className={styles.card} style={{ borderColor: balance > 0 ? "var(--red)" : "var(--border-light)" }}>
           <div className={styles.cardLabel}>Outstanding Balance</div>
           <div className={styles.cardValue} style={{ color: balance > 0 ? "var(--red)" : "var(--green)" }}>
-            {formatGHS(balance)}
+            {formatCFA(balance)}
           </div>
           
           {balance > 0 ? (
@@ -122,9 +122,9 @@ export default function StudentFeesStatus() {
                     fontSize: "0.85rem",
                   }}
                 >
-                  <span>Total: {formatGHS(item.amount)}</span>
-                  <span>Paid: {formatGHS(item.paid)}</span>
-                  <span>Remaining: {formatGHS(item.remaining)}</span>
+                  <span>Total: {formatCFA(item.amount)}</span>
+                  <span>Paid: {formatCFA(item.paid)}</span>
+                  <span>Remaining: {formatCFA(item.remaining)}</span>
                 </div>
                 {item.amountInWords ? (
                   <div style={{ marginTop: 10, color: "var(--text-secondary)", fontSize: "0.82rem" }}>

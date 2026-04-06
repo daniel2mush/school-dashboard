@@ -2,6 +2,7 @@ import { prisma } from "../clients/prismaClient.js";
 import AppError from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendJson } from "../utils/sendJson.js";
+import { startOfDay, endOfDay } from "date-fns";
 
 // Fetch classes (Year Groups) assigned to this teacher
 export const GetTeacherClasses = asyncHandler(async (req, res) => {
@@ -70,7 +71,7 @@ export const SubmitGrades = asyncHandler(async (req, res) => {
   return sendJson(res, 201, true, "Grade submitted successfully", newGrade);
 });
 
-// Submit attendance for a student
+// Submit attendance for a student (Upsert logic)
 export const SubmitAttendance = asyncHandler(async (req, res) => {
   const { role } = req.user;
   const { studentId, status, date } = req.body;
@@ -83,13 +84,37 @@ export const SubmitAttendance = asyncHandler(async (req, res) => {
     throw new AppError("Missing required fields: studentId, status", 400);
   }
 
-  const newAttendance = await prisma.attendance.create({
-    data: {
+  const attendanceDate = date ? new Date(date) : new Date();
+  
+  // Find if an attendance record already exists for this student on this day
+  const existingAttendance = await prisma.attendance.findFirst({
+    where: {
       studentId: Number(studentId),
-      status: status, // "P", "A", "T", "H"
-      date: date ? new Date(date) : new Date()
-    }
+      date: {
+        gte: startOfDay(attendanceDate),
+        lte: endOfDay(attendanceDate),
+      },
+    },
   });
 
-  return sendJson(res, 201, true, "Attendance marked successfully", newAttendance);
+  let attendance;
+  if (existingAttendance) {
+    attendance = await prisma.attendance.update({
+      where: { id: existingAttendance.id },
+      data: {
+        status: status, // "P", "A", "T", "H"
+        updatedAt: new Date(),
+      },
+    });
+  } else {
+    attendance = await prisma.attendance.create({
+      data: {
+        studentId: Number(studentId),
+        status: status,
+        date: attendanceDate,
+      },
+    });
+  }
+
+  return sendJson(res, 201, true, "Attendance marked successfully", attendance);
 });

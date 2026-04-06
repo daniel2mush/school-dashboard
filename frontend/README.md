@@ -48,7 +48,7 @@ src/
 ├── constants/
 │   └── navigation.js          # Sidebar nav config per role
 ├── data/
-│   └── mockData.js            # All mock data (replace with API)
+│   └── (replaced with API)   # Mock data removed as requested
 ├── components/
 │   ├── Sidebar.jsx            # Role-aware sidebar
 │   ├── RoleSwitcher.jsx       # Dev preview bar (remove in production)
@@ -68,13 +68,12 @@ src/
 
 ## Connecting to a Real Backend
 
-All mock data is in `src/data/mockData.js`. Replace each export with an API call.
+Mock data has been removed. All data is now expected to be fetched from the API.
 
 ### Example with React Query:
 
 ```jsx
-// Before (mock):
-import { STUDENTS } from "../data/mockData";
+// Removed mockData import
 
 // After (real API):
 import { useQuery } from "@tanstack/react-query";
@@ -142,7 +141,7 @@ export default function App() {
 
 | What | Where |
 |---|---|
-| School name / term | `src/data/mockData.js` → `SCHOOL` |
+| School name / term | `SchoolDataProvider.tsx` → `SCHOOL` |
 | Year group labels (Form 1, Grade 1, etc.) | `YEAR_GROUPS[].name` |
 | Colour palette | `src/styles/globals.css` → `:root` |
 | Currency | `SCHOOL.currency` (currently `GHS`) |

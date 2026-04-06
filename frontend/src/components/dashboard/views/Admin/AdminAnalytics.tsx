@@ -196,7 +196,7 @@ export default function AdminAnalytics() {
             <h3 className={styles.chartTitle}>School Fees Revenue</h3>
             <p className={styles.chartSub}>Collected vs Outstanding Fees</p>
           </div>
-          <div className={styles.chartContent}>
+          <div className={styles.chartContent} style={{ minWidth: 0 }}>
             <ResponsiveContainer width="100%" height={250}>
               <BarChart data={revenueData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
@@ -231,7 +231,7 @@ export default function AdminAnalytics() {
             <h3 className={styles.chartTitle}>Payment Status Distribution</h3>
             <p className={styles.chartSub}>Breakdown of fee item settlements</p>
           </div>
-          <div className={styles.chartContent}>
+          <div className={styles.chartContent} style={{ minWidth: 0 }}>
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
@@ -259,7 +259,7 @@ export default function AdminAnalytics() {
             <h3 className={styles.chartTitle}>Attendance by Cohort</h3>
             <p className={styles.chartSub}>Presence rate per year group</p>
           </div>
-          <div className={styles.chartContent}>
+          <div className={styles.chartContent} style={{ minWidth: 0 }}>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={attendanceByCohort} layout="vertical" margin={{ left: 40, right: 40 }}>
                 <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border-light)" />

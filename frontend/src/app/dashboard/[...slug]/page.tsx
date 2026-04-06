@@ -2,12 +2,13 @@
 
 import DashboardHeader from "@/components/dashboard/DashboardHeader/DashboardHeader";
 import Sidebar from "@/components/dashboard/Sidebar/Sidebar";
-import { getSectionLabel } from "@/constants/navigation";
+import { getDashboardHref, getSectionLabel } from "@/constants/navigation";
 import useUserStore from "@/store/UserStore";
 import { useTheme } from "next-themes";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import styles from "./Dashboard.module.scss";
 import Loading from "@/components/Loading/Loading";
+import { useEffect } from "react";
 import { User } from "@/types/Types";
 import {
   AdminAnalytics,
@@ -68,6 +69,7 @@ const VIEW_MAP: Record<User["role"], Record<string, React.ReactNode>> = {
 export default function DashboardRolePage() {
   const userStore = useUserStore();
   const pathName = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
 
   const isDark = theme === "dark";
@@ -76,9 +78,21 @@ export default function DashboardRolePage() {
 
   const { user } = userStore;
 
-  async function logout() {}
+  useEffect(() => {
+    if (user && !sectionPath) {
+      router.replace(getDashboardHref(user.role));
+    } else if (!user) {
+      router.replace("/login");
+    }
+  }, [user, sectionPath, router]);
 
-  if (!user) {
+  async function logout() {
+    userStore.clearUser();
+    // Use window.location to force a full reload and clear any state
+    window.location.href = "/login";
+  }
+
+  if (!user || !sectionPath) {
     return <Loading />;
   }
   return (

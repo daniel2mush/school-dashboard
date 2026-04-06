@@ -1,5 +1,5 @@
 // import { useSchoolData } from "../../providers/SchoolDataProvider";
-// import { PERIODS, SUBJECT_COLORS, gradeColor, scoreLetter } from "../../data/mockData";
+// Removed mockData import as requested.
 // import { Badge, Card, CardHeader, GradeRing, MetricCard, PageHeader, ProgressBar } from "../../components/ui";
 // import useUserStore from "@/store/UserStore";
 
@@ -64,7 +64,7 @@
 //       <div className="metrics-grid" style={{ gridTemplateColumns: "repeat(4, minmax(0,1fr))" }}>
 //         <MetricCard label="Year group" value={yearGroup.name} sub={yearGroup.level} />
 //         <MetricCard label="Attendance" value={`${student.att}%`} sub="This term" valueColor="var(--green)" />
-//         <MetricCard label="Fees paid" value={`${feePct}%`} sub={`GHS ${student.fees.paid.toLocaleString()} of ${student.fees.total.toLocaleString()}`} />
+//         <MetricCard label="Fees paid" value={`${feePct}%`} sub={`CFA ${student.fees.paid.toLocaleString()} of ${student.fees.total.toLocaleString()}`} />
 //         <MetricCard label="Best subject" value={strongestSubject?.subject || "Waiting"} sub={strongestSubject ? `${strongestSubject.score}%` : "No grades yet"} valueColor="var(--accent)" />
 //       </div>
 
@@ -337,8 +337,8 @@
 //               <div className="fee-fill" style={{ width: `${pct}%`, background: pct >= 100 ? "var(--green)" : "var(--accent)" }} />
 //             </div>
 //             <div style={{ display: "flex", justifyContent: "space-between", fontSize: 10, color: "var(--text-secondary)", marginTop: 4 }}>
-//               <span>GHS {student.fees.paid.toLocaleString()} paid</span>
-//               <span>GHS {student.fees.total.toLocaleString()} total</span>
+//               <span>CFA {student.fees.paid.toLocaleString()} paid</span>
+//               <span>CFA {student.fees.total.toLocaleString()} total</span>
 //             </div>
 //           </div>
 //         </div>

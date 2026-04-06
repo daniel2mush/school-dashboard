@@ -14,12 +14,12 @@ import { Badge, Input } from "@/components/ui";
 import { Banknote, CheckCircle2, CreditCard, Plus, Receipt, Trash2, Users } from "lucide-react";
 import { useMemo, useState } from "react";
 
-function formatGHS(amount: number) {
-  return new Intl.NumberFormat("en-GH", {
+function formatCFA(amount: number) {
+  return new Intl.NumberFormat("fr-FR", {
     style: "currency",
-    currency: "GHS",
+    currency: "XOF",
     minimumFractionDigits: 0,
-  }).format(amount);
+  }).format(amount).replace("F CFA", "CFA").replace("FCFA", "CFA");
 }
 
 function FeePaymentModal({
@@ -73,7 +73,7 @@ function FeePaymentModal({
             <div className={styles.modalEyebrow}>Payment Ledger</div>
             <h3 className={styles.modalTitle}>{fee.title}</h3>
             <p className={styles.modalSubtitle}>
-              {yearGroup.name} · {formatGHS(fee.amount)} per student
+              {yearGroup.name} · {formatCFA(fee.amount)} per student
             </p>
           </div>
           <button type="button" className={styles.modalClose} onClick={onClose}>
@@ -103,9 +103,9 @@ function FeePaymentModal({
                   </div>
 
                   <div className={styles.paymentSummary}>
-                    <span>Billed {formatGHS(fee.amount)}</span>
-                    <span>Paid {formatGHS(amountPaid)}</span>
-                    <span>Remaining {formatGHS(remaining)}</span>
+                    <span>Billed {formatCFA(fee.amount)}</span>
+                    <span>Paid {formatCFA(amountPaid)}</span>
+                    <span>Remaining {formatCFA(remaining)}</span>
                   </div>
 
                   <div className={styles.paymentGrid}>
@@ -136,7 +136,7 @@ function FeePaymentModal({
                           },
                         }))
                       }
-                      placeholder="Twenty thousand Ghana cedis"
+                      placeholder="Twenty thousand CFA"
                       fullWidth
                     />
                   </div>
@@ -205,17 +205,17 @@ export default function AdminFees() {
     return [
       {
         label: "Expected Revenue",
-        value: formatGHS(analytics.totalExpectedRevenue),
+        value: formatCFA(analytics.totalExpectedRevenue),
         icon: <Receipt size={18} strokeWidth={2} />,
       },
       {
         label: "Collected Revenue",
-        value: formatGHS(analytics.totalCollectedRevenue),
+        value: formatCFA(analytics.totalCollectedRevenue),
         icon: <Banknote size={18} strokeWidth={2} />,
       },
       {
         label: "Outstanding",
-        value: formatGHS(
+        value: formatCFA(
           Math.max(analytics.totalExpectedRevenue - analytics.totalCollectedRevenue, 0),
         ),
         icon: <CreditCard size={18} strokeWidth={2} />,
@@ -312,8 +312,8 @@ export default function AdminFees() {
                     {yearGroup.students.length} students · {yearGroup.fees.length} charges
                   </div>
                   <div className={styles.yearGroupValues}>
-                    <span>Expected {formatGHS(expected)}</span>
-                    <span>Collected {formatGHS(collected)}</span>
+                    <span>Expected {formatCFA(expected)}</span>
+                    <span>Collected {formatCFA(collected)}</span>
                   </div>
                 </button>
               );
@@ -418,15 +418,15 @@ export default function AdminFees() {
                           <div className={styles.feeMetrics}>
                             <div>
                               <span>Per student</span>
-                              <strong>{formatGHS(fee.amount)}</strong>
+                              <strong>{formatCFA(fee.amount)}</strong>
                             </div>
                             <div>
                               <span>Collected</span>
-                              <strong>{formatGHS(totalCollected)}</strong>
+                              <strong>{formatCFA(totalCollected)}</strong>
                             </div>
                             <div>
                               <span>Expected total</span>
-                              <strong>{formatGHS(expectedTotal)}</strong>
+                              <strong>{formatCFA(expectedTotal)}</strong>
                             </div>
                             <div>
                               <span>Fully paid students</span>

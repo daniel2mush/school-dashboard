@@ -1,9 +1,10 @@
 import useUserStore from "@/store/UserStore";
 import { Announcement, LoginResponse, User, UserResponse } from "@/types/Types";
 import { LoginFormData } from "@/validation/authValidation";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { getDashboardHref } from "@/constants/navigation";
 
 export const useLoginUser = () => {
   const router = useRouter();
@@ -42,9 +43,10 @@ export const useLoginUser = () => {
       }
 
       const { data: userData } = responseData as UserResponse;
+      const redirectPath = getDashboardHref(userData.role);
 
       setUser(userData);
-      router.push("/dashboard/");
+      router.push(redirectPath);
     },
 
     onError: (data) => {
@@ -85,3 +87,38 @@ export const useGetAnnouncements = () => {
 //     },
 //   });
 // };
+
+
+export const useLogout = () => {
+  const router = useRouter();
+  const { clearUser,user } = useUserStore();
+
+
+
+  return useMutation({
+    mutationKey : ['logout'],
+    mutationFn: async () => {
+      const res = await fetch(`/api/user/${user!.id}`, {method: 'DELETE'});
+
+      const responseData = await res.json();
+
+      if(!res.ok)  return  toast.error("Logout unsuccessful");
+
+      return responseData.data
+
+    },
+    onSuccess : ()=>{
+      clearUser();
+      router.push("/login");
+      toast.success("Logout successful");
+      router.replace('/login')
+  }
+  })
+
+}
+
+
+
+
+
+

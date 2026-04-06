@@ -1,7 +1,7 @@
 .sidebar {
   width: 292px;
   min-width: 292px;
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -13,6 +13,7 @@
   box-shadow: 14px 0 30px rgba(15, 23, 42, 0.04);
   position: sticky;
   top: 0;
+  overflow: hidden;
 }
 
 .brandCard {
@@ -54,6 +55,20 @@
   flex-direction: column;
   gap: 6px;
   min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px; /* Space for scrollbar if needed */
+
+  /* Scrollbar styles for better UI */
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 10px;
+  }
 }
 
 .sectionLabel {
@@ -115,6 +130,7 @@
   .sidebar {
     width: 100%;
     min-width: 0;
+    height: auto;
     min-height: auto;
     position: static;
     box-shadow: none;

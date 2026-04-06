@@ -2,20 +2,34 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import {
-  ANNOUNCEMENTS,
-  ATTENDANCE,
-  GRADES,
-  PERIODS,
-  PUBLICATIONS,
-  SCHOOL,
-  STUDENTS,
-  SUBJECT_COLORS,
-  TEACHERS,
-  TIMETABLE,
-  YEAR_GROUPS,
-  scoreLetter,
-} from "../data/mockData";
+const ANNOUNCEMENTS = [];
+const ATTENDANCE = {};
+const GRADES = {};
+const PERIODS = [
+  { id: 1, name: "Period 1", start: "08:00", end: "09:00", isBreak: false },
+  { id: 2, name: "Period 2", start: "09:00", end: "10:00", isBreak: false },
+  { id: 3, name: "Break", start: "10:00", end: "10:30", isBreak: true },
+  { id: 4, name: "Period 3", start: "10:30", end: "11:30", isBreak: false },
+  { id: 5, name: "Period 4", start: "11:30", end: "12:30", isBreak: false },
+];
+const PUBLICATIONS = [];
+const SCHOOL = {
+  name: "Sunridge International School",
+  term: "Michaelmas Term 2025",
+  logo: "/logo.svg",
+};
+const STUDENTS = [];
+const SUBJECT_COLORS = {};
+const TEACHERS = [];
+const TIMETABLE = {};
+const YEAR_GROUPS = [];
+const scoreLetter = (score) => {
+  if (score >= 80) return "A";
+  if (score >= 70) return "B";
+  if (score >= 60) return "C";
+  if (score >= 50) return "D";
+  return "F";
+};
 
 const STORAGE_KEY = "sunridge-school-data";
 

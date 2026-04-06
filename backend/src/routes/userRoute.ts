@@ -1,10 +1,12 @@
 import express from "express";
 import { GetUserProfile, GetAnnouncements } from "../controllers/userController.js";
 import { AuthenticateRequest } from "../middleware/authenticate.js";
+import {Logout} from "../controllers/authControllers.js";
 
 const router = express.Router();
 
 router.get("/announcements", AuthenticateRequest, GetAnnouncements);
 router.get("/:id", AuthenticateRequest, GetUserProfile);
+router.delete("/:id", AuthenticateRequest, Logout)
 
 export default router;

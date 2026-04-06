@@ -19,7 +19,7 @@ import {
   PERIOD_OPTIONS,
 } from "../../providers/SchoolDataProvider";
 
-function formatMoney(amount, currency = "GHS") {
+function formatMoney(amount, currency = "CFA") {
   return `${currency} ${Number(amount || 0).toLocaleString()}`;
 }
 

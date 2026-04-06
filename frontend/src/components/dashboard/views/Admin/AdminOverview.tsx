@@ -63,12 +63,12 @@ const YG_ACCENTS = [
   },
 ];
 
-function formatGHS(amount: number) {
-  return new Intl.NumberFormat("en-GH", {
+function formatCFA(amount: number) {
+  return new Intl.NumberFormat("fr-FR", {
     style: "currency",
-    currency: "GHS",
+    currency: "XOF",
     minimumFractionDigits: 0,
-  }).format(amount);
+  }).format(amount).replace("F CFA", "CFA").replace("FCFA", "CFA");
 }
 
 function targetLabel(ann: Announcement) {
@@ -155,7 +155,7 @@ export default function AdminOverview() {
         )
       : 0;
 
-  const outstandingGHS = Math.max(
+  const outstandingCFA = Math.max(
     0,
     analytics.totalExpectedRevenue - analytics.totalCollectedRevenue,
   );
@@ -197,7 +197,7 @@ export default function AdminOverview() {
   // Prepare chart data
   const revenueData = [
     { name: 'Collected', value: analytics.totalCollectedRevenue, fill: '#10b981' },
-    { name: 'Outstanding', value: outstandingGHS, fill: '#f59e0b' }
+    { name: 'Outstanding', value: outstandingCFA, fill: '#f59e0b' }
   ];
 
   const enrollmentData = structure?.map(yg => ({
@@ -302,12 +302,12 @@ export default function AdminOverview() {
         <article className={styles.insight}>
           <div className={styles.insightLabel}>Fee collection</div>
           <div className={styles.insightValue}>
-            {feeCollectionPct}% · {formatGHS(analytics.totalCollectedRevenue)}{" "}
+            {feeCollectionPct}% · {formatCFA(analytics.totalCollectedRevenue)}{" "}
             received
           </div>
           <p className={styles.insightSub}>
             {analytics.totalExpectedRevenue > 0
-              ? `${formatGHS(outstandingGHS)} still outstanding against expected term fees.`
+              ? `${formatCFA(outstandingCFA)} still outstanding against expected term fees.`
               : "No fee records yet — add amounts under Fee Management."}
           </p>
           <div className={styles.insightBar}>
@@ -353,11 +353,60 @@ export default function AdminOverview() {
         </article>
       </div>
 
+      <div className={styles.statsGrid}>
+        <StatTile
+            icon={Layers}
+            iconClass={styles.iconIndigo}
+            label="Year groups"
+            value={analytics.yearGroups}
+            sub="Configured levels"
+        />
+        <StatTile
+            icon={Users}
+            iconClass={styles.iconEmerald}
+            label="Students"
+            value={analytics.students}
+            sub="Active accounts"
+        />
+        <StatTile
+            icon={GraduationCap}
+            iconClass={styles.iconViolet}
+            label="Teaching staff"
+            value={analytics.teachers}
+            sub="Active teachers"
+        />
+        <StatTile
+            icon={Banknote}
+            iconClass={styles.iconAmber}
+            label="Fees collected"
+            value={`${feeCollectionPct}%`}
+            sub={`${formatCFA(analytics.totalCollectedRevenue)} of ${formatCFA(analytics.totalExpectedRevenue)}`}
+            valueColor={feeCollectionPct >= 80 ? "var(--green)" : "var(--amber)"}
+        />
+        <StatTile
+            icon={UserCheck}
+            iconClass={styles.iconSky}
+            label="Attendance"
+            value={
+              analytics.attendancePresentPct === null
+                  ? "—"
+                  : `${analytics.attendancePresentPct}%`
+            }
+            sub={
+              analytics.attendancePresentPct === null
+                  ? "Awaiting data"
+                  : "Present ÷ (P+A+T)"
+            }
+            valueColor="var(--accent)"
+        />
+      </div>
+
+
       <div className={styles.overviewCharts}>
         <Card>
           <CardHeader title="Revenue Overview" />
-          <div style={{ height: 250, padding: '1rem' }}>
-            <ResponsiveContainer width="100%" height="100%">
+          <div style={{ height: 250, padding: '1rem', minWidth: 0 }}>
+            <ResponsiveContainer width="100%" height={250}>
               <PieChart>
                 <Pie
                   data={revenueData}
@@ -373,7 +422,7 @@ export default function AdminOverview() {
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number) => formatGHS(value)}
+                    formatter={(value: number) => formatCFA(value)}
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                 />
                 <Legend verticalAlign="bottom" height={36}/>
@@ -384,8 +433,8 @@ export default function AdminOverview() {
 
         <Card>
           <CardHeader title="Enrollment by Year Group" />
-          <div style={{ height: 250, padding: '1rem' }}>
-            <ResponsiveContainer width="100%" height="100%">
+          <div style={{ height: 250, padding: '1rem', minWidth: 0 }}>
+            <ResponsiveContainer width="100%" height={250}>
               <BarChart data={enrollmentData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
                 <XAxis 
@@ -410,53 +459,7 @@ export default function AdminOverview() {
         </Card>
       </div>
 
-      <div className={styles.statsGrid}>
-        <StatTile
-          icon={Layers}
-          iconClass={styles.iconIndigo}
-          label="Year groups"
-          value={analytics.yearGroups}
-          sub="Configured levels"
-        />
-        <StatTile
-          icon={Users}
-          iconClass={styles.iconEmerald}
-          label="Students"
-          value={analytics.students}
-          sub="Active accounts"
-        />
-        <StatTile
-          icon={GraduationCap}
-          iconClass={styles.iconViolet}
-          label="Teaching staff"
-          value={analytics.teachers}
-          sub="Active teachers"
-        />
-        <StatTile
-          icon={Banknote}
-          iconClass={styles.iconAmber}
-          label="Fees collected"
-          value={`${feeCollectionPct}%`}
-          sub={`${formatGHS(analytics.totalCollectedRevenue)} of ${formatGHS(analytics.totalExpectedRevenue)}`}
-          valueColor={feeCollectionPct >= 80 ? "var(--green)" : "var(--amber)"}
-        />
-        <StatTile
-          icon={UserCheck}
-          iconClass={styles.iconSky}
-          label="Attendance"
-          value={
-            analytics.attendancePresentPct === null
-              ? "—"
-              : `${analytics.attendancePresentPct}%`
-          }
-          sub={
-            analytics.attendancePresentPct === null
-              ? "Awaiting data"
-              : "Present ÷ (P+A+T)"
-          }
-          valueColor="var(--accent)"
-        />
-      </div>
+
 
       <div className={styles.mainGrid}>
         <Card style={{ marginBottom: 0 }}>

@@ -6,6 +6,8 @@ import styles from "./DashboardHeader.module.scss";
 import { User } from "@/types/Types";
 import { DropdownMenu } from "radix-ui";
 import { LogOut, MoonStar, SunMedium } from "lucide-react";
+import {useLogout} from "@/query/AuthQuery";
+import {useCreateAnnouncement} from "@/query/AdminQuery";
 
 type DashboardHeaderProps = {
   role: User["role"];
@@ -30,6 +32,13 @@ export default function DashboardHeader({
   onToggleTheme,
   onLogout,
 }: DashboardHeaderProps) {
+
+  const { mutateAsync:logout} = useLogout()
+
+
+  const logoutUser =  async ()=>{
+    await logout()
+  }
   return (
     <header className={styles.header}>
       <div className={styles.titleBlock}>
@@ -53,7 +62,7 @@ export default function DashboardHeader({
           <span>{isDark ? "Light mode" : "Dark mode"}</span>
         </Button>
 
-        <DropdownMenu.Root>
+        <DropdownMenu.Root >
           <DropdownMenu.Trigger asChild>
             <button
               type="button"
@@ -78,7 +87,7 @@ export default function DashboardHeader({
                 <div className={styles.menuEmail}>{user.email}</div>
               </div>
               <DropdownMenu.Separator className={styles.menuSeparator} />
-              <DropdownMenu.Item className={styles.menuItem} onClick={onLogout}>
+              <DropdownMenu.Item className={styles.menuItem} onClick={logoutUser}>
                 <LogOut size={16} />
                 <span>Sign out</span>
               </DropdownMenu.Item>

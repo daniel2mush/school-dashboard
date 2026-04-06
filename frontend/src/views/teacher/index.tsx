@@ -1,7 +1,7 @@
 // import { useState } from "react";
 // import { useAuth } from "../../providers/AuthProvider";
 // import { useSchoolData } from "../../providers/SchoolDataProvider";
-// import { gradeColor, scoreLetter } from "../../data/mockData";
+// Removed mockData import as requested.
 // import { AttBadge, Badge, Card, CardHeader, MetricCard, PageHeader, ProgressBar, Toggle, AnnouncementItem, UserRow } from "../../components/ui";
 
 // function useCurrentTeacher() {
