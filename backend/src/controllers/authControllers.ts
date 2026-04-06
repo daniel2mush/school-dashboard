@@ -109,7 +109,11 @@ const studentInclude = {
   enrolledYearGroup: {
     include: {
       subjects: true,
-      fees: true,
+      fees: {
+        include: {
+          payments: true,
+        },
+      },
     },
   },
   grades: {
@@ -126,7 +130,7 @@ const studentInclude = {
     take: 30,
     orderBy: { date: "desc" as const },
   },
-};
+} as any;
 
 export const Login = asyncHandler(async (req, res) => {
   const { success, data, error } = ValidateLogin(req.body);

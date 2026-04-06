@@ -9,7 +9,7 @@ import {
 import { useGetAnnouncements } from "@/query/AuthQuery";
 import type { Announcement } from "@/types/Types";
 import { useRouter } from "next/navigation";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   AlertTriangle,
@@ -26,16 +26,38 @@ import {
   Users,
 } from "lucide-react";
 
-const YG_BAR_PALETTE = [
-  "var(--y1)",
-  "var(--y2)",
-  "var(--y3)",
-  "var(--y4)",
-  "var(--y5)",
-  "var(--y6)",
+const YG_ACCENTS = [
+  {
+    top: "linear-gradient(180deg, #0f766e, #14b8a6)",
+    surface: "rgba(20, 184, 166, 0.12)",
+    text: "#0f766e",
+  },
+  {
+    top: "linear-gradient(180deg, #b45309, #f59e0b)",
+    surface: "rgba(245, 158, 11, 0.14)",
+    text: "#b45309",
+  },
+  {
+    top: "linear-gradient(180deg, #7c3aed, #a78bfa)",
+    surface: "rgba(167, 139, 250, 0.16)",
+    text: "#6d28d9",
+  },
+  {
+    top: "linear-gradient(180deg, #be123c, #fb7185)",
+    surface: "rgba(251, 113, 133, 0.14)",
+    text: "#be123c",
+  },
+  {
+    top: "linear-gradient(180deg, #1d4ed8, #60a5fa)",
+    surface: "rgba(96, 165, 250, 0.16)",
+    text: "#1d4ed8",
+  },
+  {
+    top: "linear-gradient(180deg, #166534, #4ade80)",
+    surface: "rgba(74, 222, 128, 0.14)",
+    text: "#166534",
+  },
 ];
-
-const CAPACITY_REF = 50;
 
 function formatGHS(amount: number) {
   return new Intl.NumberFormat("en-GH", {
@@ -392,16 +414,30 @@ export default function AdminOverview() {
               {structure.map((yearGroup, index) => {
                 const studentCount = yearGroup._count.students;
                 const teacherCount = yearGroup._count.teachers;
-                const barColor = YG_BAR_PALETTE[index % YG_BAR_PALETTE.length];
-                const capacityPct = Math.min(
-                  100,
-                  Math.round((studentCount / CAPACITY_REF) * 100),
-                );
+                const accent =
+                  YG_ACCENTS[(yearGroup.id + index) % YG_ACCENTS.length];
+                const capacityValue = yearGroup.capacity;
+                const capacityPct =
+                  capacityValue && capacityValue > 0
+                    ? Math.min(
+                        100,
+                        Math.round((studentCount / capacityValue) * 100),
+                      )
+                    : null;
                 return (
-                  <div key={yearGroup.id} className={styles.ygRow}>
+                  <div
+                    key={yearGroup.id}
+                    className={styles.ygRow}
+                    style={
+                      {
+                        "--yg-accent-bar": accent.top,
+                        "--yg-accent-surface": accent.surface,
+                        "--yg-accent-text": accent.text,
+                      } as CSSProperties
+                    }
+                  >
                     <div
                       className={styles.ygAccent}
-                      style={{ background: barColor }}
                       aria-hidden
                     />
                     <div className={styles.ygMain}>
@@ -427,15 +463,33 @@ export default function AdminOverview() {
                         </span>
                       </div>
                       <div className={styles.ygProgressLabel}>
-                        <span>Capacity vs {CAPACITY_REF} students</span>
-                        <span>{capacityPct}%</span>
+                        <span>
+                          {capacityValue
+                            ? `Capacity vs ${capacityValue} students`
+                            : "Capacity not set"}
+                        </span>
+                        <span>
+                          {capacityPct !== null ? `${capacityPct}%` : "—"}
+                        </span>
                       </div>
-                      <ProgressBar
-                        pct={capacityPct}
-                        color={barColor}
-                        height={5}
-                        style={{ marginTop: 6 }}
-                      />
+                      {capacityPct !== null ? (
+                        <ProgressBar
+                          pct={capacityPct}
+                          color={accent.text}
+                          height={5}
+                          style={{ marginTop: 6 }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            marginTop: 6,
+                            fontSize: 11,
+                            color: "var(--text-tertiary)",
+                          }}
+                        >
+                          Set a class capacity in Year Groups to track seat usage.
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

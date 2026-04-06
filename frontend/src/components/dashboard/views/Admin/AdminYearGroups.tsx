@@ -5,13 +5,15 @@ import { useGetSchoolStructure, useGetAllUsers } from "@/query/AdminQuery";
 import { Badge } from "@/components/ui";
 import {
   CreateYearGroupModal,
+  EditYearGroupModal,
   TeacherRosterModal,
   MoveStudentModal,
+  YearGroupSubjectsModal,
 } from "./AdminYearGroupsModals";
 import {
-  BookText,
   BookOpen,
   DoorOpen,
+  Edit,
   GraduationCap,
   LayoutGrid,
   MoreHorizontal,
@@ -19,20 +21,54 @@ import {
   Users,
   UserRoundPlus,
 } from "lucide-react";
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 
 function formatLevel(level: string) {
   return level.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
+
+const CARD_ACCENTS = [
+  {
+    top: "linear-gradient(90deg, #0f766e, #14b8a6)",
+    surface: "rgba(20, 184, 166, 0.12)",
+    text: "#0f766e",
+  },
+  {
+    top: "linear-gradient(90deg, #b45309, #f59e0b)",
+    surface: "rgba(245, 158, 11, 0.14)",
+    text: "#b45309",
+  },
+  {
+    top: "linear-gradient(90deg, #7c3aed, #a78bfa)",
+    surface: "rgba(167, 139, 250, 0.16)",
+    text: "#6d28d9",
+  },
+  {
+    top: "linear-gradient(90deg, #be123c, #fb7185)",
+    surface: "rgba(251, 113, 133, 0.14)",
+    text: "#be123c",
+  },
+  {
+    top: "linear-gradient(90deg, #1d4ed8, #60a5fa)",
+    surface: "rgba(96, 165, 250, 0.16)",
+    text: "#1d4ed8",
+  },
+  {
+    top: "linear-gradient(90deg, #166534, #4ade80)",
+    surface: "rgba(74, 222, 128, 0.14)",
+    text: "#166534",
+  },
+];
 
 export default function AdminYearGroups() {
   const { data: yearGroups, isLoading } = useGetSchoolStructure();
   const { data: allUsers, isLoading: usersLoading } = useGetAllUsers();
 
   const [createOpen, setCreateOpen] = useState(false);
+  const [editForId, setEditForId] = useState<number | null>(null);
   const [rosterForId, setRosterForId] = useState<number | null>(null);
   const [moveForId, setMoveForId] = useState<number | null>(null);
+  const [subjectsForId, setSubjectsForId] = useState<number | null>(null);
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -49,6 +85,14 @@ export default function AdminYearGroups() {
   const moveYearGroup =
     moveForId != null && yearGroups
       ? yearGroups.find((y) => y.id === moveForId)
+      : undefined;
+  const subjectYearGroup =
+    subjectsForId != null && yearGroups
+      ? yearGroups.find((y) => y.id === subjectsForId)
+      : undefined;
+  const editingYearGroup =
+    editForId != null && yearGroups
+      ? yearGroups.find((y) => y.id === editForId)
       : undefined;
 
   if (isLoading || usersLoading || !yearGroups || !allUsers) {
@@ -111,8 +155,21 @@ export default function AdminYearGroups() {
         </div>
       ) : (
         <div className={styles.grid}>
-          {yearGroups.map((yg) => (
-            <article key={yg.id} className={styles.card}>
+          {yearGroups.map((yg, index) => {
+            const accent = CARD_ACCENTS[(yg.id + index) % CARD_ACCENTS.length];
+
+            return (
+            <article
+              key={yg.id}
+              className={styles.card}
+              style={
+                {
+                  "--card-accent-bar": accent.top,
+                  "--card-accent-surface": accent.surface,
+                  "--card-accent-text": accent.text,
+                } as CSSProperties
+              }
+            >
               <div className={styles.cardTopBar} aria-hidden />
               <div className={styles.cardHeader}>
                 <div className={styles.cardTitleBlock}>
@@ -164,12 +221,36 @@ export default function AdminYearGroups() {
                         role="menuitem"
                         className={styles.dropdownItem}
                         onClick={() => {
+                          setEditForId(yg.id);
+                          setMenuOpenId(null);
+                        }}
+                      >
+                        <Edit size={15} strokeWidth={2} />
+                        Edit details
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className={styles.dropdownItem}
+                        onClick={() => {
                           setRosterForId(yg.id);
                           setMenuOpenId(null);
                         }}
                       >
                         <UserRoundPlus size={15} strokeWidth={2} />
                         Assign teachers
+                      </button>
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className={styles.dropdownItem}
+                        onClick={() => {
+                          setSubjectsForId(yg.id);
+                          setMenuOpenId(null);
+                        }}
+                      >
+                        <BookOpen size={15} strokeWidth={2} />
+                        Manage subjects
                       </button>
                       <button
                         type="button"
@@ -269,40 +350,20 @@ export default function AdminYearGroups() {
                   </p>
                 )}
               </div>
-
-              <div className={styles.cardActions}>
-                <button
-                  type="button"
-                  className={`btn ${styles.actionBtn}`}
-                  onClick={() => setRosterForId(yg.id)}
-                >
-                  <UserRoundPlus size={15} strokeWidth={2} />
-                  Assign teachers
-                </button>
-                <button
-                  type="button"
-                  className={`btn ${styles.actionBtn}`}
-                  onClick={() => setMoveForId(yg.id)}
-                >
-                  <Users size={15} strokeWidth={2} />
-                  Move student
-                </button>
-                <Link
-                  href="/dashboard/curriculum"
-                  className={`btn ${styles.actionBtn}`}
-                  onClick={() => setMenuOpenId(null)}
-                >
-                  <BookText size={15} strokeWidth={2} />
-                  Manage subjects
-                </Link>
-              </div>
             </article>
-          ))}
+          )})}
         </div>
       )}
 
       {createOpen ? (
         <CreateYearGroupModal onClose={() => setCreateOpen(false)} />
+      ) : null}
+      {editingYearGroup ? (
+        <EditYearGroupModal
+          key={editingYearGroup.id}
+          yearGroup={editingYearGroup}
+          onClose={() => setEditForId(null)}
+        />
       ) : null}
       {rosterYearGroup ? (
         <TeacherRosterModal
@@ -319,6 +380,13 @@ export default function AdminYearGroups() {
           allYearGroups={yearGroups}
           allUsers={allUsers}
           onClose={() => setMoveForId(null)}
+        />
+      ) : null}
+      {subjectYearGroup ? (
+        <YearGroupSubjectsModal
+          key={subjectYearGroup.id}
+          yearGroup={subjectYearGroup}
+          onClose={() => setSubjectsForId(null)}
         />
       ) : null}
     </section>

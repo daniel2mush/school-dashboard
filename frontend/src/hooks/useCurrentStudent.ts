@@ -28,7 +28,26 @@ export default function useCurrentStudent() {
     subjects: hasRealData ? yearGroupMapping.subjects?.map(s => s.name) || [] : [],
   };
 
-  const studentFees = hasRealData && yearGroupMapping.fees && yearGroupMapping.fees.length > 0 ? yearGroupMapping.fees[0] : { amount: 0, paid: 0 };
+  const feeItems =
+    hasRealData && yearGroupMapping.fees
+      ? yearGroupMapping.fees.map((fee) => {
+          const payment = fee.payments?.find((entry) => entry.studentId === user.id);
+          const paid = payment?.amountPaid || 0;
+          return {
+            id: fee.id,
+            title: fee.title,
+            description: fee.description || "",
+            amount: fee.amount,
+            paid,
+            remaining: Math.max(fee.amount - paid, 0),
+            amountInWords: payment?.amountInWords || "",
+            isFullyPaid: payment?.isFullyPaid || paid >= fee.amount,
+          };
+        })
+      : [];
+
+  const totalFees = feeItems.reduce((sum, fee) => sum + fee.amount, 0);
+  const totalPaid = feeItems.reduce((sum, fee) => sum + fee.paid, 0);
   
   const attendanceCount = user.attendance?.length || 0;
   const presentCount = user.attendance?.filter(a => a.status === 'P').length || 0;
@@ -38,9 +57,10 @@ export default function useCurrentStudent() {
     year: yearGroup.id,
     att: attendanceCount > 0 ? Math.round((presentCount / attendanceCount) * 100) : 0,
     fees: {
-      total: studentFees.amount,
-      paid: studentFees.paid
-    }
+      total: totalFees,
+      paid: totalPaid,
+      items: feeItems,
+    },
   };
 
   const studentGrades = user.grades?.map(g => ({
@@ -98,4 +118,3 @@ export default function useCurrentStudent() {
     subjects: yearGroup.subjects,
   };
 }
-

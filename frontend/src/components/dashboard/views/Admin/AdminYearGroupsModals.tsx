@@ -2,13 +2,18 @@
 
 import {
   useCreateYearGroup,
+  useUpdateYearGroup,
   useAssignTeacherToYearGroup,
   useUnassignTeacherFromYearGroup,
   useMoveStudentYearGroup,
+  useGetSubjects,
+  useAssignSubjectToYearGroup,
+  useUnassignSubjectFromYearGroup,
   type AdminYearGroupStructure,
 } from "@/query/AdminQuery";
 import type { User } from "@/types/Types";
 import { useEffect, useId, useState, type ReactNode } from "react";
+import { Input } from "@/components/ui";
 import styles from "./AdminYearGroups.module.scss";
 
 export const YEAR_LEVEL_OPTIONS = [
@@ -84,9 +89,20 @@ function BaseModal({
 
 export function CreateYearGroupModal({ onClose }: { onClose: () => void }) {
   const { mutate, isPending } = useCreateYearGroup();
+  const { data: subjects = [], isLoading: subjectsLoading } = useGetSubjects();
   const [name, setName] = useState("");
   const [level, setLevel] = useState<string>(YEAR_LEVEL_OPTIONS[0].value);
   const [roomNumber, setRoomNumber] = useState("");
+  const [capacity, setCapacity] = useState("");
+  const [selectedSubjectIds, setSelectedSubjectIds] = useState<number[]>([]);
+
+  const toggleSubject = (subjectId: number) => {
+    setSelectedSubjectIds((prev) =>
+      prev.includes(subjectId)
+        ? prev.filter((id) => id !== subjectId)
+        : [...prev, subjectId],
+    );
+  };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -96,6 +112,8 @@ export function CreateYearGroupModal({ onClose }: { onClose: () => void }) {
         name: name.trim(),
         level,
         roomNumber: roomNumber.trim() || undefined,
+        capacity: capacity.trim() ? Number(capacity) : null,
+        subjectIds: selectedSubjectIds,
       },
       { onSuccess: onClose },
     );
@@ -104,7 +122,7 @@ export function CreateYearGroupModal({ onClose }: { onClose: () => void }) {
   return (
     <BaseModal
       title="New year group"
-      subtitle="Create a cohort. You can assign teachers and subjects afterwards."
+      subtitle="Create a cohort and assign its starting subjects right away."
       onClose={onClose}
       footer={
         <div className={styles.modalFooterActions}>
@@ -128,16 +146,15 @@ export function CreateYearGroupModal({ onClose }: { onClose: () => void }) {
       }
     >
       <form id="create-yg-form" className={styles.modalForm} onSubmit={submit}>
-        <label className={styles.field}>
-          <span>Cohort name</span>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Year 3 Gold"
-            autoFocus
-            required
-          />
-        </label>
+        <Input
+          label="Cohort name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Year 3 Gold"
+          autoFocus
+          required
+          fullWidth
+        />
         <label className={styles.field}>
           <span>Level</span>
           <select value={level} onChange={(e) => setLevel(e.target.value)}>
@@ -148,15 +165,235 @@ export function CreateYearGroupModal({ onClose }: { onClose: () => void }) {
             ))}
           </select>
         </label>
-        <label className={styles.field}>
-          <span>Room / base (optional)</span>
-          <input
-            value={roomNumber}
-            onChange={(e) => setRoomNumber(e.target.value)}
-            placeholder="e.g. Block A · Room 12"
-          />
-        </label>
+        <Input
+          label="Room / base (optional)"
+          value={roomNumber}
+          onChange={(e) => setRoomNumber(e.target.value)}
+          placeholder="e.g. Block A · Room 12"
+          fullWidth
+        />
+        <Input
+          label="Class capacity"
+          value={capacity}
+          onChange={(e) => setCapacity(e.target.value)}
+          placeholder="e.g. 40"
+          inputMode="numeric"
+          fullWidth
+        />
+        <div className={styles.field}>
+          <span>Subjects</span>
+          <div className={styles.selectionPills}>
+            {subjects.map((subject) => {
+              const selected = selectedSubjectIds.includes(subject.id);
+              return (
+                <button
+                  key={subject.id}
+                  type="button"
+                  className={`${styles.selectionPill} ${selected ? styles.selectionPillActive : ""}`}
+                  onClick={() => toggleSubject(subject.id)}
+                  disabled={subjectsLoading || isPending}
+                >
+                  {subject.name}
+                </button>
+              );
+            })}
+            {!subjectsLoading && subjects.length === 0 ? (
+              <p className={styles.inlineHint}>
+                No subjects yet. Add subjects from Curriculum first.
+              </p>
+            ) : null}
+          </div>
+        </div>
       </form>
+    </BaseModal>
+  );
+}
+
+export function EditYearGroupModal({
+  yearGroup,
+  onClose,
+}: {
+  yearGroup: AdminYearGroupStructure;
+  onClose: () => void;
+}) {
+  const { mutate, isPending } = useUpdateYearGroup();
+  const [name, setName] = useState(yearGroup.name);
+  const [level, setLevel] = useState<string>(yearGroup.level);
+  const [roomNumber, setRoomNumber] = useState(yearGroup.roomNumber || "");
+  const [capacity, setCapacity] = useState(
+    yearGroup.capacity ? String(yearGroup.capacity) : "",
+  );
+
+  const submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) return;
+    mutate(
+      {
+        id: yearGroup.id,
+        name: name.trim(),
+        level,
+        roomNumber: roomNumber.trim() || null,
+        capacity: capacity.trim() ? Number(capacity) : null,
+      },
+      { onSuccess: onClose },
+    );
+  };
+
+  return (
+    <BaseModal
+      title="Edit year group"
+      subtitle="Update the cohort details shown across the dashboard."
+      onClose={onClose}
+      footer={
+        <div className={styles.modalFooterActions}>
+          <button
+            type="button"
+            className="btn"
+            onClick={onClose}
+            disabled={isPending}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            form="edit-yg-form"
+            className="btn btn-primary"
+            disabled={isPending || !name.trim()}
+          >
+            {isPending ? "Saving…" : "Save changes"}
+          </button>
+        </div>
+      }
+    >
+      <form id="edit-yg-form" className={styles.modalForm} onSubmit={submit}>
+        <Input
+          label="Cohort name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+          fullWidth
+        />
+        <label className={styles.field}>
+          <span>Level</span>
+          <select value={level} onChange={(e) => setLevel(e.target.value)}>
+            {YEAR_LEVEL_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <Input
+          label="Room / base (optional)"
+          value={roomNumber}
+          onChange={(e) => setRoomNumber(e.target.value)}
+          fullWidth
+        />
+        <Input
+          label="Class capacity"
+          value={capacity}
+          onChange={(e) => setCapacity(e.target.value)}
+          inputMode="numeric"
+          fullWidth
+        />
+      </form>
+    </BaseModal>
+  );
+}
+
+export function YearGroupSubjectsModal({
+  yearGroup,
+  onClose,
+}: {
+  yearGroup: AdminYearGroupStructure;
+  onClose: () => void;
+}) {
+  const { data: subjects = [], isLoading } = useGetSubjects();
+  const assignMutation = useAssignSubjectToYearGroup();
+  const unassignMutation = useUnassignSubjectFromYearGroup();
+  const [selectedSubjectIds, setSelectedSubjectIds] = useState<number[]>(
+    yearGroup.subjects.map((subject) => subject.id),
+  );
+  const [isSaving, setIsSaving] = useState(false);
+
+  const toggleSubject = (subjectId: number) => {
+    setSelectedSubjectIds((prev) =>
+      prev.includes(subjectId)
+        ? prev.filter((id) => id !== subjectId)
+        : [...prev, subjectId],
+    );
+  };
+
+  const handleSave = async () => {
+    const currentIds = new Set(yearGroup.subjects.map((subject) => subject.id));
+    const nextIds = new Set(selectedSubjectIds);
+    const toAssign = selectedSubjectIds.filter((id) => !currentIds.has(id));
+    const toUnassign = [...currentIds].filter((id) => !nextIds.has(id));
+
+    setIsSaving(true);
+    try {
+      for (const subjectId of toAssign) {
+        await assignMutation.mutateAsync({ subjectId, yearGroupId: yearGroup.id });
+      }
+      for (const subjectId of toUnassign) {
+        await unassignMutation.mutateAsync({
+          subjectId,
+          yearGroupId: yearGroup.id,
+        });
+      }
+      onClose();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <BaseModal
+      title="Manage subjects"
+      subtitle={`Add or remove subjects for ${yearGroup.name}.`}
+      onClose={onClose}
+      footer={
+        <div className={styles.modalFooterActions}>
+          <button
+            type="button"
+            className="btn"
+            onClick={onClose}
+            disabled={isSaving}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={handleSave}
+            disabled={isSaving || isLoading}
+          >
+            {isSaving ? "Saving…" : "Save subjects"}
+          </button>
+        </div>
+      }
+    >
+      <div className={styles.selectionPills}>
+        {subjects.map((subject) => {
+          const selected = selectedSubjectIds.includes(subject.id);
+          return (
+            <button
+              key={subject.id}
+              type="button"
+              className={`${styles.selectionPill} ${selected ? styles.selectionPillActive : ""}`}
+              onClick={() => toggleSubject(subject.id)}
+              disabled={isSaving}
+            >
+              {subject.name}
+            </button>
+          );
+        })}
+        {!isLoading && subjects.length === 0 ? (
+          <p className={styles.inlineHint}>
+            No subjects available yet. Create subjects in Curriculum first.
+          </p>
+        ) : null}
+      </div>
     </BaseModal>
   );
 }

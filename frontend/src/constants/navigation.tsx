@@ -12,6 +12,7 @@ import {
   FileText,
   Wallet,
   PieChart,
+  BookText,
 } from "lucide-react";
 import { UserRole } from "@/types/Types";
 import { ReactNode } from "react";
@@ -55,6 +56,7 @@ export const NAV_CONFIG: Record<UserRole, NavItem[]> = {
       icon: <Megaphone size={20} />,
     },
     { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} /> },
+    { id: "curriculum", label: "Curriculum", icon: <BookText size={20} /> },
   ],
   TEACHER: [
     { section: "My Classes" },

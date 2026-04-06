@@ -18,7 +18,13 @@ export const GetUserProfile = asyncHandler(async (req, res) => {
       enrolledYearGroup: {
         include: {
           subjects: true,
-          fees: true,
+          fees: {
+            include: {
+              payments: {
+                where: { studentId: userId },
+              },
+            } as any,
+          },
         },
       },
       grades: {

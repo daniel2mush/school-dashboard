@@ -33,6 +33,7 @@ import {
   TeachMyYearGroups,
   TeachSubjectsContent,
 } from "@/components/dashboard/views/Teach";
+import AdminCurriculum from "@/components/dashboard/views/Admin/AdminCurriculum";
 
 const VIEW_MAP: Record<User["role"], Record<string, React.ReactNode>> = {
   ADMIN: {
@@ -43,6 +44,7 @@ const VIEW_MAP: Record<User["role"], Record<string, React.ReactNode>> = {
     timetable: <AdminTimetable />,
     announcements: <AdminAnnouncements />,
     analytics: <AdminAnalytics />,
+    curriculum: <AdminCurriculum />,
   },
   TEACHER: {
     tmy: <TeachMyYearGroups />,

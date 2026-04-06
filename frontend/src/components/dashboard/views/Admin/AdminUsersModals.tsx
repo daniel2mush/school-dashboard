@@ -3,11 +3,14 @@
 import {
   useCreateAdminUser,
   useGetSchoolStructure,
+  useResetUserPassword,
+  useUpdateAdminUser,
   type AdminCreateTeacherPayload,
   type AdminCreateStudentPayload,
   type AdminDirectoryUser,
   type CredentialsPayload,
 } from "@/query/AdminQuery";
+import { Input } from "@/components/ui";
 import { generateSecurePassword } from "@/lib/generatePassword";
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { toast } from "sonner";
@@ -175,32 +178,35 @@ export function AddTeacherModal({
         >
           <label className={styles.field}>
             <span>Full name</span>
-            <input
+            <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               placeholder="e.g. Mrs. Abena Asante"
+              fullWidth
             />
           </label>
           <label className={styles.field}>
             <span>School email (login)</span>
-            <input
+            <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
               placeholder="name@sunridge.edu"
+              fullWidth
             />
           </label>
           <label className={styles.field}>
             <span>Initial password</span>
             <div className={styles.passwordRow}>
-              <input
+              <Input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
                 autoComplete="new-password"
+                fullWidth
               />
               <button
                 type="button"
@@ -213,17 +219,19 @@ export function AddTeacherModal({
           </label>
           <label className={styles.field}>
             <span>Specialization (optional)</span>
-            <input
+            <Input
               value={specialization}
               onChange={(e) => setSpecialization(e.target.value)}
               placeholder="e.g. Mathematics"
+              fullWidth
             />
           </label>
           <label className={styles.field}>
             <span>Phone (optional)</span>
-            <input
+            <Input
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
+              fullWidth
             />
           </label>
           <label className={styles.field}>
@@ -343,30 +351,33 @@ export function AddStudentModal({
         >
           <label className={styles.field}>
             <span>Full name</span>
-            <input
+            <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              fullWidth
             />
           </label>
           <label className={styles.field}>
             <span>Login email</span>
-            <input
+            <Input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              fullWidth
             />
           </label>
           <label className={styles.field}>
             <span>Initial password</span>
             <div className={styles.passwordRow}>
-              <input
+              <Input
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={8}
                 autoComplete="new-password"
+                fullWidth
               />
               <button
                 type="button"
@@ -401,9 +412,10 @@ export function AddStudentModal({
           </label>
           <label className={styles.field}>
             <span>Phone (optional)</span>
-            <input
+            <Input
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
+              fullWidth
             />
           </label>
           <label className={styles.field}>
@@ -503,6 +515,261 @@ export function DeleteUserModal({
           </button>
         </footer>
       </div>
+    </div>
+  );
+}
+
+export function UserProfileDrawer({
+  user,
+  onClose,
+  onRequestCredentials,
+  onDelete,
+  onToggleAccess,
+}: {
+  user: AdminDirectoryUser;
+  onClose: () => void;
+  onRequestCredentials: (credentials: CredentialsPayload) => void;
+  onDelete: (user: AdminDirectoryUser) => void;
+  onToggleAccess: (user: AdminDirectoryUser) => void;
+}) {
+  const { data: yearGroups } = useGetSchoolStructure();
+  const { mutate: updateUser, isPending: isSaving } = useUpdateAdminUser();
+  const { mutate: resetPassword, isPending: isResetting } =
+    useResetUserPassword();
+  const isTeacher = user.role === "TEACHER";
+  const isStudent = user.role === "STUDENT";
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber ?? "");
+  const [gender, setGender] = useState<"Male" | "Female" | "Other">(
+    user.gender ?? "Other",
+  );
+  const [specialization, setSpecialization] = useState(user.specialization ?? "");
+  const [yearGroupId, setYearGroupId] = useState(
+    user.enrolledYearGroupId ? String(user.enrolledYearGroupId) : "",
+  );
+  const id = useId();
+
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKeyDown);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = "";
+    };
+  }, [onClose]);
+
+  useEffect(() => {
+    setName(user.name);
+    setEmail(user.email);
+    setPhoneNumber(user.phoneNumber ?? "");
+    setGender(user.gender ?? "Other");
+    setSpecialization(user.specialization ?? "");
+    setYearGroupId(user.enrolledYearGroupId ? String(user.enrolledYearGroupId) : "");
+  }, [user]);
+
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    if (isTeacher) {
+      updateUser(
+        {
+          userId: user.id,
+          role: "TEACHER",
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          phoneNumber: phoneNumber.trim() || null,
+          gender,
+          specialization: specialization.trim() || null,
+        },
+        { onSuccess: onClose },
+      );
+      return;
+    }
+
+    updateUser(
+      {
+        userId: user.id,
+        role: "STUDENT",
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phoneNumber: phoneNumber.trim() || null,
+        gender,
+        enrolledYearGroupId: yearGroupId ? Number(yearGroupId) : null,
+      },
+      { onSuccess: onClose },
+    );
+  };
+
+  const handleResetPassword = () => {
+    if (
+      !window.confirm(
+        `Generate a new temporary password for ${user.name}? They will be signed out everywhere.`,
+      )
+    ) {
+      return;
+    }
+    resetPassword(user.id, {
+      onSuccess: (data) => {
+        onRequestCredentials(data);
+      },
+    });
+  };
+
+  return (
+    <div className={styles.drawerShell} role="presentation" onClick={onClose}>
+      <aside
+        className={styles.drawer}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`${id}-title`}
+        onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <header className={styles.drawerHead}>
+          <div className={styles.drawerIdentity}>
+            <div className={styles.drawerAvatar}>
+              {(user.initials || user.name.slice(0, 2)).toUpperCase()}
+            </div>
+            <div>
+              <div className={styles.drawerEyebrow}>
+                {isTeacher ? "Teacher profile" : "Student profile"}
+              </div>
+              <h2 id={`${id}-title`} className={styles.drawerTitle}>
+                {user.name}
+              </h2>
+              <p className={styles.drawerSub}>{user.email}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            className={styles.modalClose}
+            aria-label="Close"
+            onClick={onClose}
+          >
+            ×
+          </button>
+        </header>
+
+        <div className={styles.drawerBody}>
+          <div className={styles.drawerStats}>
+            <div className={styles.infoChip}>
+              <span>Status</span>
+              <strong>{user.status}</strong>
+            </div>
+            <div className={styles.infoChip}>
+              <span>{isTeacher ? "Focus" : "Year group"}</span>
+              <strong>
+                {isTeacher
+                  ? user.specialization || "Not set"
+                  : user.enrolledYearGroup?.name || "Not assigned"}
+              </strong>
+            </div>
+          </div>
+
+          <div className={styles.drawerActions}>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => onToggleAccess(user)}
+            >
+              {user.status === "Active" ? "Restrict login" : "Restore login"}
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={handleResetPassword}
+              disabled={isResetting}
+            >
+              {isResetting ? "Generating…" : "Regenerate password"}
+            </button>
+            <button
+              type="button"
+              className={`btn ${styles.dangerBtn}`}
+              onClick={() => onDelete(user)}
+            >
+              Delete user
+            </button>
+          </div>
+
+          <form className={styles.drawerForm} onSubmit={submit}>
+            <Input
+              label="Full name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              fullWidth
+            />
+            <Input
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              fullWidth
+            />
+            <Input
+              label="Phone number"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              fullWidth
+            />
+
+            <label className={styles.field}>
+              <span>Gender</span>
+              <select
+                value={gender}
+                onChange={(e) =>
+                  setGender(e.target.value as "Male" | "Female" | "Other")
+                }
+              >
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </label>
+
+            {isTeacher ? (
+              <Input
+                label="Specialization"
+                value={specialization}
+                onChange={(e) => setSpecialization(e.target.value)}
+                fullWidth
+              />
+            ) : null}
+
+            {isStudent ? (
+              <label className={styles.field}>
+                <span>Year group</span>
+                <select
+                  value={yearGroupId}
+                  onChange={(e) => setYearGroupId(e.target.value)}
+                >
+                  <option value="">Not assigned</option>
+                  {yearGroups?.map((yg) => (
+                    <option key={yg.id} value={yg.id}>
+                      {yg.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+
+            <div className={styles.drawerFooter}>
+              <button type="button" className="btn" onClick={onClose}>
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={isSaving}
+              >
+                {isSaving ? "Saving…" : "Save changes"}
+              </button>
+            </div>
+          </form>
+        </div>
+      </aside>
     </div>
   );
 }

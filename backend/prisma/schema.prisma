@@ -34,6 +34,7 @@ model User {
   enrolledYearGroupId Int?
   grades              Grade[]      @relation("StudentGrades")
   attendance          Attendance[]
+  feePayments         FeePayment[]
 
   // For teachers:
   taughtYearGroups YearGroup[] @relation("TeacherYearGroups")
@@ -72,6 +73,7 @@ model YearGroup {
   name       String
   level      Level   @default(Primary)
   roomNumber String?
+  capacity   Int?
 
   // Relationships
   students      User[]         @relation("StudentYearGroup")
@@ -186,13 +188,31 @@ enum DayOfWeek {
 }
 
 model Fee {
-  id          Int       @id @default(autoincrement())
+  id          Int          @id @default(autoincrement())
+  title       String
+  description String?
   amount      Float
-  paid        Float     @default(0)
-  yearGroup   YearGroup @relation(fields: [yearGroupId], references: [id])
+  yearGroup   YearGroup    @relation(fields: [yearGroupId], references: [id])
   yearGroupId Int
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  payments    FeePayment[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model FeePayment {
+  id            Int      @id @default(autoincrement())
+  fee           Fee      @relation(fields: [feeId], references: [id], onDelete: Cascade)
+  feeId         Int
+  student       User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId     Int
+  amountPaid    Float    @default(0)
+  amountInWords String?
+  isFullyPaid   Boolean  @default(false)
+  paidAt        DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([feeId, studentId])
 }
 
 //refreshToken

@@ -31,15 +31,20 @@ export interface YearGroup {
   id: number;
   name: string;
   level: "Primary" | "JuniorSecondary" | "SeniorSecondary" | "University";
-  roomNumber?: string;
+  roomNumber?: string | null;
+  capacity?: number | null;
   subjects?: Subject[];
   fees?: Fee[];
+  students?: User[];
 }
 
 export interface Subject {
   id: number;
   name: string;
-  description?: string;
+  description?: string | null;
+  yearGroups?: Pick<YearGroup, "id" | "name" | "level">[];
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Grade {
@@ -59,9 +64,26 @@ export interface Attendance {
 
 export interface Fee {
   id: number;
+  title: string;
+  description?: string | null;
   amount: number;
-  paid: number;
   yearGroupId: number;
+  payments?: FeePayment[];
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface FeePayment {
+  id: number;
+  feeId: number;
+  studentId: number;
+  amountPaid: number;
+  amountInWords?: string | null;
+  isFullyPaid: boolean;
+  paidAt?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  student?: Pick<User, "id" | "name" | "email">;
 }
 
 // If this is part of your login response, you can use a wrapper type like this:

@@ -8,6 +8,7 @@ export default function StudentFeesStatus() {
 
   const { student, yearGroup } = currentData;
   const { total, paid } = student.fees;
+  const feeItems = student.fees.items || [];
 
   const balance = total - paid;
   const percentagePaid = total > 0 ? Math.round((paid / total) * 100) : 100;
@@ -66,6 +67,74 @@ export default function StudentFeesStatus() {
             </p>
           )}
         </div>
+      </div>
+
+      <div className={styles.card}>
+        <div className={styles.cardLabel}>Expense list</div>
+        {feeItems.length === 0 ? (
+          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+            No fee items have been assigned to your year group yet.
+          </p>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {feeItems.map((item: any) => (
+              <div
+                key={item.id}
+                style={{
+                  padding: "14px 16px",
+                  border: "1px solid var(--border-light)",
+                  borderRadius: "var(--radius-md)",
+                  background: "var(--bg-secondary)",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    alignItems: "flex-start",
+                  }}
+                >
+                  <div>
+                    <div style={{ color: "var(--text-primary)", fontWeight: 600 }}>
+                      {item.title}
+                    </div>
+                    <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: 4 }}>
+                      {item.description || "Year-group fee item"}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      color: item.isFullyPaid ? "var(--green)" : "var(--amber)",
+                      fontSize: "0.82rem",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {item.isFullyPaid ? "Fully paid" : "Pending"}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                    gap: 10,
+                    marginTop: 12,
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  <span>Total: {formatGHS(item.amount)}</span>
+                  <span>Paid: {formatGHS(item.paid)}</span>
+                  <span>Remaining: {formatGHS(item.remaining)}</span>
+                </div>
+                {item.amountInWords ? (
+                  <div style={{ marginTop: 10, color: "var(--text-secondary)", fontSize: "0.82rem" }}>
+                    Amount in words: {item.amountInWords}
+                  </div>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );
