@@ -56,6 +56,7 @@ export const NAV_CONFIG: Record<UserRole, NavItem[]> = {
       icon: <Megaphone size={20} />,
     },
     { id: "analytics", label: "Analytics", icon: <BarChart3 size={20} /> },
+    { id: "attendance", label: "Attendance", icon: <UserCheck size={20} /> },
     { id: "curriculum", label: "Curriculum", icon: <BookText size={20} /> },
   ],
   TEACHER: [

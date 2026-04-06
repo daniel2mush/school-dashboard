@@ -5,3 +5,4 @@ export { default as AdminFees } from "./AdminFees";
 export { default as AdminTimetable } from "./AdminTimetable";
 export { default as AdminAnnouncements } from "./AdminAnnouncements";
 export { default as AdminAnalytics } from "./AdminAnalytics";
+export { default as AdminAttendance } from "./AdminAttendance";

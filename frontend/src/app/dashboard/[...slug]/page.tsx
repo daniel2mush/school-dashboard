@@ -11,6 +11,7 @@ import Loading from "@/components/Loading/Loading";
 import { User } from "@/types/Types";
 import {
   AdminAnalytics,
+  AdminAttendance,
   AdminAnnouncements,
   AdminFees,
   AdminOverview,
@@ -44,6 +45,7 @@ const VIEW_MAP: Record<User["role"], Record<string, React.ReactNode>> = {
     timetable: <AdminTimetable />,
     announcements: <AdminAnnouncements />,
     analytics: <AdminAnalytics />,
+    attendance: <AdminAttendance />,
     curriculum: <AdminCurriculum />,
   },
   TEACHER: {

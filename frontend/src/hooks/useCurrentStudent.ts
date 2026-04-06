@@ -1,5 +1,5 @@
 import useUserStore from "@/store/UserStore";
-import { YearGroup } from "@/types/Types";
+import { Timetable, YearGroup } from "@/types/Types";
 
 export default function useCurrentStudent() {
   const user = useUserStore().user;
@@ -77,7 +77,7 @@ export default function useCurrentStudent() {
       ? (yearGroupMapping as any).announcements 
       : [];
 
-  const rawTimetable: any[] = hasRealData && "timetables" in yearGroupMapping 
+  const rawTimetable: Timetable[] = hasRealData && "timetables" in yearGroupMapping 
       ? (yearGroupMapping as any).timetables 
       : [];
 
@@ -106,7 +106,10 @@ export default function useCurrentStudent() {
      });
   }
 
-  const teachers: any[] = []; // Typed to any[] for now since backend doesn't return full teacher objects for the year group yet.
+  const teachers =
+    hasRealData && "teachers" in yearGroupMapping
+      ? ((yearGroupMapping as any).teachers ?? [])
+      : [];
 
   return {
     student,
@@ -115,6 +118,7 @@ export default function useCurrentStudent() {
     studentAnnouncements,
     studentGrades,
     studentTimetable,
+    studentTimetableSlots: rawTimetable,
     subjects: yearGroup.subjects,
   };
 }

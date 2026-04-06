@@ -63,7 +63,7 @@ export const useSubmitAttendance = () => {
   const queryClient = useQueryClient();
   
   return useMutation({
-    mutationKey: ["teacher", "submitAttendance"],
+    mutationKey: ["attendance", "submitAttendance"],
     mutationFn: async (data: { studentId: number; status: string; date?: Date }) => {
       const res = await fetch("/api/teacher/attendance", {
         method: "POST",
@@ -82,6 +82,7 @@ export const useSubmitAttendance = () => {
     onSuccess: () => {
       toast.success("Attendance marked successfully");
       queryClient.invalidateQueries({ queryKey: ["teacher", "classes"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "analytics"] });
     },
     onError: (error: Error) => {
       toast.error(error.message);

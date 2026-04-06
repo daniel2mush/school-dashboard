@@ -75,8 +75,8 @@ export const SubmitAttendance = asyncHandler(async (req, res) => {
   const { role } = req.user;
   const { studentId, status, date } = req.body;
 
-  if (role !== "TEACHER") {
-    throw new AppError("Unauthorized access. Teachers only.", 403);
+  if (role !== "TEACHER" && role !== "ADMIN") {
+    throw new AppError("Unauthorized access.", 403);
   }
 
   if (!studentId || !status) {

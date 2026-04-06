@@ -30,12 +30,49 @@ export type AdminAnalyticsData = {
   attendancePresentPct: number | null;
   /** Active students in year groups that still have under-paid fee records */
   studentsWithOutstandingFees: number;
+  paymentStats: {
+    fullyPaid: number;
+    partiallyPaid: number;
+    notPaid: number;
+  };
+  studentStats: {
+    studentId: number;
+    name: string;
+    email: string;
+    yearGroupName: string;
+    totalBilled: number;
+    totalPaid: number;
+    balance: number;
+    fees: {
+      feeId: number;
+      title: string;
+      totalAmount: number;
+      amountPaid: number;
+      isFullyPaid: boolean;
+    }[];
+    attendance: {
+      present: number;
+      absent: number;
+      tardy: number;
+      holiday: number;
+      total: number;
+    };
+    attendance_records: {
+      status: string;
+      date: string;
+    }[];
+  }[];
 };
 
 export type AdminDirectoryUser = User & {
   enrolledYearGroupId: number | null;
   enrolledYearGroup: { id: number; name: string } | null;
   specialization: string | null;
+  gender: "Male" | "Female" | "Other" | null;
+  phoneNumber: string | null;
+  address: string | null;
+  avatarUrl: string | null;
+  dateOfBirth: string | null;
 };
 
 export type AdminCreateTeacherPayload = {
@@ -68,8 +105,10 @@ export type AdminUpdateTeacherPayload = {
   role: "TEACHER";
   email: string;
   name: string;
-  gender?: "Male" | "Female" | "Other";
+  gender?: "Male" | "Female" | "Other" | null;
   phoneNumber?: string | null;
+  address?: string | null;
+  dateOfBirth?: string | null;
   specialization?: string | null;
 };
 
@@ -78,8 +117,10 @@ export type AdminUpdateStudentPayload = {
   role: "STUDENT";
   email: string;
   name: string;
-  gender?: "Male" | "Female" | "Other";
+  gender?: "Male" | "Female" | "Other" | null;
   phoneNumber?: string | null;
+  address?: string | null;
+  dateOfBirth?: string | null;
   enrolledYearGroupId: number | null;
 };
 
@@ -454,6 +495,140 @@ export const useAssignTeacherToYearGroup = () => {
   });
 };
 
+export const useUpsertTimetableSlot = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: {
+      yearGroupId: number;
+      day: string;
+      periodId: number;
+      subjectId: number | null;
+      teacherId: number | null;
+    }) => {
+      const res = await fetch("/api/admin/timetable", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const responseData = await res.json();
+      if (!res.ok) {
+        throw new Error(
+          responseData.message ||
+            responseData.error ||
+            "Could not save timetable slot",
+        );
+      }
+      return responseData.data;
+    },
+    onSuccess: () => {
+      toast.success("Timetable updated");
+      invalidateYearGroupRelated(qc);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
+export const useCreatePeriod = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      label: string;
+      startTime: string;
+      endTime: string;
+      isBreak?: boolean;
+    }) => {
+      const res = await fetch("/api/admin/periods", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const responseData = await res.json();
+      if (!res.ok) {
+        throw new Error(responseData.message || "Could not create period");
+      }
+      return responseData.data;
+    },
+    onSuccess: () => {
+      toast.success("Period created");
+      invalidateYearGroupRelated(qc);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
+export const useAssignPeriodToYearGroup = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: { yearGroupId: number; periodId: number }) => {
+      const res = await fetch("/api/admin/periods/assign-year-group", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const responseData = await res.json();
+      if (!res.ok) {
+        throw new Error(responseData.message || "Could not assign period");
+      }
+      return responseData.data;
+    },
+    onSuccess: () => {
+      toast.success("Period added to year group");
+      invalidateYearGroupRelated(qc);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
+export const useDeletePeriod = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/admin/periods/${id}`, {
+        method: "DELETE",
+      });
+      const responseData = await res.json();
+      if (!res.ok) {
+        throw new Error(responseData.message || "Could not delete period");
+      }
+      return responseData.data;
+    },
+    onSuccess: () => {
+      toast.success("Period deleted");
+      invalidateYearGroupRelated(qc);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
+export const useUpdatePeriod = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: {
+      id: number;
+      label?: string;
+      startTime?: string;
+      endTime?: string;
+      isBreak?: boolean;
+    }) => {
+      const res = await fetch(`/api/admin/periods/${payload.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const responseData = await res.json();
+      if (!res.ok) {
+        throw new Error(responseData.message || "Could not update period");
+      }
+      return responseData.data;
+    },
+    onSuccess: () => {
+      toast.success("Period updated");
+      invalidateYearGroupRelated(qc);
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+};
+
 export const useUnassignTeacherFromYearGroup = () => {
   const qc = useQueryClient();
   return useMutation({
@@ -595,6 +770,8 @@ export const useUpdateAdminUser = () => {
                 name: payload.name,
                 gender: payload.gender,
                 phoneNumber: payload.phoneNumber,
+                address: payload.address,
+                dateOfBirth: payload.dateOfBirth,
                 specialization: payload.specialization,
               }
             : {
@@ -602,6 +779,8 @@ export const useUpdateAdminUser = () => {
                 name: payload.name,
                 gender: payload.gender,
                 phoneNumber: payload.phoneNumber,
+                address: payload.address,
+                dateOfBirth: payload.dateOfBirth,
                 enrolledYearGroupId: payload.enrolledYearGroupId,
               },
         ),

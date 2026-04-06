@@ -6,6 +6,7 @@ import {
   useUpdateUserStatus,
   useDeleteAdminUser,
   useResetUserPassword,
+  useUpdateAdminUser,
   type AdminDirectoryUser,
   type CredentialsPayload,
 } from "@/query/AdminQuery";
@@ -22,10 +23,15 @@ import {
   Mail,
   MoreHorizontal,
   Plus,
+  RefreshCw,
+  Save,
+  Search,
   Shield,
+  User,
   UserMinus,
   UserPlus,
   Users,
+  X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -72,6 +78,11 @@ export default function AdminUsers() {
     null,
   );
   const [menuUserId, setMenuUserId] = useState<number | null>(null);
+  const [selectedUser, setSelectedUser] = useState<AdminDirectoryUser | null>(
+    null,
+  );
+  const [teacherSearch, setTeacherSearch] = useState("");
+  const [studentSearch, setStudentSearch] = useState("");
 
   useEffect(() => {
     if (menuUserId === null) return;
@@ -82,12 +93,26 @@ export default function AdminUsers() {
 
   const { teachers, students, admins } = useMemo(() => {
     if (!users) return { teachers: [], students: [], admins: [] };
+
+    const tLower = teacherSearch.toLowerCase();
+    const sLower = studentSearch.toLowerCase();
+
     return {
-      teachers: users.filter((u) => u.role === "TEACHER"),
-      students: users.filter((u) => u.role === "STUDENT"),
+      teachers: users.filter(
+        (u) =>
+          u.role === "TEACHER" &&
+          (u.name.toLowerCase().includes(tLower) ||
+            u.email.toLowerCase().includes(tLower)),
+      ),
+      students: users.filter(
+        (u) =>
+          u.role === "STUDENT" &&
+          (u.name.toLowerCase().includes(sLower) ||
+            u.email.toLowerCase().includes(sLower)),
+      ),
       admins: users.filter((u) => u.role === "ADMIN"),
     };
-  }, [users]);
+  }, [users, teacherSearch, studentSearch]);
 
   const openResetPassword = (u: AdminDirectoryUser) => {
     if (
@@ -125,7 +150,11 @@ export default function AdminUsers() {
   const renderRow = (u: AdminDirectoryUser, kind: "teacher" | "student") => {
     const isSelf = u.id === me?.id;
     return (
-      <div key={u.id} className={styles.tableRow}>
+      <div
+        key={u.id}
+        className={styles.tableRow}
+        onClick={() => setSelectedUser(u)}
+      >
         <div className={styles.userCell}>
           <div className={styles.avatar}>{initialsFromName(u.name)}</div>
           <div>
@@ -264,7 +293,7 @@ export default function AdminUsers() {
       ) : null}
 
       <div className={styles.twoCards}>
-        <article className={styles.card}>
+        <article className={`${styles.card} ${styles.teacherCard}`}>
           <div className={styles.cardHead}>
             <div className={styles.cardTitleRow}>
               <div className={styles.cardIcon}>
@@ -277,14 +306,25 @@ export default function AdminUsers() {
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              className={`btn btn-primary ${styles.cardCta}`}
-              onClick={() => setAddTeacherOpen(true)}
-            >
-              <Plus size={17} strokeWidth={2} />
-              Add teacher
-            </button>
+            <div className={styles.cardActions}>
+              <div className={styles.searchBox}>
+                <Search size={14} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder="Search staff..."
+                  value={teacherSearch}
+                  onChange={(e) => setTeacherSearch(e.target.value)}
+                />
+              </div>
+              <button
+                type="button"
+                className={`btn btn-primary ${styles.cardCta}`}
+                onClick={() => setAddTeacherOpen(true)}
+              >
+                <Plus size={17} strokeWidth={2} />
+                Add teacher
+              </button>
+            </div>
           </div>
           <div className={styles.table}>
             <div className={styles.tableHead}>
@@ -302,7 +342,7 @@ export default function AdminUsers() {
           </div>
         </article>
 
-        <article className={styles.card}>
+        <article className={`${styles.card} ${styles.studentCard}`}>
           <div className={styles.cardHead}>
             <div className={styles.cardTitleRow}>
               <div className={styles.cardIconAlt}>
@@ -316,14 +356,25 @@ export default function AdminUsers() {
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              className={`btn btn-primary ${styles.cardCta}`}
-              onClick={() => setAddStudentOpen(true)}
-            >
-              <Plus size={17} strokeWidth={2} />
-              Add student
-            </button>
+            <div className={styles.cardActions}>
+              <div className={styles.searchBox}>
+                <Search size={14} className={styles.searchIcon} />
+                <input
+                  type="text"
+                  placeholder="Search students..."
+                  value={studentSearch}
+                  onChange={(e) => setStudentSearch(e.target.value)}
+                />
+              </div>
+              <button
+                type="button"
+                className={`btn btn-primary ${styles.cardCta}`}
+                onClick={() => setAddStudentOpen(true)}
+              >
+                <Plus size={17} strokeWidth={2} />
+                Add student
+              </button>
+            </div>
           </div>
           <div className={styles.table}>
             <div className={styles.tableHead}>
@@ -385,6 +436,252 @@ export default function AdminUsers() {
           }
         />
       ) : null}
+
+      {selectedUser ? (
+        <UserProfileDrawer
+          user={selectedUser}
+          isSelf={selectedUser.id === me?.id}
+          adminsCount={admins.length}
+          onClose={() => setSelectedUser(null)}
+          onResetPassword={(u) => {
+            openResetPassword(u);
+          }}
+          onDelete={(u) => {
+            setSelectedUser(null);
+            setDeleteTarget(u);
+          }}
+          onToggleAccess={(u) => {
+            toggleAccess(u);
+            setSelectedUser({
+              ...u,
+              status: u.status === "Active" ? "Suspended" : "Active",
+            });
+          }}
+        />
+      ) : null}
     </section>
+  );
+}
+
+function UserProfileDrawer({
+  user,
+  isSelf,
+  adminsCount,
+  onClose,
+  onResetPassword,
+  onDelete,
+  onToggleAccess,
+}: {
+  user: AdminDirectoryUser;
+  isSelf: boolean;
+  adminsCount: number;
+  onClose: () => void;
+  onResetPassword: (u: AdminDirectoryUser) => void;
+  onDelete: (u: AdminDirectoryUser) => void;
+  onToggleAccess: (u: AdminDirectoryUser) => void;
+}) {
+  const { mutate: updateProfile, isPending: isUpdating } = useUpdateAdminUser();
+  const [name, setName] = useState(user.name);
+  const [email, setEmail] = useState(user.email);
+  const [gender, setGender] = useState(user.gender || "");
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber || "");
+  const [address, setAddress] = useState(user.address || "");
+  const [dateOfBirth, setDateOfBirth] = useState(
+    user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split("T")[0] : "",
+  );
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    setName(user.name);
+    setEmail(user.email);
+    setGender(user.gender || "");
+    setPhoneNumber(user.phoneNumber || "");
+    setAddress(user.address || "");
+    setDateOfBirth(
+      user.dateOfBirth
+        ? new Date(user.dateOfBirth).toISOString().split("T")[0]
+        : "",
+    );
+    setHasChanges(false);
+  }, [user]);
+
+  const handleSave = () => {
+    const payload =
+      user.role === "TEACHER"
+        ? {
+            userId: user.id,
+            role: "TEACHER" as const,
+            name,
+            email,
+            gender: (gender || null) as any,
+            phoneNumber: phoneNumber || null,
+            address: address || null,
+            dateOfBirth: dateOfBirth ? new Date(dateOfBirth).toISOString() : null,
+            specialization: user.specialization,
+          }
+        : {
+            userId: user.id,
+            role: "STUDENT" as const,
+            name,
+            email,
+            gender: (gender || null) as any,
+            phoneNumber: phoneNumber || null,
+            address: address || null,
+            dateOfBirth: dateOfBirth ? new Date(dateOfBirth).toISOString() : null,
+            enrolledYearGroupId: user.enrolledYearGroupId,
+          };
+
+    updateProfile(payload, {
+      onSuccess: () => {
+        setHasChanges(false);
+      },
+    });
+  };
+
+  return (
+    <div className={styles.drawerOverlay} onClick={onClose}>
+      <div className={styles.drawer} onClick={(e) => e.stopPropagation()}>
+        <header className={styles.drawerHead}>
+          <h2 className={styles.drawerTitle}>User Profile</h2>
+          <button className={styles.drawerClose} onClick={onClose}>
+            <X size={20} />
+          </button>
+        </header>
+
+        <div className={styles.drawerBody}>
+          <div className={styles.drawerProfile}>
+            <div className={styles.drawerAvatar}>
+              {initialsFromName(user.name)}
+            </div>
+            <div className={styles.drawerName}>{user.name}</div>
+            <div className={styles.drawerRole}>
+              {user.role} {isSelf && " (You)"}
+            </div>
+          </div>
+
+          <div className={styles.drawerSection}>
+            <div className={styles.drawerSectionTitle}>
+              <User size={14} />
+              Basic Information
+            </div>
+            <div className={styles.drawerForm}>
+              <div className={styles.field}>
+                <span>Full Name</span>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => {
+                    setName(e.target.value);
+                    setHasChanges(true);
+                  }}
+                />
+              </div>
+              <div className={styles.field}>
+                <span>Email Address</span>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setHasChanges(true);
+                  }}
+                />
+              </div>
+              <div className={styles.field}>
+                <span>Phone Number</span>
+                <input
+                  type="tel"
+                  value={phoneNumber}
+                  onChange={(e) => {
+                    setPhoneNumber(e.target.value);
+                    setHasChanges(true);
+                  }}
+                />
+              </div>
+              <div className={styles.field}>
+                <span>Gender</span>
+                <select
+                  value={gender}
+                  onChange={(e) => {
+                    setGender(e.target.value);
+                    setHasChanges(true);
+                  }}
+                >
+                  <option value="">Select Gender</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div className={styles.field}>
+                <span>Date of Birth</span>
+                <input
+                  type="date"
+                  value={dateOfBirth}
+                  onChange={(e) => {
+                    setDateOfBirth(e.target.value);
+                    setHasChanges(true);
+                  }}
+                />
+              </div>
+              <div className={styles.field}>
+                <span>Address</span>
+                <textarea
+                  rows={2}
+                  value={address}
+                  onChange={(e) => {
+                    setAddress(e.target.value);
+                    setHasChanges(true);
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.drawerSection}>
+            <div className={styles.drawerSectionTitle}>
+              <Shield size={14} />
+              Account Actions
+            </div>
+            <div className={styles.drawerActions}>
+              <button
+                className={styles.drawerActionBtn}
+                onClick={() => onResetPassword(user)}
+              >
+                <RefreshCw size={16} />
+                Regenerate Password
+              </button>
+              <button
+                className={styles.drawerActionBtn}
+                disabled={isSelf}
+                onClick={() => onToggleAccess(user)}
+              >
+                <UserMinus size={16} />
+                {user.status === "Active" ? "Restrict Access" : "Restore Access"}
+              </button>
+              <button
+                className={`${styles.drawerActionBtn} ${styles.danger}`}
+                disabled={isSelf || (user.role === "ADMIN" && adminsCount <= 1)}
+                onClick={() => onDelete(user)}
+              >
+                <UserMinus size={16} />
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <footer className={styles.drawerFooter}>
+          <button
+            className="btn btn-primary w-full"
+            disabled={!hasChanges || isUpdating}
+            onClick={handleSave}
+          >
+            <Save size={18} />
+            {isUpdating ? "Saving..." : "Save Changes"}
+          </button>
+        </footer>
+      </div>
+    </div>
   );
 }

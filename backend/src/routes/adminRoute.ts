@@ -6,6 +6,11 @@ import {
   CreateAnnouncement,
   CreateYearGroup,
   UpdateYearGroup,
+  UpsertTimetableSlot,
+  CreatePeriod,
+  UpdatePeriod,
+  DeletePeriod,
+  AssignPeriodToYearGroup,
   AssignTeacherToYearGroup,
   UnassignTeacherFromYearGroup,
   MoveStudentYearGroup,
@@ -51,6 +56,14 @@ router.post("/announcements", AuthenticateRequest, CreateAnnouncement);
 // Year groups
 router.post("/year-groups", AuthenticateRequest, CreateYearGroup);
 router.patch("/year-groups/:id", AuthenticateRequest, UpdateYearGroup);
+router.post("/timetable", AuthenticateRequest, UpsertTimetableSlot);
+
+// Periods
+router.post("/periods", AuthenticateRequest, CreatePeriod);
+router.patch("/periods/:id", AuthenticateRequest, UpdatePeriod);
+router.delete("/periods/:id", AuthenticateRequest, DeletePeriod);
+router.post("/periods/assign-year-group", AuthenticateRequest, AssignPeriodToYearGroup);
+
 router.post(
   "/year-groups/assign-teacher",
   AuthenticateRequest,

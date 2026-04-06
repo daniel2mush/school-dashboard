@@ -32,6 +32,8 @@ export const AdminUpdateTeacherSchema = z.object({
   name: z.string().min(1).max(120),
   gender: genderEnum.optional(),
   phoneNumber: z.string().max(40).optional().nullable(),
+  address: z.string().max(255).optional().nullable(),
+  dateOfBirth: z.string().datetime().optional().nullable(),
   specialization: z.string().max(120).optional().nullable(),
 });
 
@@ -40,6 +42,8 @@ export const AdminUpdateStudentSchema = z.object({
   name: z.string().min(1).max(120),
   gender: genderEnum.optional(),
   phoneNumber: z.string().max(40).optional().nullable(),
+  address: z.string().max(255).optional().nullable(),
+  dateOfBirth: z.string().datetime().optional().nullable(),
   enrolledYearGroupId: z.coerce.number().int().positive().nullable(),
 });
 

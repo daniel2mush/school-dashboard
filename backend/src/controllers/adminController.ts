@@ -1,5 +1,6 @@
 import { prisma } from "../clients/prismaClient.js";
 import {
+  DayOfWeek,
   Gender,
   Level,
   Priority,
@@ -45,6 +46,7 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
     presentAttendanceCount,
     yearGroups,
     feePayments,
+    allStudents,
   ] = await Promise.all([
     prisma.user.count({ where: { role: "STUDENT", status: "Active" } }),
     prisma.user.count({ where: { role: "TEACHER", status: "Active" } }),
@@ -57,12 +59,13 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
     prisma.yearGroup.findMany({
       select: {
         id: true,
+        name: true,
         students: {
           where: { role: "STUDENT", status: "Active" },
           select: { id: true },
         },
         fees: {
-          select: { id: true, amount: true },
+          select: { id: true, title: true, amount: true },
         },
       },
     }),
@@ -72,10 +75,74 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
         studentId: true,
         amountPaid: true,
         isFullyPaid: true,
-        fee: { select: { yearGroupId: true, amount: true } },
+        fee: { select: { yearGroupId: true, title: true, amount: true } },
       },
     }),
+    prisma.user.findMany({
+      where: { role: "STUDENT", status: "Active" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        enrolledYearGroupId: true,
+        enrolledYearGroup: { select: { name: true } },
+        attendance: {
+          select: { status: true, date: true },
+        },
+      },
+      orderBy: { name: "asc" },
+    }),
   ]);
+
+  const studentFeeStats = allStudents.map((student) => {
+    const studentYearGroup = yearGroups.find(
+      (yg) => yg.id === student.enrolledYearGroupId,
+    );
+    const applicableFees = studentYearGroup?.fees || [];
+    const studentPayments = feePayments.filter(
+      (p: any) => p.studentId === student.id,
+    );
+
+    const feeDetails = applicableFees.map((fee) => {
+      const payment = studentPayments.find((p: any) => p.feeId === fee.id);
+      const amountPaid = payment?.amountPaid || 0;
+      const isFullyPaid = payment?.isFullyPaid || amountPaid >= fee.amount;
+      return {
+        feeId: fee.id,
+        title: fee.title,
+        totalAmount: fee.amount,
+        amountPaid,
+        isFullyPaid,
+      };
+    });
+
+    const totalBilled = applicableFees.reduce((sum, f) => sum + f.amount, 0);
+    const totalPaid = studentPayments.reduce(
+      (sum: number, p: any) => sum + p.amountPaid,
+      0,
+    );
+
+    const attendanceStats = {
+      present: student.attendance.filter((a) => a.status === "P").length,
+      absent: student.attendance.filter((a) => a.status === "A").length,
+      tardy: student.attendance.filter((a) => a.status === "T").length,
+      holiday: student.attendance.filter((a) => a.status === "H").length,
+      total: student.attendance.length,
+    };
+
+    return {
+      studentId: student.id,
+      name: student.name,
+      email: student.email,
+      yearGroupName: student.enrolledYearGroup?.name || "N/A",
+      totalBilled,
+      totalPaid,
+      balance: totalBilled - totalPaid,
+      fees: feeDetails,
+      attendance: attendanceStats,
+      attendance_records: student.attendance,
+    };
+  });
 
   const totalExpectedRevenue = yearGroups.reduce(
     (sum: number, yearGroup: any) =>
@@ -138,6 +205,19 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
       ? null
       : Math.round((presentAttendanceCount / actionableAttendanceCount) * 100);
 
+  let totalFeeItems = 0;
+  for (const yg of yearGroups) {
+    totalFeeItems += yg.students.length * yg.fees.length;
+  }
+
+  const fullyPaidCount = feePayments.filter(
+    (p: any) => p.isFullyPaid || p.amountPaid >= p.fee.amount,
+  ).length;
+  const partiallyPaidCount = feePayments.filter(
+    (p: any) => !p.isFullyPaid && p.amountPaid > 0 && p.amountPaid < p.fee.amount,
+  ).length;
+  const notPaidCount = Math.max(0, totalFeeItems - feePayments.length);
+
   const analyticsLine = {
     students: totalStudents,
     teachers: totalTeachers,
@@ -147,6 +227,12 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
     totalCollectedRevenue,
     attendancePresentPct,
     studentsWithOutstandingFees,
+    paymentStats: {
+      fullyPaid: fullyPaidCount,
+      partiallyPaid: partiallyPaidCount,
+      notPaid: notPaidCount,
+    },
+    studentStats: studentFeeStats,
   };
 
   return sendJson(res, 200, true, "Analytics fetched", analyticsLine);
@@ -167,6 +253,11 @@ export const GetAllUsers = asyncHandler(async (req, res) => {
       createdAt: true,
       enrolledYearGroupId: true,
       enrolledYearGroup: { select: { id: true, name: true } },
+      gender: true,
+      phoneNumber: true,
+      address: true,
+      avatarUrl: true,
+      dateOfBirth: true,
     },
     orderBy: { name: "asc" },
   });
@@ -199,6 +290,14 @@ export const GetSchoolStructure = asyncHandler(async (req, res) => {
         include: {
           period: true,
           subject: true,
+          teacher: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              specialization: true,
+            },
+          },
         },
       },
       _count: {
@@ -207,6 +306,59 @@ export const GetSchoolStructure = asyncHandler(async (req, res) => {
     },
     orderBy: [{ level: "asc" }, { name: "asc" }],
   });
+
+  // Ensure default periods 1-5 exist for all year groups
+  const defaultPeriods = await prisma.period.findMany({
+    where: {
+      label: {
+        in: ["Period 1", "Period 2", "Period 3", "Period 4", "Period 5"],
+      },
+    },
+  });
+
+  if (defaultPeriods.length > 0) {
+    for (const yg of yearGroups) {
+      const existingPeriodIds = new Set(
+        yg.timetables.map((t) => t.periodId),
+      );
+      const missingPeriods = defaultPeriods.filter(
+        (p) => !existingPeriodIds.has(p.id),
+      );
+
+      if (missingPeriods.length > 0) {
+        const timetableData = missingPeriods.map((p) => ({
+          yearGroupId: yg.id,
+          day: DayOfWeek.Monday,
+          periodId: p.id,
+          subjectId: null,
+          teacherId: null,
+        }));
+
+        await prisma.timetable.createMany({
+          data: timetableData,
+          skipDuplicates: true,
+        });
+
+        // Re-fetch timetables for this year group to include the newly created ones
+        const updatedTimetables = await prisma.timetable.findMany({
+          where: { yearGroupId: yg.id },
+          include: {
+            period: true,
+            subject: true,
+            teacher: {
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                specialization: true,
+              },
+            },
+          },
+        });
+        (yg as any).timetables = updatedTimetables;
+      }
+    }
+  }
 
   return sendJson(res, 200, true, "Structure fetched", yearGroups);
 });
@@ -300,6 +452,30 @@ export const CreateYearGroup = asyncHandler(async (req, res) => {
     },
   });
 
+  // Automatically assign periods 1 to 5 as initials
+  const defaultPeriods = await prisma.period.findMany({
+    where: {
+      label: {
+        in: ["Period 1", "Period 2", "Period 3", "Period 4", "Period 5"],
+      },
+    },
+  });
+
+  if (defaultPeriods.length > 0) {
+    const timetableData = defaultPeriods.map((period) => ({
+      yearGroupId: yearGroup.id,
+      day: DayOfWeek.Monday,
+      periodId: period.id,
+      subjectId: null,
+      teacherId: null,
+    }));
+
+    await prisma.timetable.createMany({
+      data: timetableData,
+      skipDuplicates: true,
+    });
+  }
+
   return sendJson(res, 201, true, "Year group created", yearGroup);
 });
 
@@ -346,6 +522,222 @@ export const UpdateYearGroup = asyncHandler(async (req, res) => {
   });
 
   return sendJson(res, 200, true, "Year group updated", yearGroup);
+});
+
+export const UpsertTimetableSlot = asyncHandler(async (req, res) => {
+  checkAdmin(req.user.role);
+
+  const yearGroupId = Number(req.body.yearGroupId);
+  const periodId = Number(req.body.periodId);
+  const day = String(req.body.day || "");
+  const subjectId =
+    req.body.subjectId === null || req.body.subjectId === undefined || req.body.subjectId === ""
+      ? null
+      : Number(req.body.subjectId);
+  const teacherId =
+    req.body.teacherId === null || req.body.teacherId === undefined || req.body.teacherId === ""
+      ? null
+      : Number(req.body.teacherId);
+
+  if (!Number.isFinite(yearGroupId) || !Number.isFinite(periodId) || !day) {
+    throw new AppError("yearGroupId, day, and periodId are required", 400);
+  }
+
+  if (!Object.values(DayOfWeek).includes(day as DayOfWeek)) {
+    throw new AppError("Invalid timetable day", 400);
+  }
+
+  if (subjectId !== null && !Number.isFinite(subjectId)) {
+    throw new AppError("Invalid subjectId", 400);
+  }
+
+  if (teacherId !== null && !Number.isFinite(teacherId)) {
+    throw new AppError("Invalid teacherId", 400);
+  }
+
+  const [yearGroup, period, subject, teacher] = await Promise.all([
+    prisma.yearGroup.findUnique({
+      where: { id: yearGroupId },
+      include: {
+        subjects: { select: { id: true } },
+        teachers: {
+          where: { role: "TEACHER", status: "Active" },
+          select: { id: true },
+        },
+      },
+    }),
+    prisma.period.findUnique({ where: { id: periodId } }),
+    subjectId === null
+      ? Promise.resolve(null)
+      : prisma.subject.findUnique({ where: { id: subjectId } }),
+    teacherId === null
+      ? Promise.resolve(null)
+      : prisma.user.findFirst({
+          where: { id: teacherId, role: "TEACHER", status: "Active" },
+        }),
+  ]);
+
+  if (!yearGroup) throw new AppError("Year group not found", 404);
+  if (!period) throw new AppError("Period not found", 404);
+  if (subjectId !== null && !subject) throw new AppError("Subject not found", 404);
+  if (teacherId !== null && !teacher) throw new AppError("Teacher not found", 404);
+
+  if (
+    subjectId !== null &&
+    !yearGroup.subjects.some((yearGroupSubject) => yearGroupSubject.id === subjectId)
+  ) {
+    throw new AppError("Subject is not linked to this year group", 400);
+  }
+
+  if (
+    teacherId !== null &&
+    !yearGroup.teachers.some((yearGroupTeacher) => yearGroupTeacher.id === teacherId)
+  ) {
+    throw new AppError("Teacher is not assigned to this year group", 400);
+  }
+
+  if (subjectId === null && teacherId !== null) {
+    throw new AppError("Assign a subject before assigning a teacher", 400);
+  }
+
+  const timetable = await prisma.timetable.upsert({
+    where: {
+      yearGroupId_day_periodId: {
+        yearGroupId,
+        day: day as DayOfWeek,
+        periodId,
+      },
+    },
+    update: {
+      subjectId,
+      teacherId,
+    },
+    create: {
+      yearGroupId,
+      day: day as DayOfWeek,
+      periodId,
+      subjectId,
+      teacherId,
+    },
+    include: {
+      period: true,
+      subject: true,
+      teacher: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          specialization: true,
+        },
+      },
+    },
+  });
+
+  return sendJson(res, 200, true, "Timetable slot saved", timetable);
+});
+
+export const CreatePeriod = asyncHandler(async (req, res) => {
+  checkAdmin(req.user.role);
+
+  const { label, startTime, endTime, isBreak } = req.body;
+
+  if (!label || !startTime || !endTime) {
+    throw new AppError("Label, startTime, and endTime are required", 400);
+  }
+
+  const period = await prisma.period.create({
+    data: {
+      label,
+      startTime,
+      endTime,
+      isBreak: Boolean(isBreak),
+    },
+  });
+
+  return sendJson(res, 201, true, "Period created successfully", period);
+});
+
+export const DeletePeriod = asyncHandler(async (req, res) => {
+  checkAdmin(req.user.role);
+  const periodId = Number(req.params.id);
+
+  if (!Number.isFinite(periodId)) {
+    throw new AppError("Invalid period ID", 400);
+  }
+
+  // Check if period is used in any timetable
+  const usageCount = await prisma.timetable.count({
+    where: { periodId },
+  });
+
+  if (usageCount > 0) {
+    throw new AppError(
+      "Cannot delete period as it is currently being used in one or more timetables. Please remove those entries first.",
+      400,
+    );
+  }
+
+  await prisma.period.delete({
+    where: { id: periodId },
+  });
+
+  return sendJson(res, 200, true, "Period deleted successfully", null);
+});
+
+export const UpdatePeriod = asyncHandler(async (req, res) => {
+  checkAdmin(req.user.role);
+  const periodId = Number(req.params.id);
+  const { label, startTime, endTime, isBreak } = req.body;
+
+  if (!Number.isFinite(periodId)) {
+    throw new AppError("Invalid period ID", 400);
+  }
+
+  const period = await prisma.period.update({
+    where: { id: periodId },
+    data: {
+      label,
+      startTime,
+      endTime,
+      isBreak: isBreak !== undefined ? Boolean(isBreak) : undefined,
+    },
+  });
+
+  return sendJson(res, 200, true, "Period updated successfully", period);
+});
+
+export const AssignPeriodToYearGroup = asyncHandler(async (req, res) => {
+  checkAdmin(req.user.role);
+  const { yearGroupId, periodId } = req.body;
+
+  if (!yearGroupId || !periodId) {
+    throw new AppError("yearGroupId and periodId are required", 400);
+  }
+
+  // We ensure the link exists by creating a 'Free' slot for Monday (or any day)
+  // Or better, we just allow the frontend to upsert slots with any period.
+  // Actually, if we want to 'add' a period to a year group's view,
+  // we can just create one Timetable entry for it.
+  
+  const timetable = await prisma.timetable.upsert({
+    where: {
+      yearGroupId_day_periodId: {
+        yearGroupId: Number(yearGroupId),
+        day: DayOfWeek.Monday,
+        periodId: Number(periodId),
+      },
+    },
+    update: {},
+    create: {
+      yearGroupId: Number(yearGroupId),
+      day: DayOfWeek.Monday,
+      periodId: Number(periodId),
+      subjectId: null,
+      teacherId: null,
+    },
+  });
+
+  return sendJson(res, 200, true, "Period assigned to year group", timetable);
 });
 
 export const AssignTeacherToYearGroup = asyncHandler(async (req, res) => {

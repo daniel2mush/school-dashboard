@@ -109,6 +109,28 @@ const studentInclude = {
   enrolledYearGroup: {
     include: {
       subjects: true,
+      teachers: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          specialization: true,
+        },
+      },
+      timetables: {
+        include: {
+          period: true,
+          subject: true,
+          teacher: {
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              specialization: true,
+            },
+          },
+        },
+      },
       fees: {
         include: {
           payments: true,

@@ -203,8 +203,14 @@
   gap: 14px;
 }
 
+.overviewCharts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
 @media (max-width: 900px) {
-  .insights {
+  .insights, .overviewCharts {
     grid-template-columns: 1fr;
   }
 }

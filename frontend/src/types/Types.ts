@@ -34,6 +34,8 @@ export interface YearGroup {
   roomNumber?: string | null;
   capacity?: number | null;
   subjects?: Subject[];
+  teachers?: Pick<User, "id" | "name" | "email" | "specialization">[];
+  timetables?: Timetable[];
   fees?: Fee[];
   students?: User[];
 }
@@ -124,8 +126,10 @@ export interface Timetable {
   yearGroupId: number;
   periodId: number;
   subjectId: number | null;
+  teacherId?: number | null;
   period: Period;
   subject: Subject | null;
+  teacher?: Pick<User, "id" | "name" | "email" | "specialization"> | null;
 }
 
 export interface Period {
