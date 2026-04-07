@@ -8,9 +8,22 @@
   width: 100%;
   height: 100%;
   position: relative;
-
   margin: auto;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    width: 100%;
+    height: auto;
+    max-width: 400px;
+    object-fit: contain;
+    transform: scale(1.5);
+    margin: auto;
+    transition: transform 0.2s ease-out;
+  }
 }
 
 .texts {

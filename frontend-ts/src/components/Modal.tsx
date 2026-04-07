@@ -161,7 +161,7 @@
 //         <option>Senior Secondary</option>
 //         <option>University</option>
 //       </select>
-//       <label>Default term fee (GHS)</label>
+//       <label>Default term fee (CFA)</label>
 //       <input type="number" min={0} value={feeTotal} onChange={(event) => setFeeTotal(event.target.value)} />
 //       <label>Subjects</label>
 //       <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 }}>
@@ -381,7 +381,7 @@
 //           <select value={yearId} onChange={(event) => setYearId(Number(event.target.value))}>
 //             {yearGroups.map((yearGroup) => <option key={yearGroup.id} value={yearGroup.id}>{yearGroup.name}</option>)}
 //           </select>
-//           <label>Fee plan (GHS)</label>
+//           <label>Fee plan (CFA)</label>
 //           <input type="number" placeholder="e.g. 3200" min={0} value={feeTotal} onChange={(event) => setFeeTotal(event.target.value)} />
 //         </>
 //       )}
@@ -497,7 +497,7 @@
 
 //   return (
 //     <>
-//       <div className="modal-title">Set fee structure (GHS)</div>
+//       <div className="modal-title">Set fee structure (CFA)</div>
 //       {yearGroups.map((yearGroup) => (
 //         <div key={yearGroup.id} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 0", borderBottom: "0.5px solid var(--border-light)" }}>
 //           <span style={{ fontSize: 12, flex: 1 }}>{yearGroup.name}</span>

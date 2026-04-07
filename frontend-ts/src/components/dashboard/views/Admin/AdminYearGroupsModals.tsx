@@ -126,7 +126,7 @@ export function CreateYearGroupModal({ onClose }: { onClose: () => void }) {
         <div className={styles.modalFooterActions}>
           <button
             type="button"
-            className="btn"
+            className="btn btn-secondary"
             onClick={onClose}
             disabled={isPending}
           >
@@ -246,7 +246,7 @@ export function EditYearGroupModal({
         <div className={styles.modalFooterActions}>
           <button
             type="button"
-            className="btn"
+            className="btn btn-secondary"
             onClick={onClose}
             disabled={isPending}
           >
@@ -357,7 +357,7 @@ export function YearGroupSubjectsModal({
         <div className={styles.modalFooterActions}>
           <button
             type="button"
-            className="btn"
+            className="btn btn-secondary"
             onClick={onClose}
             disabled={isSaving}
           >
@@ -544,7 +544,7 @@ export function MoveStudentModal({
         <div className={styles.modalFooterActions}>
           <button
             type="button"
-            className="btn"
+            className="btn btn-secondary"
             onClick={onClose}
             disabled={isPending}
           >

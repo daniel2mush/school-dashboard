@@ -177,7 +177,7 @@ export function FeeBar({ paid, total }: any) {
   return (
     <div>
       <div style={{ fontSize: 10 }}>
-        GHS {paid.toLocaleString()} / {total.toLocaleString()}
+        CFA {paid.toLocaleString()} / {total.toLocaleString()}
       </div>
       <div className="fee-bar">
         <div

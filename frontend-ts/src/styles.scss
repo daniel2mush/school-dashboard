@@ -222,6 +222,12 @@
       transform: translateY(0) scale(0.98);
     }
   }
+  &.btn-ghost,
+  &.ghost {
+    background: transparent;
+    color: var(--text-primary);
+    border-color: transparent;
+  }
 
   /* Sizes */
   &.btn-sm,

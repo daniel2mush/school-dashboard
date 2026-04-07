@@ -6,6 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend
 } from 'recharts';
+import type { TooltipValueType } from 'recharts';
 import {
   useGetAdminAnalytics,
   useGetSchoolStructure,
@@ -69,6 +70,12 @@ function formatCFA(amount: number) {
     currency: "XOF",
     minimumFractionDigits: 0,
   }).format(amount).replace("F CFA", "CFA").replace("FCFA", "CFA");
+}
+
+function tooltipValueToNumber(value: TooltipValueType | undefined) {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  const parsedValue = Number(rawValue);
+  return Number.isFinite(parsedValue) ? parsedValue : 0;
 }
 
 function targetLabel(ann: Announcement) {
@@ -427,7 +434,7 @@ export default function AdminOverview() {
                     ))}
                   </Pie>
                   <Tooltip 
-                    formatter={(value: number) => formatCFA(value)}
+                    formatter={(value) => formatCFA(tooltipValueToNumber(value))}
                     contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
                   />
                   <Legend verticalAlign="bottom" height={36}/>

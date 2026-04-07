@@ -7,10 +7,6 @@ export default function AuthImage() {
     <div className={styles.container}>
       <div className={styles.imageWrapper}>
         <img
-          style={{
-            objectFit: 'contain',
-            scale: 1.5,
-          }}
           src={'/authImage.svg'}
           alt="Auth Image"
           loading="eager"

@@ -144,6 +144,6 @@ export default function App() {
 | School name / term | `SchoolDataProvider.tsx` → `SCHOOL` |
 | Year group labels (Form 1, Grade 1, etc.) | `YEAR_GROUPS[].name` |
 | Colour palette | `src/styles/globals.css` → `:root` |
-| Currency | `SCHOOL.currency` (currently `GHS`) |
+| Currency | `SCHOOL.currency` (currently `CFA`) |
 | Add a new page | Create component → add to `PAGE_MAP` in `App.jsx` → add to `NAV_CONFIG` in `navigation.js` |
 | Add a modal | Add new `if (type === ...)` block in `Modal.jsx` |

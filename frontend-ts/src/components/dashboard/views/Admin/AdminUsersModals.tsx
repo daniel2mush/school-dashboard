@@ -1,18 +1,20 @@
 import { Input } from '@/components/ui'
-import { useEffect, useId, useState, type FormEvent } from 'react'
+import { useEffect, useId, useState  } from 'react'
+import type {FormEvent} from 'react';
 import { toast } from 'sonner'
 import styles from './AdminUsers.module.scss'
 import { generateSecurePassword } from '#/components/lib/generatePassword'
 import {
   useCreateAdminUser,
-  type AdminCreateTeacherPayload,
+
   useGetSchoolStructure,
   useUpdateAdminUser,
-  useResetUserPassword,
-  type AdminCreateStudentPayload,
-  type CredentialsPayload,
-  type AdminDirectoryUser,
+  useResetUserPassword
+
+
+
 } from '#/components/query/AdminQuery'
+import type {AdminCreateTeacherPayload, AdminCreateStudentPayload, CredentialsPayload, AdminDirectoryUser} from '#/components/query/AdminQuery';
 
 function copyText(value: string) {
   void navigator.clipboard.writeText(value)
@@ -208,7 +210,7 @@ export function AddTeacherModal({
               />
               <button
                 type="button"
-                className="btn"
+                className="btn btn-outline"
                 onClick={() => setPassword(generateSecurePassword())}
               >
                 Generate
@@ -250,7 +252,7 @@ export function AddTeacherModal({
         <footer className={styles.modalFooter}>
           <button
             type="button"
-            className="btn"
+            className="btn btn-secondary"
             onClick={onClose}
             disabled={isPending}
           >
@@ -379,7 +381,7 @@ export function AddStudentModal({
               />
               <button
                 type="button"
-                className="btn"
+                className="btn btn-outline"
                 onClick={() => setPassword(generateSecurePassword())}
               >
                 Generate
@@ -434,7 +436,7 @@ export function AddStudentModal({
         <footer className={styles.modalFooter}>
           <button
             type="button"
-            className="btn"
+            className="btn btn-secondary"
             onClick={onClose}
             disabled={isPending}
           >
@@ -501,7 +503,7 @@ export function DeleteUserModal({
           </p>
         </div>
         <footer className={styles.modalFooter}>
-          <button type="button" className="btn" onClick={onClose}>
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
             Cancel
           </button>
           <button
@@ -758,7 +760,7 @@ export function UserProfileDrawer({
             ) : null}
 
             <div className={styles.drawerFooter}>
-              <button type="button" className="btn" onClick={onClose}>
+              <button type="button" className="btn btn-secondary" onClick={onClose}>
                 Cancel
               </button>
               <button

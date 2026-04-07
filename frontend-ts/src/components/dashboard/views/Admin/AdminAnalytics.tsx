@@ -12,6 +12,7 @@ import {
   Pie,
   Legend,
 } from 'recharts'
+import type { TooltipValueType } from 'recharts'
 import {
   Users,
   GraduationCap,
@@ -92,10 +93,14 @@ function StudentEditModal({
                   style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}
                 >
                   Total:{' '}
-                  {new Intl.NumberFormat('en-GH', {
+                  {new Intl.NumberFormat('fr-FR', {
                     style: 'currency',
-                    currency: 'GHS',
-                  }).format(f.totalAmount)}
+                    currency: 'XOF',
+                    minimumFractionDigits: 0,
+                  })
+                    .format(f.totalAmount)
+                    .replace('F CFA', 'CFA')
+                    .replace('FCFA', 'CFA')}
                 </span>
               </div>
               <div className={styles.feeItemInputGrid}>
@@ -175,11 +180,20 @@ export function AdminAnalytics() {
   }
 
   const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-GH', {
+    return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'GHS',
+      currency: 'XOF',
       maximumFractionDigits: 0,
-    }).format(val)
+    })
+      .format(val)
+      .replace('F CFA', 'CFA')
+      .replace('FCFA', 'CFA')
+  }
+
+  const tooltipValueToNumber = (value: TooltipValueType | undefined) => {
+    const rawValue = Array.isArray(value) ? value[0] : value
+    const parsedValue = Number(rawValue)
+    return Number.isFinite(parsedValue) ? parsedValue : 0
   }
 
   const filteredStudents = stats.studentStats.filter(
@@ -359,8 +373,8 @@ export function AdminAnalytics() {
                       boxShadow: 'var(--shadow-md)',
                       background: 'var(--bg-primary)',
                     }}
-                    formatter={(value: number) => [
-                      formatCurrency(value),
+                    formatter={(value) => [
+                      formatCurrency(tooltipValueToNumber(value)),
                       'Amount',
                     ]}
                   />
@@ -474,8 +488,8 @@ export function AdminAnalytics() {
                       boxShadow: 'var(--shadow-md)',
                       background: 'var(--bg-primary)',
                     }}
-                    formatter={(value: number) => [
-                      `${value}%`,
+                    formatter={(value) => [
+                      `${tooltipValueToNumber(value)}%`,
                       'Attendance Rate',
                     ]}
                   />

@@ -108,5 +108,5 @@ export function getDashboardHref(
   role: UserRole,
   section = ROLE_DEFAULT_PAGE[role],
 ) {
-  return `/dashboard/${section}`
+  return `/dashboard/${role.toLowerCase()}/${section}`
 }

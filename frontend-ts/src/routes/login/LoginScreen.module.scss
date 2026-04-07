@@ -9,14 +9,12 @@
   height: 600px;
   width: 100%;
   max-width: 940px; // Very sleek, narrow card like modern SaaS
-  display: flex;
-  flex-direction: column;
-  align-items: center;
   background-color: var(--bg-secondary);
   border-radius: var(--radius-lg);
   border: 1px solid var(--accent-bg);
   display: grid;
   grid-template-columns: 1fr 1fr;
+  overflow: hidden;
 }
 .loginContent {
   width: 100%;

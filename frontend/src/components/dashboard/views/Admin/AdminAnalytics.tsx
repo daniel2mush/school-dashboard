@@ -4,6 +4,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
   Cell, PieChart, Pie, Legend 
 } from 'recharts';
+import type { TooltipValueType } from 'recharts';
 import { Users, GraduationCap, Wallet, CheckCircle, Search, Edit2, X, Calendar, User, Mail, School } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui";
@@ -45,7 +46,14 @@ function StudentEditModal({ student, onClose }: { student: any, onClose: () => v
             <div key={f.feeId} className={styles.feeItemRow}>
               <div className={styles.feeItemHeader}>
                 <span className={styles.feeItemTitle}>{f.title}</span>
-                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Total: {new Intl.NumberFormat('en-GH', { style: 'currency', currency: 'GHS' }).format(f.totalAmount)}</span>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Total: {new Intl.NumberFormat('fr-FR', {
+                  style: 'currency',
+                  currency: 'XOF',
+                  minimumFractionDigits: 0,
+                })
+                  .format(f.totalAmount)
+                  .replace('F CFA', 'CFA')
+                  .replace('FCFA', 'CFA')}</span>
               </div>
               <div className={styles.feeItemInputGrid}>
                 <Input 
@@ -101,11 +109,20 @@ export default function AdminAnalytics() {
   }
 
   const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('en-GH', {
+    return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
-      currency: 'GHS',
+      currency: 'XOF',
       maximumFractionDigits: 0,
-    }).format(val);
+    })
+      .format(val)
+      .replace('F CFA', 'CFA')
+      .replace('FCFA', 'CFA')
+  };
+
+  const tooltipValueToNumber = (value: TooltipValueType | undefined) => {
+    const rawValue = Array.isArray(value) ? value[0] : value;
+    const parsedValue = Number(rawValue);
+    return Number.isFinite(parsedValue) ? parsedValue : 0;
   };
 
   const filteredStudents = stats.studentStats.filter(s => 
@@ -210,7 +227,7 @@ export default function AdminAnalytics() {
                   <Tooltip 
                     cursor={{ fill: 'transparent' }}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)', background: 'var(--bg-primary)' }}
-                    formatter={(value: number) => [formatCurrency(value), 'Amount']}
+                    formatter={(value) => [formatCurrency(tooltipValueToNumber(value)), 'Amount']}
                   />
                   <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={60}>
                     {revenueData.map((entry, index) => (
@@ -277,7 +294,7 @@ export default function AdminAnalytics() {
                   <Tooltip 
                     cursor={{ fill: 'rgba(0,0,0,0.05)' }}
                     contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)', background: 'var(--bg-primary)' }}
-                    formatter={(value: number) => [`${value}%`, 'Attendance Rate']}
+                    formatter={(value) => [`${tooltipValueToNumber(value)}%`, 'Attendance Rate']}
                   />
                   <Bar dataKey="rate" radius={[0, 4, 4, 0]} barSize={24} fill="var(--accent)">
                     {attendanceByCohort.map((entry, index) => (

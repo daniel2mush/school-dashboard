@@ -62,7 +62,7 @@ export default function StudentDashboard({ onNavigate }: StudentDashboardProps) 
         <MetricCard
           label="Fees paid"
           value={`${feePct}%`}
-          sub={`GHS ${student.fees.paid.toLocaleString()} of ${student.fees.total.toLocaleString()}`}
+          sub={`CFA ${student.fees.paid.toLocaleString()} of ${student.fees.total.toLocaleString()}`}
         />
         <MetricCard
           label="Best subject"
