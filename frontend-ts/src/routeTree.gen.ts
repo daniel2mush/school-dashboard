@@ -9,38 +9,553 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LoginIndexRouteImport } from './routes/login/index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardTeacherTmyRouteImport } from './routes/dashboard/teacher/tmy'
+import { Route as DashboardStudentSdashRouteImport } from './routes/dashboard/student/sdash'
+import { Route as DashboardAdminYeargroupsRouteImport } from './routes/dashboard/admin/yeargroups'
+import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard/admin/users'
+import { Route as DashboardAdminTimetableRouteImport } from './routes/dashboard/admin/timetable'
+import { Route as DashboardAdminOverviewRouteImport } from './routes/dashboard/admin/overview'
+import { Route as DashboardAdminFeesRouteImport } from './routes/dashboard/admin/fees'
+import { Route as DashboardAdminCurriculumRouteImport } from './routes/dashboard/admin/curriculum'
+import { Route as DashboardAdminAttendanceRouteImport } from './routes/dashboard/admin/attendance'
+import { Route as DashboardAdminAnnouncementsRouteImport } from './routes/dashboard/admin/announcements'
+import { Route as DashboardAdminAnalyticsRouteImport } from './routes/dashboard/admin/analytics'
+import { Route as ApiUserAnnouncementsRouteImport } from './routes/api/user/announcements'
+import { Route as ApiUserIdRouteImport } from './routes/api/user/$id'
+import { Route as ApiAuthLoginRouteImport } from './routes/api/auth/login'
+import { Route as ApiAdminYearGroupsRouteImport } from './routes/api/admin/year-groups'
+import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
+import { Route as ApiAdminTimetableRouteImport } from './routes/api/admin/timetable'
+import { Route as ApiAdminSubjectsRouteImport } from './routes/api/admin/subjects'
+import { Route as ApiAdminStructureRouteImport } from './routes/api/admin/structure'
+import { Route as ApiAdminPeriodsRouteImport } from './routes/api/admin/periods'
+import { Route as ApiAdminFeesRouteImport } from './routes/api/admin/fees'
+import { Route as ApiAdminAnnouncementsRouteImport } from './routes/api/admin/announcements'
+import { Route as ApiAdminAnalyticsRouteImport } from './routes/api/admin/analytics'
+import { Route as ApiAdminYearGroupsUnassignTeacherRouteImport } from './routes/api/admin/year-groups/unassign-teacher'
+import { Route as ApiAdminYearGroupsMoveStudentRouteImport } from './routes/api/admin/year-groups/move-student'
+import { Route as ApiAdminYearGroupsAssignTeacherRouteImport } from './routes/api/admin/year-groups/assign-teacher'
+import { Route as ApiAdminYearGroupsIdRouteImport } from './routes/api/admin/year-groups/$id'
+import { Route as ApiAdminSubjectsUnassignYearGroupRouteImport } from './routes/api/admin/subjects/unassign-year-group'
+import { Route as ApiAdminSubjectsAssignYearGroupRouteImport } from './routes/api/admin/subjects/assign-year-group'
+import { Route as ApiAdminSubjectsIdRouteImport } from './routes/api/admin/subjects/$id'
+import { Route as ApiAdminPeriodsAssignYearGroupRouteImport } from './routes/api/admin/periods/assign-year-group'
+import { Route as ApiAdminPeriodsIdRouteImport } from './routes/api/admin/periods/$id'
+import { Route as ApiAdminFeesIdRouteImport } from './routes/api/admin/fees/$id'
+import { Route as ApiAdminUsersIdUsersRouteImport } from './routes/api/admin/users/$id/users'
+import { Route as ApiAdminUsersIdStatusRouteImport } from './routes/api/admin/users/$id/status'
+import { Route as ApiAdminUsersIdResetPasswordRouteImport } from './routes/api/admin/users/$id/reset-password'
+import { Route as ApiAdminFeesIdPaymentsStudentIdRouteImport } from './routes/api/admin/fees/$id/payments/$studentId'
 
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LoginIndexRoute = LoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTeacherTmyRoute = DashboardTeacherTmyRouteImport.update({
+  id: '/teacher/tmy',
+  path: '/teacher/tmy',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStudentSdashRoute = DashboardStudentSdashRouteImport.update({
+  id: '/student/sdash',
+  path: '/student/sdash',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAdminYeargroupsRoute =
+  DashboardAdminYeargroupsRouteImport.update({
+    id: '/admin/yeargroups',
+    path: '/admin/yeargroups',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardAdminUsersRoute = DashboardAdminUsersRouteImport.update({
+  id: '/admin/users',
+  path: '/admin/users',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAdminTimetableRoute = DashboardAdminTimetableRouteImport.update({
+  id: '/admin/timetable',
+  path: '/admin/timetable',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAdminOverviewRoute = DashboardAdminOverviewRouteImport.update({
+  id: '/admin/overview',
+  path: '/admin/overview',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAdminFeesRoute = DashboardAdminFeesRouteImport.update({
+  id: '/admin/fees',
+  path: '/admin/fees',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAdminCurriculumRoute =
+  DashboardAdminCurriculumRouteImport.update({
+    id: '/admin/curriculum',
+    path: '/admin/curriculum',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardAdminAttendanceRoute =
+  DashboardAdminAttendanceRouteImport.update({
+    id: '/admin/attendance',
+    path: '/admin/attendance',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardAdminAnnouncementsRoute =
+  DashboardAdminAnnouncementsRouteImport.update({
+    id: '/admin/announcements',
+    path: '/admin/announcements',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardAdminAnalyticsRoute = DashboardAdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const ApiUserAnnouncementsRoute = ApiUserAnnouncementsRouteImport.update({
+  id: '/api/user/announcements',
+  path: '/api/user/announcements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUserIdRoute = ApiUserIdRouteImport.update({
+  id: '/api/user/$id',
+  path: '/api/user/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
+  id: '/api/auth/login',
+  path: '/api/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminYearGroupsRoute = ApiAdminYearGroupsRouteImport.update({
+  id: '/api/admin/year-groups',
+  path: '/api/admin/year-groups',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
+  id: '/api/admin/users',
+  path: '/api/admin/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminTimetableRoute = ApiAdminTimetableRouteImport.update({
+  id: '/api/admin/timetable',
+  path: '/api/admin/timetable',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminSubjectsRoute = ApiAdminSubjectsRouteImport.update({
+  id: '/api/admin/subjects',
+  path: '/api/admin/subjects',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminStructureRoute = ApiAdminStructureRouteImport.update({
+  id: '/api/admin/structure',
+  path: '/api/admin/structure',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminPeriodsRoute = ApiAdminPeriodsRouteImport.update({
+  id: '/api/admin/periods',
+  path: '/api/admin/periods',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminFeesRoute = ApiAdminFeesRouteImport.update({
+  id: '/api/admin/fees',
+  path: '/api/admin/fees',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAnnouncementsRoute = ApiAdminAnnouncementsRouteImport.update({
+  id: '/api/admin/announcements',
+  path: '/api/admin/announcements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAnalyticsRoute = ApiAdminAnalyticsRouteImport.update({
+  id: '/api/admin/analytics',
+  path: '/api/admin/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminYearGroupsUnassignTeacherRoute =
+  ApiAdminYearGroupsUnassignTeacherRouteImport.update({
+    id: '/unassign-teacher',
+    path: '/unassign-teacher',
+    getParentRoute: () => ApiAdminYearGroupsRoute,
+  } as any)
+const ApiAdminYearGroupsMoveStudentRoute =
+  ApiAdminYearGroupsMoveStudentRouteImport.update({
+    id: '/move-student',
+    path: '/move-student',
+    getParentRoute: () => ApiAdminYearGroupsRoute,
+  } as any)
+const ApiAdminYearGroupsAssignTeacherRoute =
+  ApiAdminYearGroupsAssignTeacherRouteImport.update({
+    id: '/assign-teacher',
+    path: '/assign-teacher',
+    getParentRoute: () => ApiAdminYearGroupsRoute,
+  } as any)
+const ApiAdminYearGroupsIdRoute = ApiAdminYearGroupsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiAdminYearGroupsRoute,
+} as any)
+const ApiAdminSubjectsUnassignYearGroupRoute =
+  ApiAdminSubjectsUnassignYearGroupRouteImport.update({
+    id: '/unassign-year-group',
+    path: '/unassign-year-group',
+    getParentRoute: () => ApiAdminSubjectsRoute,
+  } as any)
+const ApiAdminSubjectsAssignYearGroupRoute =
+  ApiAdminSubjectsAssignYearGroupRouteImport.update({
+    id: '/assign-year-group',
+    path: '/assign-year-group',
+    getParentRoute: () => ApiAdminSubjectsRoute,
+  } as any)
+const ApiAdminSubjectsIdRoute = ApiAdminSubjectsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiAdminSubjectsRoute,
+} as any)
+const ApiAdminPeriodsAssignYearGroupRoute =
+  ApiAdminPeriodsAssignYearGroupRouteImport.update({
+    id: '/assign-year-group',
+    path: '/assign-year-group',
+    getParentRoute: () => ApiAdminPeriodsRoute,
+  } as any)
+const ApiAdminPeriodsIdRoute = ApiAdminPeriodsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiAdminPeriodsRoute,
+} as any)
+const ApiAdminFeesIdRoute = ApiAdminFeesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiAdminFeesRoute,
+} as any)
+const ApiAdminUsersIdUsersRoute = ApiAdminUsersIdUsersRouteImport.update({
+  id: '/$id/users',
+  path: '/$id/users',
+  getParentRoute: () => ApiAdminUsersRoute,
+} as any)
+const ApiAdminUsersIdStatusRoute = ApiAdminUsersIdStatusRouteImport.update({
+  id: '/$id/status',
+  path: '/$id/status',
+  getParentRoute: () => ApiAdminUsersRoute,
+} as any)
+const ApiAdminUsersIdResetPasswordRoute =
+  ApiAdminUsersIdResetPasswordRouteImport.update({
+    id: '/$id/reset-password',
+    path: '/$id/reset-password',
+    getParentRoute: () => ApiAdminUsersRoute,
+  } as any)
+const ApiAdminFeesIdPaymentsStudentIdRoute =
+  ApiAdminFeesIdPaymentsStudentIdRouteImport.update({
+    id: '/payments/$studentId',
+    path: '/payments/$studentId',
+    getParentRoute: () => ApiAdminFeesIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/api/admin/analytics': typeof ApiAdminAnalyticsRoute
+  '/api/admin/announcements': typeof ApiAdminAnnouncementsRoute
+  '/api/admin/fees': typeof ApiAdminFeesRouteWithChildren
+  '/api/admin/periods': typeof ApiAdminPeriodsRouteWithChildren
+  '/api/admin/structure': typeof ApiAdminStructureRoute
+  '/api/admin/subjects': typeof ApiAdminSubjectsRouteWithChildren
+  '/api/admin/timetable': typeof ApiAdminTimetableRoute
+  '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
+  '/api/admin/year-groups': typeof ApiAdminYearGroupsRouteWithChildren
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/user/$id': typeof ApiUserIdRoute
+  '/api/user/announcements': typeof ApiUserAnnouncementsRoute
+  '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
+  '/dashboard/admin/announcements': typeof DashboardAdminAnnouncementsRoute
+  '/dashboard/admin/attendance': typeof DashboardAdminAttendanceRoute
+  '/dashboard/admin/curriculum': typeof DashboardAdminCurriculumRoute
+  '/dashboard/admin/fees': typeof DashboardAdminFeesRoute
+  '/dashboard/admin/overview': typeof DashboardAdminOverviewRoute
+  '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
+  '/dashboard/admin/users': typeof DashboardAdminUsersRoute
+  '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
+  '/dashboard/teacher/tmy': typeof DashboardTeacherTmyRoute
+  '/api/admin/fees/$id': typeof ApiAdminFeesIdRouteWithChildren
+  '/api/admin/periods/$id': typeof ApiAdminPeriodsIdRoute
+  '/api/admin/periods/assign-year-group': typeof ApiAdminPeriodsAssignYearGroupRoute
+  '/api/admin/subjects/$id': typeof ApiAdminSubjectsIdRoute
+  '/api/admin/subjects/assign-year-group': typeof ApiAdminSubjectsAssignYearGroupRoute
+  '/api/admin/subjects/unassign-year-group': typeof ApiAdminSubjectsUnassignYearGroupRoute
+  '/api/admin/year-groups/$id': typeof ApiAdminYearGroupsIdRoute
+  '/api/admin/year-groups/assign-teacher': typeof ApiAdminYearGroupsAssignTeacherRoute
+  '/api/admin/year-groups/move-student': typeof ApiAdminYearGroupsMoveStudentRoute
+  '/api/admin/year-groups/unassign-teacher': typeof ApiAdminYearGroupsUnassignTeacherRoute
+  '/api/admin/users/$id/reset-password': typeof ApiAdminUsersIdResetPasswordRoute
+  '/api/admin/users/$id/status': typeof ApiAdminUsersIdStatusRoute
+  '/api/admin/users/$id/users': typeof ApiAdminUsersIdUsersRoute
+  '/api/admin/fees/$id/payments/$studentId': typeof ApiAdminFeesIdPaymentsStudentIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/login': typeof LoginIndexRoute
+  '/api/admin/analytics': typeof ApiAdminAnalyticsRoute
+  '/api/admin/announcements': typeof ApiAdminAnnouncementsRoute
+  '/api/admin/fees': typeof ApiAdminFeesRouteWithChildren
+  '/api/admin/periods': typeof ApiAdminPeriodsRouteWithChildren
+  '/api/admin/structure': typeof ApiAdminStructureRoute
+  '/api/admin/subjects': typeof ApiAdminSubjectsRouteWithChildren
+  '/api/admin/timetable': typeof ApiAdminTimetableRoute
+  '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
+  '/api/admin/year-groups': typeof ApiAdminYearGroupsRouteWithChildren
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/user/$id': typeof ApiUserIdRoute
+  '/api/user/announcements': typeof ApiUserAnnouncementsRoute
+  '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
+  '/dashboard/admin/announcements': typeof DashboardAdminAnnouncementsRoute
+  '/dashboard/admin/attendance': typeof DashboardAdminAttendanceRoute
+  '/dashboard/admin/curriculum': typeof DashboardAdminCurriculumRoute
+  '/dashboard/admin/fees': typeof DashboardAdminFeesRoute
+  '/dashboard/admin/overview': typeof DashboardAdminOverviewRoute
+  '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
+  '/dashboard/admin/users': typeof DashboardAdminUsersRoute
+  '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
+  '/dashboard/teacher/tmy': typeof DashboardTeacherTmyRoute
+  '/api/admin/fees/$id': typeof ApiAdminFeesIdRouteWithChildren
+  '/api/admin/periods/$id': typeof ApiAdminPeriodsIdRoute
+  '/api/admin/periods/assign-year-group': typeof ApiAdminPeriodsAssignYearGroupRoute
+  '/api/admin/subjects/$id': typeof ApiAdminSubjectsIdRoute
+  '/api/admin/subjects/assign-year-group': typeof ApiAdminSubjectsAssignYearGroupRoute
+  '/api/admin/subjects/unassign-year-group': typeof ApiAdminSubjectsUnassignYearGroupRoute
+  '/api/admin/year-groups/$id': typeof ApiAdminYearGroupsIdRoute
+  '/api/admin/year-groups/assign-teacher': typeof ApiAdminYearGroupsAssignTeacherRoute
+  '/api/admin/year-groups/move-student': typeof ApiAdminYearGroupsMoveStudentRoute
+  '/api/admin/year-groups/unassign-teacher': typeof ApiAdminYearGroupsUnassignTeacherRoute
+  '/api/admin/users/$id/reset-password': typeof ApiAdminUsersIdResetPasswordRoute
+  '/api/admin/users/$id/status': typeof ApiAdminUsersIdStatusRoute
+  '/api/admin/users/$id/users': typeof ApiAdminUsersIdUsersRoute
+  '/api/admin/fees/$id/payments/$studentId': typeof ApiAdminFeesIdPaymentsStudentIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/dashboard/': typeof DashboardIndexRoute
+  '/login/': typeof LoginIndexRoute
+  '/api/admin/analytics': typeof ApiAdminAnalyticsRoute
+  '/api/admin/announcements': typeof ApiAdminAnnouncementsRoute
+  '/api/admin/fees': typeof ApiAdminFeesRouteWithChildren
+  '/api/admin/periods': typeof ApiAdminPeriodsRouteWithChildren
+  '/api/admin/structure': typeof ApiAdminStructureRoute
+  '/api/admin/subjects': typeof ApiAdminSubjectsRouteWithChildren
+  '/api/admin/timetable': typeof ApiAdminTimetableRoute
+  '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
+  '/api/admin/year-groups': typeof ApiAdminYearGroupsRouteWithChildren
+  '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/user/$id': typeof ApiUserIdRoute
+  '/api/user/announcements': typeof ApiUserAnnouncementsRoute
+  '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
+  '/dashboard/admin/announcements': typeof DashboardAdminAnnouncementsRoute
+  '/dashboard/admin/attendance': typeof DashboardAdminAttendanceRoute
+  '/dashboard/admin/curriculum': typeof DashboardAdminCurriculumRoute
+  '/dashboard/admin/fees': typeof DashboardAdminFeesRoute
+  '/dashboard/admin/overview': typeof DashboardAdminOverviewRoute
+  '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
+  '/dashboard/admin/users': typeof DashboardAdminUsersRoute
+  '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
+  '/dashboard/teacher/tmy': typeof DashboardTeacherTmyRoute
+  '/api/admin/fees/$id': typeof ApiAdminFeesIdRouteWithChildren
+  '/api/admin/periods/$id': typeof ApiAdminPeriodsIdRoute
+  '/api/admin/periods/assign-year-group': typeof ApiAdminPeriodsAssignYearGroupRoute
+  '/api/admin/subjects/$id': typeof ApiAdminSubjectsIdRoute
+  '/api/admin/subjects/assign-year-group': typeof ApiAdminSubjectsAssignYearGroupRoute
+  '/api/admin/subjects/unassign-year-group': typeof ApiAdminSubjectsUnassignYearGroupRoute
+  '/api/admin/year-groups/$id': typeof ApiAdminYearGroupsIdRoute
+  '/api/admin/year-groups/assign-teacher': typeof ApiAdminYearGroupsAssignTeacherRoute
+  '/api/admin/year-groups/move-student': typeof ApiAdminYearGroupsMoveStudentRoute
+  '/api/admin/year-groups/unassign-teacher': typeof ApiAdminYearGroupsUnassignTeacherRoute
+  '/api/admin/users/$id/reset-password': typeof ApiAdminUsersIdResetPasswordRoute
+  '/api/admin/users/$id/status': typeof ApiAdminUsersIdStatusRoute
+  '/api/admin/users/$id/users': typeof ApiAdminUsersIdUsersRoute
+  '/api/admin/fees/$id/payments/$studentId': typeof ApiAdminFeesIdPaymentsStudentIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/dashboard/'
+    | '/login/'
+    | '/api/admin/analytics'
+    | '/api/admin/announcements'
+    | '/api/admin/fees'
+    | '/api/admin/periods'
+    | '/api/admin/structure'
+    | '/api/admin/subjects'
+    | '/api/admin/timetable'
+    | '/api/admin/users'
+    | '/api/admin/year-groups'
+    | '/api/auth/login'
+    | '/api/user/$id'
+    | '/api/user/announcements'
+    | '/dashboard/admin/analytics'
+    | '/dashboard/admin/announcements'
+    | '/dashboard/admin/attendance'
+    | '/dashboard/admin/curriculum'
+    | '/dashboard/admin/fees'
+    | '/dashboard/admin/overview'
+    | '/dashboard/admin/timetable'
+    | '/dashboard/admin/users'
+    | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/sdash'
+    | '/dashboard/teacher/tmy'
+    | '/api/admin/fees/$id'
+    | '/api/admin/periods/$id'
+    | '/api/admin/periods/assign-year-group'
+    | '/api/admin/subjects/$id'
+    | '/api/admin/subjects/assign-year-group'
+    | '/api/admin/subjects/unassign-year-group'
+    | '/api/admin/year-groups/$id'
+    | '/api/admin/year-groups/assign-teacher'
+    | '/api/admin/year-groups/move-student'
+    | '/api/admin/year-groups/unassign-teacher'
+    | '/api/admin/users/$id/reset-password'
+    | '/api/admin/users/$id/status'
+    | '/api/admin/users/$id/users'
+    | '/api/admin/fees/$id/payments/$studentId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/login'
+    | '/api/admin/analytics'
+    | '/api/admin/announcements'
+    | '/api/admin/fees'
+    | '/api/admin/periods'
+    | '/api/admin/structure'
+    | '/api/admin/subjects'
+    | '/api/admin/timetable'
+    | '/api/admin/users'
+    | '/api/admin/year-groups'
+    | '/api/auth/login'
+    | '/api/user/$id'
+    | '/api/user/announcements'
+    | '/dashboard/admin/analytics'
+    | '/dashboard/admin/announcements'
+    | '/dashboard/admin/attendance'
+    | '/dashboard/admin/curriculum'
+    | '/dashboard/admin/fees'
+    | '/dashboard/admin/overview'
+    | '/dashboard/admin/timetable'
+    | '/dashboard/admin/users'
+    | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/sdash'
+    | '/dashboard/teacher/tmy'
+    | '/api/admin/fees/$id'
+    | '/api/admin/periods/$id'
+    | '/api/admin/periods/assign-year-group'
+    | '/api/admin/subjects/$id'
+    | '/api/admin/subjects/assign-year-group'
+    | '/api/admin/subjects/unassign-year-group'
+    | '/api/admin/year-groups/$id'
+    | '/api/admin/year-groups/assign-teacher'
+    | '/api/admin/year-groups/move-student'
+    | '/api/admin/year-groups/unassign-teacher'
+    | '/api/admin/users/$id/reset-password'
+    | '/api/admin/users/$id/status'
+    | '/api/admin/users/$id/users'
+    | '/api/admin/fees/$id/payments/$studentId'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/dashboard/'
+    | '/login/'
+    | '/api/admin/analytics'
+    | '/api/admin/announcements'
+    | '/api/admin/fees'
+    | '/api/admin/periods'
+    | '/api/admin/structure'
+    | '/api/admin/subjects'
+    | '/api/admin/timetable'
+    | '/api/admin/users'
+    | '/api/admin/year-groups'
+    | '/api/auth/login'
+    | '/api/user/$id'
+    | '/api/user/announcements'
+    | '/dashboard/admin/analytics'
+    | '/dashboard/admin/announcements'
+    | '/dashboard/admin/attendance'
+    | '/dashboard/admin/curriculum'
+    | '/dashboard/admin/fees'
+    | '/dashboard/admin/overview'
+    | '/dashboard/admin/timetable'
+    | '/dashboard/admin/users'
+    | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/sdash'
+    | '/dashboard/teacher/tmy'
+    | '/api/admin/fees/$id'
+    | '/api/admin/periods/$id'
+    | '/api/admin/periods/assign-year-group'
+    | '/api/admin/subjects/$id'
+    | '/api/admin/subjects/assign-year-group'
+    | '/api/admin/subjects/unassign-year-group'
+    | '/api/admin/year-groups/$id'
+    | '/api/admin/year-groups/assign-teacher'
+    | '/api/admin/year-groups/move-student'
+    | '/api/admin/year-groups/unassign-teacher'
+    | '/api/admin/users/$id/reset-password'
+    | '/api/admin/users/$id/status'
+    | '/api/admin/users/$id/users'
+    | '/api/admin/fees/$id/payments/$studentId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  LoginIndexRoute: typeof LoginIndexRoute
+  ApiAdminAnalyticsRoute: typeof ApiAdminAnalyticsRoute
+  ApiAdminAnnouncementsRoute: typeof ApiAdminAnnouncementsRoute
+  ApiAdminFeesRoute: typeof ApiAdminFeesRouteWithChildren
+  ApiAdminPeriodsRoute: typeof ApiAdminPeriodsRouteWithChildren
+  ApiAdminStructureRoute: typeof ApiAdminStructureRoute
+  ApiAdminSubjectsRoute: typeof ApiAdminSubjectsRouteWithChildren
+  ApiAdminTimetableRoute: typeof ApiAdminTimetableRoute
+  ApiAdminUsersRoute: typeof ApiAdminUsersRouteWithChildren
+  ApiAdminYearGroupsRoute: typeof ApiAdminYearGroupsRouteWithChildren
+  ApiAuthLoginRoute: typeof ApiAuthLoginRoute
+  ApiUserIdRoute: typeof ApiUserIdRoute
+  ApiUserAnnouncementsRoute: typeof ApiUserAnnouncementsRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +563,420 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/login/': {
+      id: '/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof LoginIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/teacher/tmy': {
+      id: '/dashboard/teacher/tmy'
+      path: '/teacher/tmy'
+      fullPath: '/dashboard/teacher/tmy'
+      preLoaderRoute: typeof DashboardTeacherTmyRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/student/sdash': {
+      id: '/dashboard/student/sdash'
+      path: '/student/sdash'
+      fullPath: '/dashboard/student/sdash'
+      preLoaderRoute: typeof DashboardStudentSdashRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/yeargroups': {
+      id: '/dashboard/admin/yeargroups'
+      path: '/admin/yeargroups'
+      fullPath: '/dashboard/admin/yeargroups'
+      preLoaderRoute: typeof DashboardAdminYeargroupsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/users': {
+      id: '/dashboard/admin/users'
+      path: '/admin/users'
+      fullPath: '/dashboard/admin/users'
+      preLoaderRoute: typeof DashboardAdminUsersRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/timetable': {
+      id: '/dashboard/admin/timetable'
+      path: '/admin/timetable'
+      fullPath: '/dashboard/admin/timetable'
+      preLoaderRoute: typeof DashboardAdminTimetableRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/overview': {
+      id: '/dashboard/admin/overview'
+      path: '/admin/overview'
+      fullPath: '/dashboard/admin/overview'
+      preLoaderRoute: typeof DashboardAdminOverviewRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/fees': {
+      id: '/dashboard/admin/fees'
+      path: '/admin/fees'
+      fullPath: '/dashboard/admin/fees'
+      preLoaderRoute: typeof DashboardAdminFeesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/curriculum': {
+      id: '/dashboard/admin/curriculum'
+      path: '/admin/curriculum'
+      fullPath: '/dashboard/admin/curriculum'
+      preLoaderRoute: typeof DashboardAdminCurriculumRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/attendance': {
+      id: '/dashboard/admin/attendance'
+      path: '/admin/attendance'
+      fullPath: '/dashboard/admin/attendance'
+      preLoaderRoute: typeof DashboardAdminAttendanceRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/announcements': {
+      id: '/dashboard/admin/announcements'
+      path: '/admin/announcements'
+      fullPath: '/dashboard/admin/announcements'
+      preLoaderRoute: typeof DashboardAdminAnnouncementsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/admin/analytics': {
+      id: '/dashboard/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/dashboard/admin/analytics'
+      preLoaderRoute: typeof DashboardAdminAnalyticsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/api/user/announcements': {
+      id: '/api/user/announcements'
+      path: '/api/user/announcements'
+      fullPath: '/api/user/announcements'
+      preLoaderRoute: typeof ApiUserAnnouncementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/user/$id': {
+      id: '/api/user/$id'
+      path: '/api/user/$id'
+      fullPath: '/api/user/$id'
+      preLoaderRoute: typeof ApiUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/login': {
+      id: '/api/auth/login'
+      path: '/api/auth/login'
+      fullPath: '/api/auth/login'
+      preLoaderRoute: typeof ApiAuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/year-groups': {
+      id: '/api/admin/year-groups'
+      path: '/api/admin/year-groups'
+      fullPath: '/api/admin/year-groups'
+      preLoaderRoute: typeof ApiAdminYearGroupsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/users': {
+      id: '/api/admin/users'
+      path: '/api/admin/users'
+      fullPath: '/api/admin/users'
+      preLoaderRoute: typeof ApiAdminUsersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/timetable': {
+      id: '/api/admin/timetable'
+      path: '/api/admin/timetable'
+      fullPath: '/api/admin/timetable'
+      preLoaderRoute: typeof ApiAdminTimetableRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/subjects': {
+      id: '/api/admin/subjects'
+      path: '/api/admin/subjects'
+      fullPath: '/api/admin/subjects'
+      preLoaderRoute: typeof ApiAdminSubjectsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/structure': {
+      id: '/api/admin/structure'
+      path: '/api/admin/structure'
+      fullPath: '/api/admin/structure'
+      preLoaderRoute: typeof ApiAdminStructureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/periods': {
+      id: '/api/admin/periods'
+      path: '/api/admin/periods'
+      fullPath: '/api/admin/periods'
+      preLoaderRoute: typeof ApiAdminPeriodsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/fees': {
+      id: '/api/admin/fees'
+      path: '/api/admin/fees'
+      fullPath: '/api/admin/fees'
+      preLoaderRoute: typeof ApiAdminFeesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/announcements': {
+      id: '/api/admin/announcements'
+      path: '/api/admin/announcements'
+      fullPath: '/api/admin/announcements'
+      preLoaderRoute: typeof ApiAdminAnnouncementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/analytics': {
+      id: '/api/admin/analytics'
+      path: '/api/admin/analytics'
+      fullPath: '/api/admin/analytics'
+      preLoaderRoute: typeof ApiAdminAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/year-groups/unassign-teacher': {
+      id: '/api/admin/year-groups/unassign-teacher'
+      path: '/unassign-teacher'
+      fullPath: '/api/admin/year-groups/unassign-teacher'
+      preLoaderRoute: typeof ApiAdminYearGroupsUnassignTeacherRouteImport
+      parentRoute: typeof ApiAdminYearGroupsRoute
+    }
+    '/api/admin/year-groups/move-student': {
+      id: '/api/admin/year-groups/move-student'
+      path: '/move-student'
+      fullPath: '/api/admin/year-groups/move-student'
+      preLoaderRoute: typeof ApiAdminYearGroupsMoveStudentRouteImport
+      parentRoute: typeof ApiAdminYearGroupsRoute
+    }
+    '/api/admin/year-groups/assign-teacher': {
+      id: '/api/admin/year-groups/assign-teacher'
+      path: '/assign-teacher'
+      fullPath: '/api/admin/year-groups/assign-teacher'
+      preLoaderRoute: typeof ApiAdminYearGroupsAssignTeacherRouteImport
+      parentRoute: typeof ApiAdminYearGroupsRoute
+    }
+    '/api/admin/year-groups/$id': {
+      id: '/api/admin/year-groups/$id'
+      path: '/$id'
+      fullPath: '/api/admin/year-groups/$id'
+      preLoaderRoute: typeof ApiAdminYearGroupsIdRouteImport
+      parentRoute: typeof ApiAdminYearGroupsRoute
+    }
+    '/api/admin/subjects/unassign-year-group': {
+      id: '/api/admin/subjects/unassign-year-group'
+      path: '/unassign-year-group'
+      fullPath: '/api/admin/subjects/unassign-year-group'
+      preLoaderRoute: typeof ApiAdminSubjectsUnassignYearGroupRouteImport
+      parentRoute: typeof ApiAdminSubjectsRoute
+    }
+    '/api/admin/subjects/assign-year-group': {
+      id: '/api/admin/subjects/assign-year-group'
+      path: '/assign-year-group'
+      fullPath: '/api/admin/subjects/assign-year-group'
+      preLoaderRoute: typeof ApiAdminSubjectsAssignYearGroupRouteImport
+      parentRoute: typeof ApiAdminSubjectsRoute
+    }
+    '/api/admin/subjects/$id': {
+      id: '/api/admin/subjects/$id'
+      path: '/$id'
+      fullPath: '/api/admin/subjects/$id'
+      preLoaderRoute: typeof ApiAdminSubjectsIdRouteImport
+      parentRoute: typeof ApiAdminSubjectsRoute
+    }
+    '/api/admin/periods/assign-year-group': {
+      id: '/api/admin/periods/assign-year-group'
+      path: '/assign-year-group'
+      fullPath: '/api/admin/periods/assign-year-group'
+      preLoaderRoute: typeof ApiAdminPeriodsAssignYearGroupRouteImport
+      parentRoute: typeof ApiAdminPeriodsRoute
+    }
+    '/api/admin/periods/$id': {
+      id: '/api/admin/periods/$id'
+      path: '/$id'
+      fullPath: '/api/admin/periods/$id'
+      preLoaderRoute: typeof ApiAdminPeriodsIdRouteImport
+      parentRoute: typeof ApiAdminPeriodsRoute
+    }
+    '/api/admin/fees/$id': {
+      id: '/api/admin/fees/$id'
+      path: '/$id'
+      fullPath: '/api/admin/fees/$id'
+      preLoaderRoute: typeof ApiAdminFeesIdRouteImport
+      parentRoute: typeof ApiAdminFeesRoute
+    }
+    '/api/admin/users/$id/users': {
+      id: '/api/admin/users/$id/users'
+      path: '/$id/users'
+      fullPath: '/api/admin/users/$id/users'
+      preLoaderRoute: typeof ApiAdminUsersIdUsersRouteImport
+      parentRoute: typeof ApiAdminUsersRoute
+    }
+    '/api/admin/users/$id/status': {
+      id: '/api/admin/users/$id/status'
+      path: '/$id/status'
+      fullPath: '/api/admin/users/$id/status'
+      preLoaderRoute: typeof ApiAdminUsersIdStatusRouteImport
+      parentRoute: typeof ApiAdminUsersRoute
+    }
+    '/api/admin/users/$id/reset-password': {
+      id: '/api/admin/users/$id/reset-password'
+      path: '/$id/reset-password'
+      fullPath: '/api/admin/users/$id/reset-password'
+      preLoaderRoute: typeof ApiAdminUsersIdResetPasswordRouteImport
+      parentRoute: typeof ApiAdminUsersRoute
+    }
+    '/api/admin/fees/$id/payments/$studentId': {
+      id: '/api/admin/fees/$id/payments/$studentId'
+      path: '/payments/$studentId'
+      fullPath: '/api/admin/fees/$id/payments/$studentId'
+      preLoaderRoute: typeof ApiAdminFeesIdPaymentsStudentIdRouteImport
+      parentRoute: typeof ApiAdminFeesIdRoute
+    }
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardAdminAnalyticsRoute: typeof DashboardAdminAnalyticsRoute
+  DashboardAdminAnnouncementsRoute: typeof DashboardAdminAnnouncementsRoute
+  DashboardAdminAttendanceRoute: typeof DashboardAdminAttendanceRoute
+  DashboardAdminCurriculumRoute: typeof DashboardAdminCurriculumRoute
+  DashboardAdminFeesRoute: typeof DashboardAdminFeesRoute
+  DashboardAdminOverviewRoute: typeof DashboardAdminOverviewRoute
+  DashboardAdminTimetableRoute: typeof DashboardAdminTimetableRoute
+  DashboardAdminUsersRoute: typeof DashboardAdminUsersRoute
+  DashboardAdminYeargroupsRoute: typeof DashboardAdminYeargroupsRoute
+  DashboardStudentSdashRoute: typeof DashboardStudentSdashRoute
+  DashboardTeacherTmyRoute: typeof DashboardTeacherTmyRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardIndexRoute: DashboardIndexRoute,
+  DashboardAdminAnalyticsRoute: DashboardAdminAnalyticsRoute,
+  DashboardAdminAnnouncementsRoute: DashboardAdminAnnouncementsRoute,
+  DashboardAdminAttendanceRoute: DashboardAdminAttendanceRoute,
+  DashboardAdminCurriculumRoute: DashboardAdminCurriculumRoute,
+  DashboardAdminFeesRoute: DashboardAdminFeesRoute,
+  DashboardAdminOverviewRoute: DashboardAdminOverviewRoute,
+  DashboardAdminTimetableRoute: DashboardAdminTimetableRoute,
+  DashboardAdminUsersRoute: DashboardAdminUsersRoute,
+  DashboardAdminYeargroupsRoute: DashboardAdminYeargroupsRoute,
+  DashboardStudentSdashRoute: DashboardStudentSdashRoute,
+  DashboardTeacherTmyRoute: DashboardTeacherTmyRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
+interface ApiAdminFeesIdRouteChildren {
+  ApiAdminFeesIdPaymentsStudentIdRoute: typeof ApiAdminFeesIdPaymentsStudentIdRoute
+}
+
+const ApiAdminFeesIdRouteChildren: ApiAdminFeesIdRouteChildren = {
+  ApiAdminFeesIdPaymentsStudentIdRoute: ApiAdminFeesIdPaymentsStudentIdRoute,
+}
+
+const ApiAdminFeesIdRouteWithChildren = ApiAdminFeesIdRoute._addFileChildren(
+  ApiAdminFeesIdRouteChildren,
+)
+
+interface ApiAdminFeesRouteChildren {
+  ApiAdminFeesIdRoute: typeof ApiAdminFeesIdRouteWithChildren
+}
+
+const ApiAdminFeesRouteChildren: ApiAdminFeesRouteChildren = {
+  ApiAdminFeesIdRoute: ApiAdminFeesIdRouteWithChildren,
+}
+
+const ApiAdminFeesRouteWithChildren = ApiAdminFeesRoute._addFileChildren(
+  ApiAdminFeesRouteChildren,
+)
+
+interface ApiAdminPeriodsRouteChildren {
+  ApiAdminPeriodsIdRoute: typeof ApiAdminPeriodsIdRoute
+  ApiAdminPeriodsAssignYearGroupRoute: typeof ApiAdminPeriodsAssignYearGroupRoute
+}
+
+const ApiAdminPeriodsRouteChildren: ApiAdminPeriodsRouteChildren = {
+  ApiAdminPeriodsIdRoute: ApiAdminPeriodsIdRoute,
+  ApiAdminPeriodsAssignYearGroupRoute: ApiAdminPeriodsAssignYearGroupRoute,
+}
+
+const ApiAdminPeriodsRouteWithChildren = ApiAdminPeriodsRoute._addFileChildren(
+  ApiAdminPeriodsRouteChildren,
+)
+
+interface ApiAdminSubjectsRouteChildren {
+  ApiAdminSubjectsIdRoute: typeof ApiAdminSubjectsIdRoute
+  ApiAdminSubjectsAssignYearGroupRoute: typeof ApiAdminSubjectsAssignYearGroupRoute
+  ApiAdminSubjectsUnassignYearGroupRoute: typeof ApiAdminSubjectsUnassignYearGroupRoute
+}
+
+const ApiAdminSubjectsRouteChildren: ApiAdminSubjectsRouteChildren = {
+  ApiAdminSubjectsIdRoute: ApiAdminSubjectsIdRoute,
+  ApiAdminSubjectsAssignYearGroupRoute: ApiAdminSubjectsAssignYearGroupRoute,
+  ApiAdminSubjectsUnassignYearGroupRoute:
+    ApiAdminSubjectsUnassignYearGroupRoute,
+}
+
+const ApiAdminSubjectsRouteWithChildren =
+  ApiAdminSubjectsRoute._addFileChildren(ApiAdminSubjectsRouteChildren)
+
+interface ApiAdminUsersRouteChildren {
+  ApiAdminUsersIdResetPasswordRoute: typeof ApiAdminUsersIdResetPasswordRoute
+  ApiAdminUsersIdStatusRoute: typeof ApiAdminUsersIdStatusRoute
+  ApiAdminUsersIdUsersRoute: typeof ApiAdminUsersIdUsersRoute
+}
+
+const ApiAdminUsersRouteChildren: ApiAdminUsersRouteChildren = {
+  ApiAdminUsersIdResetPasswordRoute: ApiAdminUsersIdResetPasswordRoute,
+  ApiAdminUsersIdStatusRoute: ApiAdminUsersIdStatusRoute,
+  ApiAdminUsersIdUsersRoute: ApiAdminUsersIdUsersRoute,
+}
+
+const ApiAdminUsersRouteWithChildren = ApiAdminUsersRoute._addFileChildren(
+  ApiAdminUsersRouteChildren,
+)
+
+interface ApiAdminYearGroupsRouteChildren {
+  ApiAdminYearGroupsIdRoute: typeof ApiAdminYearGroupsIdRoute
+  ApiAdminYearGroupsAssignTeacherRoute: typeof ApiAdminYearGroupsAssignTeacherRoute
+  ApiAdminYearGroupsMoveStudentRoute: typeof ApiAdminYearGroupsMoveStudentRoute
+  ApiAdminYearGroupsUnassignTeacherRoute: typeof ApiAdminYearGroupsUnassignTeacherRoute
+}
+
+const ApiAdminYearGroupsRouteChildren: ApiAdminYearGroupsRouteChildren = {
+  ApiAdminYearGroupsIdRoute: ApiAdminYearGroupsIdRoute,
+  ApiAdminYearGroupsAssignTeacherRoute: ApiAdminYearGroupsAssignTeacherRoute,
+  ApiAdminYearGroupsMoveStudentRoute: ApiAdminYearGroupsMoveStudentRoute,
+  ApiAdminYearGroupsUnassignTeacherRoute:
+    ApiAdminYearGroupsUnassignTeacherRoute,
+}
+
+const ApiAdminYearGroupsRouteWithChildren =
+  ApiAdminYearGroupsRoute._addFileChildren(ApiAdminYearGroupsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRouteWithChildren,
+  LoginIndexRoute: LoginIndexRoute,
+  ApiAdminAnalyticsRoute: ApiAdminAnalyticsRoute,
+  ApiAdminAnnouncementsRoute: ApiAdminAnnouncementsRoute,
+  ApiAdminFeesRoute: ApiAdminFeesRouteWithChildren,
+  ApiAdminPeriodsRoute: ApiAdminPeriodsRouteWithChildren,
+  ApiAdminStructureRoute: ApiAdminStructureRoute,
+  ApiAdminSubjectsRoute: ApiAdminSubjectsRouteWithChildren,
+  ApiAdminTimetableRoute: ApiAdminTimetableRoute,
+  ApiAdminUsersRoute: ApiAdminUsersRouteWithChildren,
+  ApiAdminYearGroupsRoute: ApiAdminYearGroupsRouteWithChildren,
+  ApiAuthLoginRoute: ApiAuthLoginRoute,
+  ApiUserIdRoute: ApiUserIdRoute,
+  ApiUserAnnouncementsRoute: ApiUserAnnouncementsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

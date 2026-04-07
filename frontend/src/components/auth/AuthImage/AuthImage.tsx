@@ -1,20 +1,18 @@
 "use client";
 
-import Image from "next/image";
-import styles from "./AuthImage.module.scss";
+import styles from "";
 
 export default function AuthImage() {
   return (
     <div className={styles.container}>
       <div className={styles.imageWrapper}>
-        <Image
+        <img
           style={{
             objectFit: "contain",
             scale: 1.5,
           }}
           src={"/authImage.svg"}
           alt="Auth Image"
-          fill
           loading="eager"
         />
         <div className={styles.texts}>

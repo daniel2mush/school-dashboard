@@ -1,18 +1,15 @@
-import {
-  HeadContent,
-  Scripts,
-  createRootRouteWithContext,
-} from '@tanstack/react-router'
+import { Scripts, createRootRouteWithContext } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import { Toaster } from 'sonner'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
-import appCss from '../styles.scss'
+import '../styles.scss'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { Providers } from '#/components/client/QueryClient'
+import { ThemeProvider } from '#/components/theme/ThemeProvider'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -34,14 +31,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         title: 'TanStack Start Starter',
       },
     ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss as unknown as string,
-      },
-    ],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: () => {
+    return <div>Page not found</div>
+  },
 })
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -50,8 +44,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <Providers>{children}</Providers>
+      <body className="">
+        <ThemeProvider>
+          <Providers>{children}</Providers>
+        </ThemeProvider>
         <Toaster richColors={true} />
         <TanStackDevtools
           config={{

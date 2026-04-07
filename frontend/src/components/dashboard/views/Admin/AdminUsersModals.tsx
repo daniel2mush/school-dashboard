@@ -1,20 +1,18 @@
-"use client";
-
-import {
-  useCreateAdminUser,
-  useGetSchoolStructure,
-  useResetUserPassword,
-  useUpdateAdminUser,
-  type AdminCreateTeacherPayload,
-  type AdminCreateStudentPayload,
-  type AdminDirectoryUser,
-  type CredentialsPayload,
-} from "@/query/AdminQuery";
 import { Input } from "@/components/ui";
 import { generateSecurePassword } from "@/lib/generatePassword";
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import styles from "./AdminUsers.module.scss";
+import {
+  CredentialsPayload,
+  useCreateAdminUser,
+  AdminCreateTeacherPayload,
+  useGetSchoolStructure,
+  AdminCreateStudentPayload,
+  AdminDirectoryUser,
+  useUpdateAdminUser,
+  useResetUserPassword,
+} from "@/query/AdminQuery";
 
 function copyText(value: string) {
   void navigator.clipboard.writeText(value);
@@ -544,7 +542,9 @@ export function UserProfileDrawer({
   const [gender, setGender] = useState<"Male" | "Female" | "Other">(
     user.gender ?? "Other",
   );
-  const [specialization, setSpecialization] = useState(user.specialization ?? "");
+  const [specialization, setSpecialization] = useState(
+    user.specialization ?? "",
+  );
   const [yearGroupId, setYearGroupId] = useState(
     user.enrolledYearGroupId ? String(user.enrolledYearGroupId) : "",
   );
@@ -566,7 +566,9 @@ export function UserProfileDrawer({
     setPhoneNumber(user.phoneNumber ?? "");
     setGender(user.gender ?? "Other");
     setSpecialization(user.specialization ?? "");
-    setYearGroupId(user.enrolledYearGroupId ? String(user.enrolledYearGroupId) : "");
+    setYearGroupId(
+      user.enrolledYearGroupId ? String(user.enrolledYearGroupId) : "",
+    );
   }, [user]);
 
   const submit = (e: FormEvent) => {

@@ -13,7 +13,7 @@ import {
 import { useGetAnnouncements } from "@/query/AuthQuery";
 import type { Announcement } from "@/types/Types";
 import { useRouter } from "next/navigation";
-import type { CSSProperties, ReactNode } from "react";
+import { type CSSProperties, type ReactNode, useState, useEffect } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   AlertTriangle,
@@ -118,6 +118,10 @@ function StatTile({
 }
 
 export default function AdminOverview() {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const router = useRouter();
   const { data: analytics, isLoading: analyticsLoading } =
     useGetAdminAnalytics();
@@ -406,55 +410,59 @@ export default function AdminOverview() {
         <Card>
           <CardHeader title="Revenue Overview" />
           <div style={{ height: 250, padding: '1rem', minWidth: 0 }}>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={revenueData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {revenueData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.fill} />
-                  ))}
-                </Pie>
-                <Tooltip 
+            {isMounted && (
+              <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
+                <PieChart>
+                  <Pie
+                    data={revenueData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {revenueData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
                     formatter={(value: number) => formatCFA(value)}
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                />
-                <Legend verticalAlign="bottom" height={36}/>
-              </PieChart>
-            </ResponsiveContainer>
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  />
+                  <Legend verticalAlign="bottom" height={36}/>
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
 
         <Card>
           <CardHeader title="Enrollment by Year Group" />
           <div style={{ height: 250, padding: '1rem', minWidth: 0 }}>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={enrollmentData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
-                <XAxis 
-                  dataKey="name" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
-                />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
-                />
-                <Tooltip 
-                  cursor={{ fill: 'var(--bg-secondary)', opacity: 0.4 }}
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                />
-                <Bar dataKey="students" fill="var(--accent)" radius={[4, 4, 0, 0]} barSize={30} />
-              </BarChart>
-            </ResponsiveContainer>
+            {isMounted && (
+              <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
+                <BarChart data={enrollmentData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+                  />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 12, fill: 'var(--text-secondary)' }}
+                  />
+                  <Tooltip 
+                    cursor={{fill: 'var(--bg-secondary)', opacity: 0.4}}
+                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                  />
+                  <Bar dataKey="students" fill="var(--accent)" radius={[4, 4, 0, 0]} barSize={30} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </Card>
       </div>

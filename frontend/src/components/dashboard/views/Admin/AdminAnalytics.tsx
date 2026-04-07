@@ -5,7 +5,7 @@ import {
   Cell, PieChart, Pie, Legend 
 } from 'recharts';
 import { Users, GraduationCap, Wallet, CheckCircle, Search, Edit2, X, Calendar, User, Mail, School } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "@/components/ui";
 
 function StudentEditModal({ student, onClose }: { student: any, onClose: () => void }) {
@@ -80,6 +80,10 @@ function StudentEditModal({ student, onClose }: { student: any, onClose: () => v
 }
 
 export default function AdminAnalytics() {
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   const { data: stats, isLoading } = useGetAdminAnalytics();
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState<'fees' | 'attendance'>('fees');
@@ -197,23 +201,25 @@ export default function AdminAnalytics() {
             <p className={styles.chartSub}>Collected vs Outstanding Fees</p>
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
-            <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={revenueData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 12 }} />
-                <YAxis hide />
-                <Tooltip 
-                  cursor={{ fill: 'transparent' }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)', background: 'var(--bg-primary)' }}
-                  formatter={(value: number) => [formatCurrency(value), 'Amount']}
-                />
-                <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={60}>
-                  {revenueData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {isMounted && (
+              <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
+                <BarChart data={revenueData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-light)" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 12 }} />
+                  <YAxis hide />
+                  <Tooltip 
+                    cursor={{ fill: 'transparent' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)', background: 'var(--bg-primary)' }}
+                    formatter={(value: number) => [formatCurrency(value), 'Amount']}
+                  />
+                  <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={60}>
+                    {revenueData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
           <div style={{ marginTop: 16 }}>
              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', marginBottom: 6 }}>
@@ -232,25 +238,27 @@ export default function AdminAnalytics() {
             <p className={styles.chartSub}>Breakdown of fee item settlements</p>
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
-            <ResponsiveContainer width="100%" height={250}>
-              <PieChart>
-                <Pie
-                  data={paymentDistributionData}
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                >
-                  {paymentDistributionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)', background: 'var(--bg-primary)' }}
-                />
-                <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
-              </PieChart>
-            </ResponsiveContainer>
+            {isMounted && (
+              <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
+                <PieChart>
+                  <Pie
+                    data={paymentDistributionData}
+                    innerRadius={60}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {paymentDistributionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)', background: 'var(--bg-primary)' }}
+                  />
+                  <Legend iconType="circle" wrapperStyle={{ paddingTop: '20px' }} />
+                </PieChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
 
@@ -260,23 +268,25 @@ export default function AdminAnalytics() {
             <p className={styles.chartSub}>Presence rate per year group</p>
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={attendanceByCohort} layout="vertical" margin={{ left: 40, right: 40 }}>
-                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border-light)" />
-                <XAxis type="number" domain={[0, 100]} hide />
-                <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 12 }} width={100} />
-                <Tooltip 
-                  cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)', background: 'var(--bg-primary)' }}
-                  formatter={(value: number) => [`${value}%`, 'Attendance Rate']}
-                />
-                <Bar dataKey="rate" radius={[0, 4, 4, 0]} barSize={24} fill="var(--accent)">
-                  {attendanceByCohort.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.rate > 90 ? '#10b981' : entry.rate > 75 ? '#f59e0b' : '#ef4444'} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            {isMounted && (
+              <ResponsiveContainer width="100%" height={300} minWidth={0} minHeight={0}>
+                <BarChart data={attendanceByCohort} layout="vertical" margin={{ left: 40, right: 40 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="var(--border-light)" />
+                  <XAxis type="number" domain={[0, 100]} hide />
+                  <YAxis dataKey="name" type="category" axisLine={false} tickLine={false} tick={{ fill: 'var(--text-tertiary)', fontSize: 12 }} width={100} />
+                  <Tooltip 
+                    cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: 'var(--shadow-md)', background: 'var(--bg-primary)' }}
+                    formatter={(value: number) => [`${value}%`, 'Attendance Rate']}
+                  />
+                  <Bar dataKey="rate" radius={[0, 4, 4, 0]} barSize={24} fill="var(--accent)">
+                    {attendanceByCohort.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.rate > 90 ? '#10b981' : entry.rate > 75 ? '#f59e0b' : '#ef4444'} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
       </div>

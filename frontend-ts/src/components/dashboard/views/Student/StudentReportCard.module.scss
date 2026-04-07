@@ -1,0 +1,114 @@
+@use "sass:color";
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.panel {
+  width: 100%;
+  padding: 32px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(217, 119, 6, 0.12), rgba(217, 119, 6, 0.03)),
+    var(--bg-primary);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+  }
+}
+
+.eyebrow {
+  position: relative;
+  z-index: 1;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--amber);
+}
+
+.title {
+  position: relative;
+  z-index: 1;
+  margin-top: 10px;
+  font-size: 1.9rem;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+}
+
+.copy {
+  position: relative;
+  z-index: 1;
+  margin-top: 8px;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.tableContainer {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.headerRow {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  padding: 16px 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  padding: 20px 24px;
+  border-bottom: 1px dashed var(--border-light);
+  align-items: center;
+  transition: background 0.2s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.01);
+  }
+}
+
+.subjectCol {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.scoreCol {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.gradeCol {
+  display: flex;
+  align-items: center;
+}
