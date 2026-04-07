@@ -2,6 +2,7 @@
 
 import { Avatar, Badge, Button } from "../../ui";
 import { ROLE_LABELS } from "../../../constants/navigation";
+// @ts-ignore
 import styles from "./DashboardHeader.module.scss";
 import { User } from "@/types/Types";
 import { DropdownMenu } from "radix-ui";

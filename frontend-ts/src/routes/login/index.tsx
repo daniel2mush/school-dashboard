@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import styles from './LoginScreen.module.scss'
 import {
-  type LoginFormData,
-  loginSchema,
+  
+  loginSchema
 } from '#/components/validation/authValidation'
+import type {LoginFormData} from '#/components/validation/authValidation';
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '#/components/ui/Input/Input'
@@ -16,7 +17,7 @@ export const Route = createFileRoute('/login/')({
 })
 
 function RouteComponent() {
-  const { mutateAsync: loginUser, isPending: loading, error } = useLoginUser()
+  const { mutateAsync: loginUser, isPending: loading } = useLoginUser()
 
   const handleLoginSubmit = (data: LoginFormData) => {
     loginUser(data)
@@ -25,7 +26,7 @@ function RouteComponent() {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitted },
+    formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema as any),
     defaultValues: {
