@@ -8,7 +8,8 @@ import {
   DoorOpen,
   LayoutGrid,
 } from 'lucide-react'
-import { type CSSProperties, useState } from 'react'
+import { useState } from 'react'
+import type { CSSProperties } from 'react'
 import { TeacherTimetableModal } from './TeacherTimetableModal'
 
 const CARD_ACCENTS = [

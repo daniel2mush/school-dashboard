@@ -44,7 +44,7 @@ function BaseModal({
 }) {
   const titleId = 'modal-title'
 
-  useMemo(() => {
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose()
     }
@@ -188,6 +188,19 @@ export function AdminAttendance() {
     })
   }, [stats, searchTerm, yearGroupFilter])
 
+  useEffect(() => {
+    if (!filteredStudents.length) {
+      setSelectedStudentId(null)
+      return
+    }
+    if (
+      selectedStudentId === null ||
+      !filteredStudents.some((s) => s.studentId === selectedStudentId)
+    ) {
+      setSelectedStudentId(filteredStudents[0].studentId)
+    }
+  }, [filteredStudents, selectedStudentId])
+
   const absenceList = useMemo(() => {
     if (!stats) return []
     return stats.studentStats
@@ -226,11 +239,9 @@ export function AdminAttendance() {
 
   const trendData = useMemo(() => {
     if (!stats) return []
-    // Aggregate by date for the last 7 days or similar
-    const recordsByDate: Partial<Record<
-      string,
-      { date: string; Present: number; Absent: number }
-    >> = {}
+    const recordsByDate: Partial<
+      Record<string, { date: string; Present: number; Absent: number }>
+    > = {}
 
     stats.studentStats.forEach((s) => {
       s.attendance_records.slice(-20).forEach((r) => {
@@ -247,8 +258,9 @@ export function AdminAttendance() {
     })
 
     return Object.values(recordsByDate)
-      .filter((record): record is { date: string; Present: number; Absent: number } =>
-        record !== undefined,
+      .filter(
+        (record): record is { date: string; Present: number; Absent: number } =>
+          record !== undefined,
       )
       .slice(-7)
   }, [stats])
@@ -279,16 +291,18 @@ export function AdminAttendance() {
 
     const daysInMonth = new Date(year, month + 1, 0).getDate()
     const firstDay = new Date(year, month, 1).getDay()
-    const rows = []
-    let cells = []
+    const totalCells = 42
+    const cells = []
 
-    for (let i = 0; i < firstDay; i++) {
-      cells.push(
-        <td key={`empty-${i}`} className={styles.calendarCellEmpty}></td>,
-      )
-    }
+    for (let index = 0; index < totalCells; index++) {
+      const day = index - firstDay + 1
+      if (day < 1 || day > daysInMonth) {
+        cells.push(
+          <div key={`empty-${index}`} className={styles.calendarEmptyCell} />,
+        )
+        continue
+      }
 
-    for (let day = 1; day <= daysInMonth; day++) {
       const dayDate = new Date(year, month, day)
       const dateString = dayDate.toISOString().split('T')[0]
 
@@ -318,9 +332,10 @@ export function AdminAttendance() {
       }
 
       cells.push(
-        <td
+        <button
           key={day}
-          className={`${styles.calendarCell} ${statusClass} ${styles.clickable}`}
+          type="button"
+          className={`${styles.calendarDayCell} ${statusClass} ${styles.clickable}`}
           onClick={() =>
             openMarkModal(
               selectedStudent.studentId,
@@ -332,37 +347,20 @@ export function AdminAttendance() {
         >
           <div className={styles.cellDay}>{day}</div>
           {record && <div className={styles.cellStatusIcon}>{icon}</div>}
-        </td>,
+        </button>,
       )
-
-      if ((day + firstDay) % 7 === 0 || day === daysInMonth) {
-        rows.push(<tr key={day}>{cells}</tr>)
-        cells = []
-      }
     }
 
     return (
-      <table className={styles.calendarTable}>
-        <thead>
-          <tr>
-            {weekDays.map((d) => (
-              <th key={d}>{d}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>{rows}</tbody>
-      </table>
+      <div className={styles.calendarGrid}>
+        {weekDays.map((d) => (
+          <div key={d} className={styles.calendarDayHeader}>
+            {d}
+          </div>
+        ))}
+        {cells}
+      </div>
     )
-  }
-
-  const calculateStats = (student: any) => {
-    const records = student?.attendance_records || []
-    const present = records.filter((r: any) => r.status === 'P').length
-    const absent = records.filter((r: any) => r.status === 'A').length
-    const late = records.filter((r: any) => r.status === 'T').length
-    const total = records.length
-    const rate = total > 0 ? Math.round((present / total) * 100) : 0
-    return { present, absent, late, total, rate }
   }
 
   return (
@@ -393,12 +391,19 @@ export function AdminAttendance() {
           <div className={styles.topGrid}>
             <div className={styles.card}>
               <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>Global Status</h3>
-                <p className={styles.cardSub}>Term-to-date distribution</p>
+                <div>
+                  <h3 className={styles.cardTitle}>Global Status</h3>
+                  <p className={styles.cardSub}>Term-to-date distribution</p>
+                </div>
               </div>
               <div className={styles.chartContainer} style={{ minWidth: 0 }}>
                 {isMounted && (
-                  <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
+                  <ResponsiveContainer
+                    width="100%"
+                    height={200}
+                    minWidth={0}
+                    minHeight={0}
+                  >
                     <PieChart>
                       <Pie
                         data={chartData}
@@ -423,12 +428,19 @@ export function AdminAttendance() {
 
             <div className={styles.card}>
               <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>Daily Attendance Trend</h3>
-                <p className={styles.cardSub}>Last 7 recorded sessions</p>
+                <div>
+                  <h3 className={styles.cardTitle}>Daily Attendance Trend</h3>
+                  <p className={styles.cardSub}>Last 7 recorded sessions</p>
+                </div>
               </div>
               <div className={styles.chartContainer} style={{ minWidth: 0 }}>
                 {isMounted && (
-                  <ResponsiveContainer width="100%" height={200} minWidth={0} minHeight={0}>
+                  <ResponsiveContainer
+                    width="100%"
+                    height={200}
+                    minWidth={0}
+                    minHeight={0}
+                  >
                     <BarChart data={trendData}>
                       <CartesianGrid
                         strokeDasharray="3 3"
@@ -471,8 +483,10 @@ export function AdminAttendance() {
 
             <div className={styles.card}>
               <div className={styles.cardHeader}>
-                <h3 className={styles.cardTitle}>At-Risk Students</h3>
-                <p className={styles.cardSub}>Frequent absences this month</p>
+                <div>
+                  <h3 className={styles.cardTitle}>At-Risk Students</h3>
+                  <p className={styles.cardSub}>Frequent absences this month</p>
+                </div>
               </div>
               <div className={styles.riskList}>
                 {absenceList.map((s) => (
@@ -496,179 +510,171 @@ export function AdminAttendance() {
           </div>
 
           <div className={styles.mainGrid}>
-            <div className={styles.registryCard}>
-              <div className={styles.registryHeader}>
-                <div className={styles.registryActions}>
-                  <div className={styles.search}>
-                    <Search size={16} />
-                    <input
-                      type="text"
-                      placeholder="Find student..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-                  <div className={styles.filter}>
-                    <Filter size={16} />
-                    <select
-                      value={yearGroupFilter}
-                      onChange={(e) => setYearGroupFilter(e.target.value)}
-                    >
-                      {yearGroups.map((yg) => (
-                        <option key={yg} value={yg}>
-                          {yg}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+          <div className={styles.registryCard}>
+            <div className={styles.registryHeader}>
+              <div className={styles.registryTitleBlock}>
+                <div className={styles.registryLabel}>Student Registry</div>
+                <div className={styles.registryCopy}>
+                  Search and filter your cohorts, then open a student to mark
+                  or review attendance history.
                 </div>
               </div>
-
-              <div className={styles.tableScroll}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>Student</th>
-                      <th>Year</th>
-                      <th>Attendance</th>
-                      <th>Records</th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredStudents.map((s) => {
-                      const sStats = calculateStats(s)
-                      return (
-                        <tr
-                          key={s.studentId}
-                          className={
-                            selectedStudentId === s.studentId
-                              ? styles.selectedRow
-                              : ''
-                          }
-                        >
-                          <td>
-                            <div className={styles.userCell}>
-                              <div className={styles.avatar}>
-                                {s.name.charAt(0)}
-                              </div>
-                              <div>
-                                <div className={styles.name}>{s.name}</div>
-                                <div className={styles.email}>{s.email}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <span className={styles.yearTag}>
-                              {s.yearGroupName}
-                            </span>
-                          </td>
-                          <td>
-                            <div className={styles.progressCell}>
-                              <div className={styles.progressInfo}>
-                                <span>{sStats.rate}%</span>
-                                <span
-                                  className={
-                                    sStats.rate < 75 ? styles.textRed : ''
-                                  }
-                                >
-                                  {sStats.present}P / {sStats.absent}A
-                                </span>
-                              </div>
-                              <div className={styles.progressBar}>
-                                <div
-                                  className={styles.progressFill}
-                                  style={{
-                                    width: `${sStats.rate}%`,
-                                    backgroundColor:
-                                      sStats.rate < 75 ? '#ef4444' : '#10b981',
-                                  }}
-                                />
-                              </div>
-                            </div>
-                          </td>
-                          <td>{sStats.total}</td>
-                          <td>
-                            <button
-                              className={styles.actionBtn}
-                              onClick={() => setSelectedStudentId(s.studentId)}
-                            >
-                              Details
-                            </button>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+              <div className={styles.registryActions}>
+                <div className={styles.search}>
+                  <Search size={16} />
+                  <input
+                    type="text"
+                    placeholder="Find student..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
+                <div className={styles.filter}>
+                  <Filter size={16} />
+                  <select
+                    value={yearGroupFilter}
+                    onChange={(e) => setYearGroupFilter(e.target.value)}
+                  >
+                    {yearGroups.map((yg) => (
+                      <option key={yg} value={yg}>
+                        {yg}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
 
-            <div
-              className={`${styles.calendarCard} ${!selectedStudent ? styles.hidden : ''}`}
-            >
-              {selectedStudent ? (
-                <>
-                  <div className={styles.calendarNav}>
-                    <div>
-                      <h4 className={styles.calendarName}>
-                        {selectedStudent.name}
-                      </h4>
-                      <p className={styles.calendarSub}>
-                        {monthNames[month]} {year}
-                      </p>
-                    </div>
-                    <div className={styles.navArrows}>
-                      <button onClick={prevMonth}>
-                        <ChevronLeft size={16} />
-                      </button>
-                      <button onClick={nextMonth}>
-                        <ChevronRight size={16} />
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className={styles.legend}>
-                    <div className={styles.lItem}>
-                      <span className={styles.dotP} /> P
-                    </div>
-                    <div className={styles.lItem}>
-                      <span className={styles.dotA} /> A
-                    </div>
-                    <div className={styles.lItem}>
-                      <span className={styles.dotT} /> L
-                    </div>
-                    <div className={styles.lItem}>
-                      <span className={styles.dotH} /> H
-                    </div>
-                  </div>
-
-                  <div className={styles.calendarTableWrapper}>
-                    {renderCalendarTable()}
-                  </div>
-
-                  <div className={styles.calendarFooter}>
-                    <div className={styles.footerInfo}>
-                      <span>Target Presence</span>
-                      <span>75%</span>
-                    </div>
-                    <div className={styles.fullProgressBar}>
-                      <div
-                        className={styles.fullProgressFill}
-                        style={{
-                          width: `${calculateStats(selectedStudent).rate}%`,
-                        }}
-                      />
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className={styles.noSelection}>
-                  <CalendarIcon size={40} />
-                  <p>Select a student to view history</p>
-                </div>
-              )}
+            <div className={styles.tableScroll}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Year</th>
+                    <th>Attendance</th>
+                    <th>Records</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStudents.map((s) => {
+                    const sStats = {
+                      present: s.attendance.present,
+                      absent: s.attendance.absent,
+                      late: s.attendance.tardy,
+                      total: s.attendance.total,
+                      rate:
+                        s.attendance.total > 0
+                          ? Math.round(
+                              (s.attendance.present / s.attendance.total) * 100,
+                            )
+                          : 0,
+                    }
+                    return (
+                      <tr
+                        key={s.studentId}
+                        className={
+                          selectedStudentId === s.studentId
+                            ? styles.selectedRow
+                            : ''
+                        }
+                        onClick={() => setSelectedStudentId(s.studentId)}
+                      >
+                        <td>
+                          <div className={styles.userCell}>
+                            <div className={styles.avatar}>
+                              {s.name.charAt(0)}
+                            </div>
+                            <div>
+                              <div className={styles.name}>{s.name}</div>
+                              <div className={styles.email}>{s.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span className={styles.yearTag}>
+                            {s.yearGroupName}
+                          </span>
+                        </td>
+                        <td>
+                          <div className={styles.progressCell}>
+                            <div className={styles.progressInfo}>
+                              <span>{sStats.rate}%</span>
+                              <span className={styles.textRed}>
+                                {sStats.present}P / {sStats.absent}A
+                              </span>
+                            </div>
+                            <div className={styles.progressBar}>
+                              <div
+                                className={styles.progressFill}
+                                style={{
+                                  width: `${sStats.rate}%`,
+                                  backgroundColor:
+                                    sStats.rate < 75 ? '#ef4444' : '#10b981',
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+                        <td className={styles.recordsCell}>{sStats.total}</td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
             </div>
+          </div>
+
+          <div
+            className={`${styles.calendarCard} ${!selectedStudent ? styles.hidden : ''}`}
+          >
+            {selectedStudent ? (
+              <>
+                <div className={styles.calendarNav}>
+                  <div>
+                    <h4 className={styles.calendarName}>
+                      {selectedStudent.name}
+                    </h4>
+                    <p className={styles.calendarSub}>
+                      {selectedStudent.yearGroupName} • {monthNames[month]}{' '}
+                      {year}
+                    </p>
+                  </div>
+                  <div className={styles.navArrows}>
+                    <button onClick={prevMonth}>
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button onClick={nextMonth}>
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className={styles.legend}>
+                  <div className={styles.lItem}>
+                    <span className={styles.dotP} /> P
+                  </div>
+                  <div className={styles.lItem}>
+                    <span className={styles.dotA} /> A
+                  </div>
+                  <div className={styles.lItem}>
+                    <span className={styles.dotT} /> L
+                  </div>
+                  <div className={styles.lItem}>
+                    <span className={styles.dotH} /> H
+                  </div>
+                </div>
+
+                <div className={styles.calendarTableWrapper}>
+                  {renderCalendarTable()}
+                </div>
+              </>
+            ) : (
+              <div className={styles.noSelection}>
+                <CalendarIcon size={40} />
+                <p>Select a student to view history</p>
+              </div>
+            )}
+          </div>
           </div>
         </>
       ) : (
