@@ -78,6 +78,19 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 4px;
+
+  &.red {
+    color: var(--red);
+  }
+  &.amber {
+    color: var(--amber);
+  }
+}
+
+.emptyState {
+  padding: 24px;
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 .statLabel {

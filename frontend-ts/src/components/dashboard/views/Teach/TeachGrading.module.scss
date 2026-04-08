@@ -170,6 +170,38 @@
   gap: 3px;
 }
 
+.tableActions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.filterWrap {
+  position: relative;
+}
+
+.filterSelect {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--amber);
+  }
+
+  &:focus {
+    border-color: var(--amber);
+    box-shadow: 0 0 0 3px rgba(var(--amber-rgb), 0.12);
+  }
+}
+
 .searchWrap {
   position: relative;
   width: min(340px, 100%);

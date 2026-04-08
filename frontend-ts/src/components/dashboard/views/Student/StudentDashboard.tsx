@@ -4,161 +4,256 @@ import {
   CardHeader,
   MetricCard,
   PageHeader,
-} from "@/components/ui";
-import styles from "./StudentDashboard.module.scss";
-import useCurrentStudent from "@/hooks/useCurrentStudent";
-import { useGetAnnouncements } from "@/query/AuthQuery";
+  ProgressBar,
+} from '@/components/ui'
+import styles from './StudentDashboard.module.scss'
+
+import {
+  CalendarDays,
+  School,
+  BookOpen,
+  GraduationCap,
+  Banknote,
+  UserCheck,
+  TrendingUp,
+  Clock,
+  ArrowRight,
+} from 'lucide-react'
+import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
+import { useGetAnnouncements } from '#/components/query/AuthQuery.ts'
+import { useCurrency } from '#/context/CurrencyContext.tsx'
 
 const PERIODS = [
-  { label: "Period 1", time: "7:30 – 8:30" },
-  { label: "Period 2", time: "8:30 – 9:30" },
-  { label: "Period 3", time: "9:30 – 10:30" },
-  { label: "Break",    time: "10:30 – 11:00", isBreak: true },
-  { label: "Period 4", time: "11:00 – 12:00" },
-  { label: "Period 5", time: "12:00 – 13:00" },
-];
+  { label: 'Period 1', time: '7:30 – 8:30' },
+  { label: 'Period 2', time: '8:30 – 9:30' },
+  { label: 'Period 3', time: '9:30 – 10:30' },
+  { label: 'Break', time: '10:30 – 11:00', isBreak: true },
+  { label: 'Period 4', time: '11:00 – 12:00' },
+  { label: 'Period 5', time: '12:00 – 13:00' },
+]
 
 interface StudentDashboardProps {
-  onNavigate?: (page: string) => void;
+  onNavigate?: (page: string) => void
 }
 
-export default function StudentDashboard({ onNavigate }: StudentDashboardProps) {
-  const currentData = useCurrentStudent();
-  const { data: announcements } = useGetAnnouncements();
+export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
+  const currentData = useCurrentStudent()
+  const { data: announcements } = useGetAnnouncements()
+  const { formatCurrency } = useCurrency()
 
-  if (!currentData) return null;
+  if (!currentData) return null
 
-  const {
-    student,
-    yearGroup,
-    teachers,
-    studentAnnouncements,
-    studentGrades,
-    studentTimetable,
-  } = currentData;
+  const { student, yearGroup, teachers, studentGrades, studentTimetable } =
+    currentData
 
-  const feePct = Math.round((student.fees.paid / student.fees.total) * 100);
-  const todayLessons = Object.values(studentTimetable)[0] as string[] || [];
+  const feePct = Math.round((student.fees.paid / student.fees.total) * 100)
+  const todayLessons = (Object.values(studentTimetable)[0] as string[]) || []
   const strongestSubject = [...studentGrades].sort(
     (left, right) => right.score - left.score,
-  )[0];
+  )[0]
+
+  const today = new Date().toLocaleDateString('en-GB', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 
   return (
-    <>
-      <PageHeader title={`Good morning, ${student.name.split(" ")[0]}`} />
-      
+    <section className={styles.view}>
+      <header className={styles.hero}>
+        <div className={styles.heroInner}>
+          <div className={styles.heroCopy}>
+            <div className={styles.eyebrow}>{yearGroup.name}</div>
+            <h1 className={styles.heroTitle}>
+              Welcome back, {student.name.split(' ')[0]}
+            </h1>
+            <p className={styles.heroLead}>
+              You have <strong>{todayLessons.length}</strong> classes scheduled
+              for today. Your current attendance is{' '}
+              <strong>{student.att}%</strong>.
+            </p>
+            <div className={styles.heroMeta}>
+              <span className={styles.metaChip}>
+                <CalendarDays size={12} strokeWidth={2} />
+                {today}
+              </span>
+              <span className={styles.metaChip}>
+                <School size={12} strokeWidth={2} />
+                Term 2 · 2026
+              </span>
+            </div>
+          </div>
+          <div className={styles.heroActions}>
+            <button
+              className="btn btn-primary"
+              onClick={() => onNavigate?.('stimetable')}
+            >
+              <Clock size={16} /> My Timetable
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => onNavigate?.('sreport')}
+            >
+              <TrendingUp size={16} /> Report Card
+            </button>
+          </div>
+        </div>
+      </header>
+
       <div className={styles.metricsGrid}>
         <MetricCard
-          label="Year group"
+          label="Current Year"
           value={yearGroup.name}
           sub={yearGroup.level}
+          icon={GraduationCap}
+          valueColor="var(--accent)"
         />
         <MetricCard
           label="Attendance"
           value={`${student.att}%`}
-          sub="This term"
+          sub="Present rate"
+          icon={UserCheck}
           valueColor="var(--green)"
         />
         <MetricCard
-          label="Fees paid"
+          label="Fees Status"
           value={`${feePct}%`}
-          sub={`CFA ${student.fees.paid.toLocaleString()} of ${student.fees.total.toLocaleString()}`}
+          sub={`Paid: ${formatCurrency(student.fees.paid)}`}
+          icon={Banknote}
+          valueColor={feePct >= 80 ? 'var(--green)' : 'var(--amber)'}
         />
         <MetricCard
-          label="Best subject"
-          value={strongestSubject?.subject || "Waiting"}
-          sub={strongestSubject ? `${strongestSubject.score}%` : "No grades yet"}
-          valueColor="var(--accent)"
+          label="Classes Today"
+          value={todayLessons.length}
+          sub="Scheduled periods"
+          icon={BookOpen}
         />
       </div>
 
       <div className={styles.twoCol}>
-        <Card>
-          <CardHeader
-            title={`My subjects – ${yearGroup.name}`}
-            action="View all"
-            onAction={() => onNavigate?.("ssubjects")}
-          />
-          {yearGroup.subjects.map((subject) => {
-            const teacher = teachers.find((candidate) =>
-              candidate.subjects.includes(subject),
-            );
-            const gradeEntry = studentGrades.find(
-              (entry) => entry.subject === subject,
-            );
-            return (
-              <div key={subject} className={styles.subjectRow}>
-                <div className={styles.subjectInfo}>
-                  <div className={styles.subjectName}>{subject}</div>
-                  <div className={styles.subjectName}>{teacher ? teacher.name : "Teacher to be assigned"}</div>
+        <div className={styles.mainContent}>
+          <Card>
+            <CardHeader
+              title="My Subjects"
+              action="Details"
+              onAction={() => onNavigate?.('ssubjects')}
+            />
+            <div className={styles.subjectsList}>
+              {yearGroup.subjects.map((subject) => {
+                const teacher = teachers.find((candidate: any) =>
+                  candidate.specialization?.includes(subject),
+                )
+                return (
+                  <div key={subject} className={styles.subjectRow}>
+                    <div className={styles.subjectInfo}>
+                      <div className={styles.subjectName}>{subject}</div>
+                      <div className={styles.subjectTeacher}>
+                        {teacher ? teacher.name : 'Teacher to be assigned'}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </Card>
+
+          <Card>
+            <CardHeader
+              title="Fee overview"
+              action="Pay fees"
+              onAction={() => onNavigate?.('sfees')}
+            />
+            <div className={styles.feePreview}>
+              <div className={styles.feeInfo}>
+                <div className={styles.feeMain}>
+                  <div className={styles.feeLabel}>Total Balance</div>
+                  <div className={styles.feeValue}>
+                    {formatCurrency(student.fees.total - student.fees.paid)}
+                  </div>
                 </div>
-                {gradeEntry ? (
-                  <Badge variant="blue">{gradeEntry.grade}</Badge>
-                ) : (
-                  <Badge variant="gray">Awaiting grade</Badge>
-                )}
+                <div className={styles.feeProgress}>
+                  <div className={styles.progressLabel}>
+                    <span>Payment progress</span>
+                    <span>{feePct}%</span>
+                  </div>
+                  <ProgressBar pct={feePct} color="var(--accent)" height={8} />
+                </div>
               </div>
-            );
-          })}
-        </Card>
+            </div>
+          </Card>
+        </div>
 
         <div className={styles.sidebar}>
           <Card>
-            <CardHeader title="School announcements" />
-            {announcements?.slice(0, 4).map((ann) => (
-              <div key={ann.id} className={styles.announcementRow}>
-                <div
-                  className={`${styles.announcementDot} ${
-                    ann.priority === "Urgent" ? styles.urgent : styles.normal
-                  }`}
-                />
-                <div className={styles.announcementInfo}>
-                  <div className={styles.announcementTitle}>{ann.title}</div>
-                  <div className={styles.announcementMeta}>
-                    {ann.author?.name} · {new Date(ann.createdAt).toLocaleDateString()}
+            <CardHeader title="School Announcements" />
+            <div className={styles.annList}>
+              {announcements?.slice(0, 3).map((ann) => (
+                <div key={ann.id} className={styles.announcementRow}>
+                  <div
+                    className={`${styles.announcementDot} ${
+                      ann.priority === 'Urgent' ? styles.urgent : styles.normal
+                    }`}
+                  />
+                  <div className={styles.announcementInfo}>
+                    <div className={styles.announcementTitle}>{ann.title}</div>
+                    <div className={styles.announcementMeta}>
+                      {new Date(ann.createdAt).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            {(!announcements || announcements.length === 0) && (
-              <div style={{ padding: 20, textAlign: "center", fontSize: "0.85rem", color: "var(--text-tertiary)" }}>
-                No active announcements
-              </div>
-            )}
+              ))}
+              {(!announcements || announcements.length === 0) && (
+                <div className={styles.emptyState}>No active announcements</div>
+              )}
+            </div>
           </Card>
-          
+
           <Card>
-            <CardHeader title="Next classes" />
-            {todayLessons.slice(0, 4).map((subject, index) => (
-              <div key={`${subject}-${index}`} className={styles.classRow}>
-                <span className={styles.className}>{subject}</span>
-                <span className={styles.classTime}>
-                  {PERIODS[index]?.time}
-                </span>
-              </div>
-            ))}
+            <CardHeader title="Today's Schedule" />
+            <div className={styles.scheduleList}>
+              {todayLessons.slice(0, 4).map((subject, index) => (
+                <div key={`${subject}-${index}`} className={styles.classRow}>
+                  <div className={styles.classInfo}>
+                    <span className={styles.className}>{subject}</span>
+                    <span className={styles.classPeriod}>
+                      {PERIODS[index]?.label}
+                    </span>
+                  </div>
+                  <span className={styles.classTime}>
+                    {PERIODS[index]?.time}
+                  </span>
+                </div>
+              ))}
+              {todayLessons.length === 0 && (
+                <div className={styles.emptyState}>No classes today</div>
+              )}
+            </div>
           </Card>
-          
+
           <Card>
-            <CardHeader title="Quick actions" />
+            <CardHeader title="Quick Links" />
             <div className={styles.actionsList}>
               {[
-                ["sreport", "View my report card"],
-                ["stimetable", "View class timetable"],
-                ["sfees", "Check fee balance"],
+                ['sreport', 'View my report card'],
+                ['stimetable', 'Weekly timetable'],
+                ['sfees', 'Fees & finances'],
               ].map(([page, label]) => (
                 <button
                   key={page}
                   className={styles.actionButton}
                   onClick={() => onNavigate?.(page)}
                 >
-                  {label} <span>→</span>
+                  {label} <ArrowRight size={14} />
                 </button>
               ))}
             </div>
           </Card>
         </div>
       </div>
-    </>
-  );
+    </section>
+  )
 }

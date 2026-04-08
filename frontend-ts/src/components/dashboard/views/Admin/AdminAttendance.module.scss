@@ -4,7 +4,6 @@
   flex-direction: column;
   gap: 24px;
   max-width: 1400px;
-  margin: 0 auto;
 }
 
 .header {
@@ -506,6 +505,7 @@
   flex-direction: column;
   gap: 20px;
   min-height: 72vh;
+  width: 100%;
 }
 
 .markHeader {

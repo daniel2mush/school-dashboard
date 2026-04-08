@@ -22,6 +22,7 @@ const COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === "production",
   sameSite: "strict" as const,
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days (matching JWT_REFRESH_EXPIRY)
+  path: "/",
 };
 
 export const Register = asyncHandler(async (req, res) => {

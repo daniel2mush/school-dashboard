@@ -88,16 +88,20 @@ export const useGetAnnouncements = () => {
 
 export const useLogout = () => {
   const navigate = useNavigate()
-  const { clearUser, user } = useUserStore()
+  const { clearUser } = useUserStore()
 
   return useMutation({
     mutationKey: ['logout'],
     mutationFn: async () => {
-      const res = await fetch(`/api/user/${user!.id}`, { method: 'DELETE' })
+      const res = await fetch('/api/auth/logout', {
+        method: 'POST',
+      })
 
       const responseData = await res.json()
 
-      if (!res.ok) return toast.error('Logout unsuccessful')
+      if (!res.ok) {
+        throw new Error(responseData.message || 'Logout unsuccessful')
+      }
 
       return responseData.data
     },
@@ -105,6 +109,14 @@ export const useLogout = () => {
       clearUser()
       navigate({ to: '/login', replace: true })
       toast.success('Logout successful')
+    },
+    onError: (error: any) => {
+      // Even if the server-side logout fails, we should probably clear the local state
+      // so the user isn't stuck. But let's report the error.
+      console.error('Logout error:', error)
+      clearUser()
+      navigate({ to: '/login', replace: true })
+      toast.error(error.message || 'Logout failed, but session cleared locally')
     },
   })
 }

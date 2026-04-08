@@ -1,48 +1,54 @@
-import { Badge } from "@/components/ui";
-import styles from "./StudentAttendance.module.scss";
-import useCurrentStudent from "@/hooks/useCurrentStudent";
+import { Badge } from '@/components/ui'
+import styles from './StudentAttendance.module.scss'
+import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 
 // Formatter for nicer dates
 const formatDate = (dateStr: string) => {
   try {
-    return new Intl.DateTimeFormat("en-GB", {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    }).format(new Date(dateStr));
+    return new Intl.DateTimeFormat('en-GB', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(new Date(dateStr))
   } catch {
-    return dateStr;
+    return dateStr
   }
-};
+}
 
 const getStatusBadge = (status: string) => {
   switch (status) {
-    case "P":
-      return <Badge variant="green">Present</Badge>;
-    case "A":
-      return <Badge variant="red">Absent</Badge>;
-    case "T":
-      return <Badge variant="amber">Tardy / Late</Badge>;
-    case "H":
-      return <Badge variant="blue">Holiday</Badge>;
+    case 'P':
+      return <Badge variant="green">Present</Badge>
+    case 'A':
+      return <Badge variant="red">Absent</Badge>
+    case 'T':
+      return <Badge variant="amber">Tardy / Late</Badge>
+    case 'H':
+      return <Badge variant="blue">Holiday</Badge>
     default:
-      return <Badge variant="gray">Unknown</Badge>;
+      return <Badge variant="gray">Unknown</Badge>
   }
-};
+}
 
-export default function StudentAttendance() {
-  const currentData = useCurrentStudent();
+export function StudentAttendance() {
+  const currentData = useCurrentStudent()
 
-  if (!currentData) return null;
+  if (!currentData) return null
 
-  const { student } = currentData;
-  const attendanceRecords = student.attendance || [];
+  const { student } = currentData
+  const attendanceRecords = student.attendance || []
 
-  const total = attendanceRecords.length;
-  const presentCount = attendanceRecords.filter((a: any) => a.status === "P").length;
-  const absentCount = attendanceRecords.filter((a: any) => a.status === "A").length;
-  const tardyCount = attendanceRecords.filter((a: any) => a.status === "T").length;
+  const total = attendanceRecords.length
+  const presentCount = attendanceRecords.filter(
+    (a: any) => a.status === 'P',
+  ).length
+  const absentCount = attendanceRecords.filter(
+    (a: any) => a.status === 'A',
+  ).length
+  const tardyCount = attendanceRecords.filter(
+    (a: any) => a.status === 'T',
+  ).length
 
   return (
     <section className={styles.view}>
@@ -60,13 +66,13 @@ export default function StudentAttendance() {
           <div className={styles.statLabel}>Overall Attendance</div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statValue} style={{ color: "var(--red)" }}>
+          <div className={`${styles.statValue} ${styles.red}`}>
             {absentCount}
           </div>
           <div className={styles.statLabel}>Absences</div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statValue} style={{ color: "var(--amber)" }}>
+          <div className={`${styles.statValue} ${styles.amber}`}>
             {tardyCount}
           </div>
           <div className={styles.statLabel}>Late Arrivals</div>
@@ -76,15 +82,20 @@ export default function StudentAttendance() {
       <div className={styles.historyContainer}>
         <div className={styles.historyHeader}>Recent History</div>
         {attendanceRecords.length === 0 ? (
-          <div style={{ padding: 24, color: "var(--text-secondary)" }}>
+          <div className={styles.emptyState}>
             No attendance records found yet.
           </div>
         ) : (
           <div className={styles.timeline}>
             {attendanceRecords.map((record: any) => (
-              <div key={record.id || record.date} className={styles.timelineRow}>
+              <div
+                key={record.id || record.date}
+                className={styles.timelineRow}
+              >
                 <div className={styles.dateInfo}>
-                  <div className={styles.dateString}>{formatDate(record.date)}</div>
+                  <div className={styles.dateString}>
+                    {formatDate(record.date)}
+                  </div>
                 </div>
                 <div className={styles.statusWrapper}>
                   {getStatusBadge(record.status)}
@@ -95,5 +106,5 @@ export default function StudentAttendance() {
         )}
       </div>
     </section>
-  );
+  )
 }

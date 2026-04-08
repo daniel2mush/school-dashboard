@@ -112,3 +112,23 @@
   display: flex;
   align-items: center;
 }
+
+.emptyState {
+  padding: 40px;
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.summaryRow {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border-light);
+  border-bottom: none;
+
+  .subjectCol {
+    font-weight: 700;
+  }
+
+  .scoreCol {
+    color: var(--amber);
+  }
+}

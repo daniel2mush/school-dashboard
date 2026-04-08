@@ -14,6 +14,7 @@ import '../styles.scss'
 import type { QueryClient } from '@tanstack/react-query'
 import { Providers } from '#/components/client/QueryClient'
 import { ThemeProvider } from '#/components/theme/ThemeProvider'
+import { CurrencyProvider } from '../context/CurrencyContext'
 
 interface MyRouterContext {
   queryClient: QueryClient
@@ -35,9 +36,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         title: 'TanStack Start Starter',
       },
     ],
-
   }),
-
 
   shellComponent: RootDocument,
   notFoundComponent: () => {
@@ -54,7 +53,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="">
         <ThemeProvider>
-          <Providers>{children}</Providers>
+          <CurrencyProvider>
+            <Providers>{children}</Providers>
+          </CurrencyProvider>
         </ThemeProvider>
         <Toaster richColors={true} />
         <TanStackDevtools

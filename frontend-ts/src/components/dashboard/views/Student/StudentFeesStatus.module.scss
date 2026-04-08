@@ -8,12 +8,12 @@
 
 .panel {
   width: 100%;
-  padding: 32px;
-  border-radius: 24px;
-  background: linear-gradient(135deg, rgba(190, 18, 60, 0.12), rgba(190, 18, 60, 0.02)),
+  padding: 40px;
+  border-radius: 32px;
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0.02)),
     var(--bg-primary);
   border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
   position: relative;
   overflow: hidden;
 
@@ -22,9 +22,9 @@
     position: absolute;
     top: -50%;
     right: -10%;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(190, 18, 60, 0.15) 0%, transparent 70%);
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(var(--accent-rgb), 0.15) 0%, transparent 70%);
     border-radius: 50%;
     z-index: 0;
   }
@@ -33,11 +33,11 @@
 .eyebrow {
   position: relative;
   z-index: 1;
-  font-size: 0.76rem;
+  font-size: 0.8rem;
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--red);
+  color: var(--accent);
 }
 
 .title {
@@ -67,11 +67,109 @@
 .card {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
-  border-radius: 20px;
-  padding: 32px;
+  border-radius: 24px;
+  padding: 40px;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-4px);
+  }
+
+  &.debt {
+    border-color: var(--red);
+    .cardValue {
+      color: var(--red);
+    }
+  }
+}
+
+.cardNotice {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 12px;
+}
+
+.cardSuccess {
+  color: var(--green);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+.emptyText {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.expenseList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.expenseItem {
+  padding: 20px 24px;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  background: var(--bg-secondary);
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--bg-primary);
+    border-color: var(--accent-light);
+    transform: translateX(4px);
+  }
+}
+
+.expenseHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.expenseTitle {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.expenseDesc {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.expenseStatus {
+  font-size: 0.82rem;
+  font-weight: 600;
+  &.paid {
+    color: var(--green);
+  }
+  &.pending {
+    color: var(--amber);
+  }
+}
+
+.expenseGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.amountInWords {
+  margin-top: 10px;
+  color: var(--text-tertiary);
+  font-size: 0.82rem;
+  font-style: italic;
 }
 
 .cardLabel {

@@ -1,26 +1,19 @@
-import styles from "./StudentFeesStatus.module.scss";
-import useCurrentStudent from "@/hooks/useCurrentStudent";
+import styles from './StudentFeesStatus.module.scss'
+import { useCurrency } from '#/context/CurrencyContext'
+import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 
-export default function StudentFeesStatus() {
-  const currentData = useCurrentStudent();
+export function StudentFeesStatus() {
+  const currentData = useCurrentStudent()
+  const { formatCurrency } = useCurrency()
 
-  if (!currentData) return null;
+  if (!currentData) return null
 
-  const { student, yearGroup } = currentData;
-  const { total, paid } = student.fees;
-  const feeItems = student.fees.items || [];
+  const { student, yearGroup } = currentData
+  const { total, paid } = student.fees
+  const feeItems = student.fees.items || []
 
-  const balance = total - paid;
-  const percentagePaid = total > 0 ? Math.round((paid / total) * 100) : 100;
-  
-  // Format currency
-  const formatCFA = (amount: number) => {
-    return new Intl.NumberFormat("fr-FR", {
-      style: "currency",
-      currency: "XOF",
-      minimumFractionDigits: 0,
-    }).format(amount).replace("F CFA", "CFA").replace("FCFA", "CFA");
-  };
+  const balance = total - paid
+  const percentagePaid = total > 0 ? Math.round((paid / total) * 100) : 100
 
   return (
     <section className={styles.view}>
@@ -35,34 +28,33 @@ export default function StudentFeesStatus() {
       <div className={styles.feeCards}>
         <div className={styles.card}>
           <div className={styles.cardLabel}>Total Billed</div>
-          <div className={styles.cardValue}>{formatCFA(total)}</div>
-          
+          <div className={styles.cardValue}>{formatCurrency(total)}</div>
+
           <div className={styles.progressContainer}>
             <div className={styles.progressLabel}>
-              <span>Amount Paid: {formatCFA(paid)}</span>
+              <span>Amount Paid: {formatCurrency(paid)}</span>
               <span>{percentagePaid}%</span>
             </div>
             <div className={styles.progressBar}>
-              <div 
-                className={styles.progressFill} 
+              <div
+                className={styles.progressFill}
                 style={{ width: `${percentagePaid}%` }}
               />
             </div>
           </div>
         </div>
 
-        <div className={styles.card} style={{ borderColor: balance > 0 ? "var(--red)" : "var(--border-light)" }}>
+        <div className={`${styles.card} ${balance > 0 ? styles.debt : ''}`}>
           <div className={styles.cardLabel}>Outstanding Balance</div>
-          <div className={styles.cardValue} style={{ color: balance > 0 ? "var(--red)" : "var(--green)" }}>
-            {formatCFA(balance)}
-          </div>
-          
+          <div className={styles.cardValue}>{formatCurrency(balance)}</div>
+
           {balance > 0 ? (
-            <p style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-              Please settle the outstanding balance before end of term to avoid disruptions.
+            <p className={styles.cardNotice}>
+              Please settle the outstanding balance before end of term to avoid
+              disruptions.
             </p>
           ) : (
-            <p style={{ color: "var(--green)", fontSize: "0.85rem", fontWeight: 500 }}>
+            <p className={styles.cardSuccess}>
               Your account is fully settled. Thank you!
             </p>
           )}
@@ -72,62 +64,35 @@ export default function StudentFeesStatus() {
       <div className={styles.card}>
         <div className={styles.cardLabel}>Expense list</div>
         {feeItems.length === 0 ? (
-          <p style={{ color: "var(--text-secondary)", fontSize: "0.9rem" }}>
+          <p className={styles.emptyText}>
             No fee items have been assigned to your year group yet.
           </p>
         ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div className={styles.expenseList}>
             {feeItems.map((item: any) => (
-              <div
-                key={item.id}
-                style={{
-                  padding: "14px 16px",
-                  border: "1px solid var(--border-light)",
-                  borderRadius: "var(--radius-md)",
-                  background: "var(--bg-secondary)",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 12,
-                    alignItems: "flex-start",
-                  }}
-                >
+              <div key={item.id} className={styles.expenseItem}>
+                <div className={styles.expenseHeader}>
                   <div>
-                    <div style={{ color: "var(--text-primary)", fontWeight: 600 }}>
-                      {item.title}
-                    </div>
-                    <div style={{ color: "var(--text-secondary)", fontSize: "0.85rem", marginTop: 4 }}>
-                      {item.description || "Year-group fee item"}
+                    <div className={styles.expenseTitle}>{item.title}</div>
+                    <div className={styles.expenseDesc}>
+                      {item.description || 'Year-group fee item'}
                     </div>
                   </div>
                   <div
-                    style={{
-                      color: item.isFullyPaid ? "var(--green)" : "var(--amber)",
-                      fontSize: "0.82rem",
-                      fontWeight: 600,
-                    }}
+                    className={`${styles.expenseStatus} ${
+                      item.isFullyPaid ? styles.paid : styles.pending
+                    }`}
                   >
-                    {item.isFullyPaid ? "Fully paid" : "Pending"}
+                    {item.isFullyPaid ? 'Fully paid' : 'Pending'}
                   </div>
                 </div>
-                <div
-                  style={{
-                    display: "grid",
-                    gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-                    gap: 10,
-                    marginTop: 12,
-                    fontSize: "0.85rem",
-                  }}
-                >
-                  <span>Total: {formatCFA(item.amount)}</span>
-                  <span>Paid: {formatCFA(item.paid)}</span>
-                  <span>Remaining: {formatCFA(item.remaining)}</span>
+                <div className={styles.expenseGrid}>
+                  <span>Total: {formatCurrency(item.amount)}</span>
+                  <span>Paid: {formatCurrency(item.paid)}</span>
+                  <span>Remaining: {formatCurrency(item.remaining)}</span>
                 </div>
                 {item.amountInWords ? (
-                  <div style={{ marginTop: 10, color: "var(--text-secondary)", fontSize: "0.82rem" }}>
+                  <div className={styles.amountInWords}>
                     Amount in words: {item.amountInWords}
                   </div>
                 ) : null}
@@ -137,5 +102,5 @@ export default function StudentFeesStatus() {
         )}
       </div>
     </section>
-  );
+  )
 }

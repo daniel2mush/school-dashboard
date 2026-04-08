@@ -5,7 +5,7 @@ import { useLogout } from '#/components/query/AuthQuery'
 import { Avatar, Badge, Switch } from '#/components/ui'
 import { useTheme } from '#/components/theme/ThemeProvider'
 import type { User } from '#/types/Types'
-import {SunMedium, MoonStar, LogOut} from 'lucide-react'
+import { SunMedium, MoonStar, LogOut } from 'lucide-react'
 import styles from './DashboardHeader.module.scss'
 import { DropdownMenu } from 'radix-ui'
 
@@ -13,7 +13,6 @@ type DashboardHeaderProps = {
   role: User['role']
   sectionLabel: string
   user: User
-  onLogout: () => void
 }
 
 const ROLE_BADGE_VARIANT: Record<User['role'], string> = {
@@ -26,7 +25,6 @@ export default function DashboardHeader({
   role,
   sectionLabel,
   user,
-  onLogout,
 }: DashboardHeaderProps) {
   const { theme, setTheme } = useTheme()
   const isDark = theme === 'dark'
@@ -36,7 +34,6 @@ export default function DashboardHeader({
   const logoutUser = async () => {
     try {
       await logoutMutation()
-      onLogout() // This triggers the store cleanup and redirect
     } catch (e) {
       console.error('Logout failed', e)
     }
@@ -54,21 +51,29 @@ export default function DashboardHeader({
 
       <div className={styles.actions}>
         <div className={styles.themeToggleWrapper}>
-          <SunMedium size={16} className={isDark ? styles.inactiveIcon : styles.activeIcon} />
+          <SunMedium
+            size={16}
+            className={isDark ? styles.inactiveIcon : styles.activeIcon}
+          />
           <Switch
             checked={isDark}
-            onChange={(checked: boolean) => setTheme(checked ? 'dark' : 'light')}
+            onChange={(checked: boolean) =>
+              setTheme(checked ? 'dark' : 'light')
+            }
             ariaLabel="Toggle theme"
           />
-          <MoonStar size={16} className={isDark ? styles.activeIcon : styles.inactiveIcon} />
+          <MoonStar
+            size={16}
+            className={isDark ? styles.activeIcon : styles.inactiveIcon}
+          />
         </div>
 
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <button
-                type="button"
-                className={styles.profileTrigger}
-                aria-label="Open account menu"
+              type="button"
+              className={styles.profileTrigger}
+              aria-label="Open account menu"
             >
               <Avatar size={40} fontSize={14} color="var(--accent)" />
               <div className={styles.profileText}>
@@ -79,9 +84,9 @@ export default function DashboardHeader({
           </DropdownMenu.Trigger>
           <DropdownMenu.Portal>
             <DropdownMenu.Content
-                className={styles.menuContent}
-                sideOffset={10}
-                align="end"
+              className={styles.menuContent}
+              sideOffset={10}
+              align="end"
             >
               <div className={styles.menuHeader}>
                 <div className={styles.menuName}>{user.name}</div>
@@ -89,8 +94,8 @@ export default function DashboardHeader({
               </div>
               <DropdownMenu.Separator className={styles.menuSeparator} />
               <DropdownMenu.Item
-                  className={styles.menuItem}
-                  onClick={logoutUser}
+                className={styles.menuItem}
+                onClick={logoutUser}
               >
                 <LogOut size={16} />
                 <span>Sign out</span>

@@ -23,6 +23,7 @@ import {
   X,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useCurrency, type CurrencyCode } from '#/context/CurrencyContext'
 import { Input } from '@/components/ui'
 import {
   useGetAdminAnalytics,
@@ -36,6 +37,7 @@ function StudentEditModal({
   student: any
   onClose: () => void
 }) {
+  const { formatCurrency } = useCurrency()
   const upsertPayment = useUpsertFeePayment()
   const [drafts, setDrafts] = useState<
     Record<number, { amountPaid: string; isFullyPaid: boolean }>
@@ -92,15 +94,7 @@ function StudentEditModal({
                 <span
                   style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}
                 >
-                  Total:{' '}
-                  {new Intl.NumberFormat('fr-FR', {
-                    style: 'currency',
-                    currency: 'XOF',
-                    minimumFractionDigits: 0,
-                  })
-                    .format(f.totalAmount)
-                    .replace('F CFA', 'CFA')
-                    .replace('FCFA', 'CFA')}
+                  Total: {formatCurrency(f.totalAmount)}
                 </span>
               </div>
               <div className={styles.feeItemInputGrid}>
@@ -159,12 +153,17 @@ function StudentEditModal({
 }
 
 export function AdminAnalytics() {
+  const { currency, setCurrency, formatCurrency } = useCurrency()
   const [isMounted, setIsMounted] = useState(false)
   useEffect(() => {
     setIsMounted(true)
   }, [])
   const { data: stats, isLoading } = useGetAdminAnalytics()
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedYearGroup, setSelectedYearGroup] = useState<string>('All')
+  const [selectedStatus, setSelectedStatus] = useState<
+    'All' | 'Unpaid' | 'Paid'
+  >('All')
   const [activeTab, setActiveTab] = useState<'fees' | 'attendance'>('fees')
   const [editingStudent, setEditingStudent] = useState<any | null>(null)
 
@@ -179,28 +178,31 @@ export function AdminAnalytics() {
     )
   }
 
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XOF',
-      maximumFractionDigits: 0,
-    })
-      .format(val)
-      .replace('F CFA', 'CFA')
-      .replace('FCFA', 'CFA')
-  }
-
   const tooltipValueToNumber = (value: TooltipValueType | undefined) => {
     const rawValue = Array.isArray(value) ? value[0] : value
     const parsedValue = Number(rawValue)
     return Number.isFinite(parsedValue) ? parsedValue : 0
   }
 
-  const filteredStudents = stats.studentStats.filter(
-    (s) =>
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.yearGroupName.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  const yearGroups = Array.from(
+    new Set(stats.studentStats.map((s) => s.yearGroupName)),
+  ).sort()
+
+  const filteredStudents = stats.studentStats
+    .filter((s) => {
+      const matchesSearch =
+        s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.yearGroupName.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchesYearGroup =
+        selectedYearGroup === 'All' || s.yearGroupName === selectedYearGroup
+      const matchesStatus =
+        selectedStatus === 'All' ||
+        (selectedStatus === 'Unpaid' && s.balance > 0) ||
+        (selectedStatus === 'Paid' && s.balance <= 0)
+
+      return matchesSearch && matchesYearGroup && matchesStatus
+    })
+    .sort((a, b) => a.yearGroupName.localeCompare(b.yearGroupName))
 
   const collectionRate =
     stats.totalExpectedRevenue > 0
@@ -260,6 +262,20 @@ export function AdminAnalytics() {
       <header className={styles.hero}>
         <div className={styles.eyebrow}>Institutional Overview</div>
         <h2 className={styles.title}>School Performance Analytics</h2>
+        <div className={styles.currencyTabs}>
+          {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
+            (code) => (
+              <button
+                key={code}
+                type="button"
+                className={`${styles.currencyTab} ${currency === code ? styles.currencyTabActive : ''}`}
+                onClick={() => setCurrency(code)}
+              >
+                {code}
+              </button>
+            ),
+          )}
+        </div>
         <p
           style={{
             marginTop: 12,
@@ -351,7 +367,12 @@ export function AdminAnalytics() {
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
             {isMounted && (
-              <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
+              <ResponsiveContainer
+                width="100%"
+                height={250}
+                minWidth={0}
+                minHeight={0}
+              >
                 <BarChart data={revenueData}>
                   <CartesianGrid
                     strokeDasharray="3 3"
@@ -422,7 +443,12 @@ export function AdminAnalytics() {
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
             {isMounted && (
-              <ResponsiveContainer width="100%" height={250} minWidth={0} minHeight={0}>
+              <ResponsiveContainer
+                width="100%"
+                height={250}
+                minWidth={0}
+                minHeight={0}
+              >
                 <PieChart>
                   <Pie
                     data={paymentDistributionData}
@@ -460,7 +486,12 @@ export function AdminAnalytics() {
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
             {isMounted && (
-              <ResponsiveContainer width="100%" height={300} minWidth={0} minHeight={0}>
+              <ResponsiveContainer
+                width="100%"
+                height={300}
+                minWidth={0}
+                minHeight={0}
+              >
                 <BarChart
                   data={attendanceByCohort}
                   layout="vertical"
@@ -539,196 +570,135 @@ export function AdminAnalytics() {
               >
                 Fee Management
               </div>
-              <div
-                className={`${styles.tab} ${activeTab === 'attendance' ? styles.tabActive : ''}`}
-                onClick={() => setActiveTab('attendance')}
-              >
-                Attendance
-              </div>
             </div>
           </div>
-          <div style={{ position: 'relative', width: '300px' }}>
-            <Search
-              size={18}
-              style={{
-                position: 'absolute',
-                left: 12,
-                top: '50%',
-                transform: 'translateY(-50%)',
-                color: 'var(--text-tertiary)',
-              }}
-            />
-            <input
-              type="text"
-              placeholder="Search students or cohorts..."
-              className="input"
-              style={{ paddingLeft: 40, width: '100%' }}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div
+            style={{
+              display: 'flex',
+              gap: 12,
+              flexWrap: 'wrap',
+              alignItems: 'center',
+            }}
+          >
+            <div style={{ position: 'relative', width: '250px' }}>
+              <Search
+                size={18}
+                style={{
+                  position: 'absolute',
+                  left: 12,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-tertiary)',
+                }}
+              />
+              <input
+                type="text"
+                placeholder="Search students..."
+                className="input"
+                style={{ paddingLeft: 40, width: '100%' }}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            <select
+              className="select"
+              style={{ minWidth: 140 }}
+              value={selectedYearGroup}
+              onChange={(e) => setSelectedYearGroup(e.target.value)}
+            >
+              <option value="All">All Classes</option>
+              {yearGroups.map((yg) => (
+                <option key={yg} value={yg}>
+                  {yg}
+                </option>
+              ))}
+            </select>
+
+            <select
+              className="select"
+              style={{ minWidth: 140 }}
+              value={selectedStatus}
+              onChange={(e) =>
+                setSelectedStatus(e.target.value as 'All' | 'Unpaid' | 'Paid')
+              }
+            >
+              <option value="All">All Status</option>
+              <option value="Unpaid">Unpaid Only</option>
+              <option value="Paid">Fully Paid</option>
+            </select>
           </div>
         </div>
 
-        {activeTab === 'fees' ? (
-          <div className={styles.tableWrapper}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Cohort</th>
-                  <th>Fee Items</th>
-                  <th>Total Billed</th>
-                  <th>Total Paid</th>
-                  <th>Balance</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredStudents.map((student) => (
-                  <tr key={student.studentId}>
-                    <td>
-                      <div style={{ fontWeight: 600 }}>{student.name}</div>
-                      <div
-                        style={{
-                          fontSize: '0.75rem',
-                          color: 'var(--text-tertiary)',
-                        }}
-                      >
-                        {student.email}
-                      </div>
-                    </td>
-                    <td>{student.yearGroupName}</td>
-                    <td>
-                      <div
-                        style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}
-                      >
-                        {student.fees.map((f) => (
-                          <span
-                            key={f.feeId}
-                            className={styles.feeBadge}
-                            style={{
-                              background: f.isFullyPaid
-                                ? 'rgba(16, 185, 129, 0.1)'
-                                : 'rgba(239, 68, 68, 0.1)',
-                              color: f.isFullyPaid ? '#10b981' : '#ef4444',
-                            }}
-                          >
-                            {f.title}
-                          </span>
-                        ))}
-                      </div>
-                    </td>
-                    <td>{formatCurrency(student.totalBilled)}</td>
-                    <td>{formatCurrency(student.totalPaid)}</td>
-                    <td
-                      style={{
-                        color: student.balance > 0 ? '#ef4444' : '#10b981',
-                        fontWeight: 600,
-                      }}
-                    >
-                      {formatCurrency(student.balance)}
-                    </td>
-                    <td>
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => setEditingStudent(student)}
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <div className={styles.attendanceGrid}>
-            {filteredStudents.map((student) => (
-              <div
-                key={student.studentId}
-                className={styles.studentAttendanceCard}
-              >
-                <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: '50%',
-                      background: 'var(--accent)',
-                      color: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontWeight: 700,
-                    }}
-                  >
-                    {student.name[0]}
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>
-                      {student.name}
-                    </div>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Cohort</th>
+                <th>Fee Items</th>
+                <th>Total Billed</th>
+                <th>Total Paid</th>
+                <th>Balance</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredStudents.map((student) => (
+                <tr key={student.studentId}>
+                  <td>
+                    <div style={{ fontWeight: 600 }}>{student.name}</div>
                     <div
                       style={{
                         fontSize: '0.75rem',
-                        color: 'var(--text-secondary)',
+                        color: 'var(--text-tertiary)',
                       }}
                     >
-                      {student.yearGroupName}
+                      {student.email}
                     </div>
-                  </div>
-                </div>
-                <div className={styles.attendanceStats}>
-                  <div className={styles.attendanceStat}>
-                    <span
-                      className={styles.statValue}
-                      style={{ color: '#10b981' }}
-                    >
-                      {student.attendance.present}
-                    </span>
-                    <span className={styles.statLabel}>Pres</span>
-                  </div>
-                  <div className={styles.attendanceStat}>
-                    <span
-                      className={styles.statValue}
-                      style={{ color: '#ef4444' }}
-                    >
-                      {student.attendance.absent}
-                    </span>
-                    <span className={styles.statLabel}>Abs</span>
-                  </div>
-                  <div className={styles.attendanceStat}>
-                    <span
-                      className={styles.statValue}
-                      style={{ color: '#f59e0b' }}
-                    >
-                      {student.attendance.tardy}
-                    </span>
-                    <span className={styles.statLabel}>Tard</span>
-                  </div>
-                  <div className={styles.attendanceStat}>
-                    <span
-                      className={styles.statValue}
-                      style={{ color: 'var(--text-secondary)' }}
-                    >
-                      {student.attendance.total}
-                    </span>
-                    <span className={styles.statLabel}>Total</span>
-                  </div>
-                </div>
-                <div className={styles.progressBar}>
-                  <div
-                    className={styles.progressFill}
+                  </td>
+                  <td>{student.yearGroupName}</td>
+                  <td>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                      {student.fees.map((f) => (
+                        <span
+                          key={f.feeId}
+                          className={styles.feeBadge}
+                          style={{
+                            background: f.isFullyPaid
+                              ? 'rgba(16, 185, 129, 0.1)'
+                              : 'rgba(239, 68, 68, 0.1)',
+                            color: f.isFullyPaid ? '#10b981' : '#ef4444',
+                          }}
+                        >
+                          {f.title}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td>{formatCurrency(student.totalBilled)}</td>
+                  <td>{formatCurrency(student.totalPaid)}</td>
+                  <td
                     style={{
-                      width: `${student.attendance.total > 0 ? (student.attendance.present / student.attendance.total) * 100 : 0}%`,
-                      backgroundColor: '#10b981',
+                      color: student.balance > 0 ? '#ef4444' : '#10b981',
+                      fontWeight: 600,
                     }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+                  >
+                    {formatCurrency(student.balance)}
+                  </td>
+                  <td>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => setEditingStudent(student)}
+                    >
+                      <Edit2 size={16} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {editingStudent && (

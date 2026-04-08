@@ -1,34 +1,38 @@
-import { Badge } from "@/components/ui";
-import styles from "./StudentReportCard.module.scss";
-import useCurrentStudent from "@/hooks/useCurrentStudent";
+import { Badge } from '@/components/ui'
+import styles from './StudentReportCard.module.scss'
+import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 
 // Helper to determine badge color based on grade
 const getGradeBadge = (grade: string) => {
   switch (grade) {
-    case "A":
-      return <Badge variant="green">{grade}</Badge>;
-    case "B":
-      return <Badge variant="blue">{grade}</Badge>;
-    case "C":
-      return <Badge variant="amber">{grade}</Badge>;
-    case "D":
-    case "F":
-      return <Badge variant="red">{grade}</Badge>;
+    case 'A':
+      return <Badge variant="green">{grade}</Badge>
+    case 'B':
+      return <Badge variant="blue">{grade}</Badge>
+    case 'C':
+      return <Badge variant="amber">{grade}</Badge>
+    case 'D':
+    case 'F':
+      return <Badge variant="red">{grade}</Badge>
     default:
-      return <Badge variant="gray">{grade}</Badge>;
+      return <Badge variant="gray">{grade}</Badge>
   }
-};
+}
 
-export default function StudentReportCard() {
-  const currentData = useCurrentStudent();
+export function StudentReportCard() {
+  const currentData = useCurrentStudent()
 
-  if (!currentData) return null;
+  if (!currentData) return null
 
-  const { studentGrades, yearGroup } = currentData;
+  const { studentGrades, yearGroup } = currentData
 
   // Calculate average score
-  const totalScore = studentGrades.reduce((sum: number, g: any) => sum + g.score, 0);
-  const averageScore = studentGrades.length > 0 ? Math.round(totalScore / studentGrades.length) : 0;
+  const totalScore = studentGrades.reduce(
+    (sum: number, g: any) => sum + g.score,
+    0,
+  )
+  const averageScore =
+    studentGrades.length > 0 ? Math.round(totalScore / studentGrades.length) : 0
 
   return (
     <section className={styles.view}>
@@ -46,9 +50,9 @@ export default function StudentReportCard() {
           <div>Score</div>
           <div>Grade</div>
         </div>
-        
+
         {studentGrades.length === 0 ? (
-          <div style={{ padding: 40, textAlign: "center", color: "var(--text-secondary)" }}>
+          <div className={styles.emptyState}>
             No grades have been published yet.
           </div>
         ) : (
@@ -57,21 +61,31 @@ export default function StudentReportCard() {
               <div key={grade.subject} className={styles.row}>
                 <div className={styles.subjectCol}>{grade.subject}</div>
                 <div className={styles.scoreCol}>{grade.score}%</div>
-                <div className={styles.gradeCol}>{getGradeBadge(grade.grade)}</div>
+                <div className={styles.gradeCol}>
+                  {getGradeBadge(grade.grade)}
+                </div>
               </div>
             ))}
-            
+
             {/* Summary / Average Row */}
-            <div className={styles.row} style={{ background: "var(--bg-secondary)", borderTop: "1px solid var(--border-light)" }}>
-              <div className={styles.subjectCol} style={{ fontWeight: 700 }}>Overall Average</div>
-              <div className={styles.scoreCol} style={{ color: "var(--amber)" }}>{averageScore}%</div>
+            <div className={`${styles.row} ${styles.summaryRow}`}>
+              <div className={styles.subjectCol}>Overall Average</div>
+              <div className={styles.scoreCol}>{averageScore}%</div>
               <div className={styles.gradeCol}>
-                {getGradeBadge(averageScore >= 90 ? 'A' : averageScore >= 80 ? 'B' : averageScore >= 70 ? 'C' : 'D')}
+                {getGradeBadge(
+                  averageScore >= 90
+                    ? 'A'
+                    : averageScore >= 80
+                      ? 'B'
+                      : averageScore >= 70
+                        ? 'C'
+                        : 'D',
+                )}
               </div>
             </div>
           </>
         )}
       </div>
     </section>
-  );
+  )
 }

@@ -4,6 +4,37 @@
   gap: 24px;
   padding: 24px;
 }
+
+/* ── Currency Tabs ── */
+.currencyTabs {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+.currencyTab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: var(--bg-secondary);
+  }
+}
+
+.currencyTabActive {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
+}
 .hero {
   padding: 32px;
   border-radius: 24px;
@@ -152,12 +183,21 @@
 }
 .tableWrapper {
   overflow-x: auto;
+  overflow-y: auto;
   margin-top: 16px;
+  max-height: 600px;
 }
 .table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   text-align: left;
+}
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--bg-primary);
 }
 .table th {
   padding: 12px;

@@ -23,7 +23,7 @@ export const Route = createFileRoute('/dashboard')({
 })
 
 function DashboardLayout() {
-  const { user, clearUser } = useUserStore()
+  const { user } = useUserStore()
   const location = useLocation()
 
   // Derive the current section from the URL path
@@ -42,10 +42,6 @@ function DashboardLayout() {
           role={user.role}
           user={user}
           sectionLabel={getSectionLabel(user.role, currentSection)}
-          onLogout={() => {
-            clearUser()
-            window.location.href = '/login'
-          }}
         />
 
         <section className={styles.content}>

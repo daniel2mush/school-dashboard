@@ -1,22 +1,16 @@
-import {
-  BookOpen,
-  CalendarRange,
-  Clock3,
-  Sparkles,
-} from "lucide-react";
-import styles from "./StudentTimetable.module.scss";
-import useCurrentStudent from "@/hooks/useCurrentStudent";
-import type { Timetable } from "@/types/Types";
+import { BookOpen, CalendarRange, Clock3, Sparkles } from 'lucide-react'
+import styles from './StudentTimetable.module.scss'
+import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 const FALLBACK_PERIODS = [
-  { id: 1, label: "Period 1", startTime: "7:30", endTime: "8:30" },
-  { id: 2, label: "Period 2", startTime: "8:30", endTime: "9:30" },
-  { id: 3, label: "Period 3", startTime: "9:30", endTime: "10:30" },
-  { id: 4, label: "Period 4", startTime: "11:00", endTime: "12:00" },
-  { id: 5, label: "Period 5", startTime: "12:00", endTime: "13:00" },
-];
+  { id: 1, label: 'Period 1', startTime: '7:30', endTime: '8:30' },
+  { id: 2, label: 'Period 2', startTime: '8:30', endTime: '9:30' },
+  { id: 3, label: 'Period 3', startTime: '9:30', endTime: '10:30' },
+  { id: 4, label: 'Period 4', startTime: '11:00', endTime: '12:00' },
+  { id: 5, label: 'Period 5', startTime: '12:00', endTime: '13:00' },
+]
 
 const formatSubjectTone = (subject: string) => {
   const tones = [
@@ -25,21 +19,21 @@ const formatSubjectTone = (subject: string) => {
     styles.toneGold,
     styles.toneMint,
     styles.toneRose,
-  ];
+  ]
 
   const seed = subject
-    .split("")
-    .reduce((sum, char) => sum + char.charCodeAt(0), 0);
+    .split('')
+    .reduce((sum, char) => sum + char.charCodeAt(0), 0)
 
-  return tones[seed % tones.length];
-};
+  return tones[seed % tones.length]
+}
 
-export default function StudentTimetable() {
-  const currentData = useCurrentStudent();
+export function StudentTimetable() {
+  const currentData = useCurrentStudent()
 
-  if (!currentData) return null;
+  if (!currentData) return null
 
-  const { studentTimetableSlots, yearGroup } = currentData;
+  const { studentTimetableSlots, yearGroup } = currentData
 
   const periods = Array.from(
     new Map(
@@ -56,20 +50,23 @@ export default function StudentTimetable() {
           },
         ]),
     ).values(),
-  );
+  )
 
-  const visiblePeriods = periods.length > 0 ? periods : FALLBACK_PERIODS;
+  const visiblePeriods = periods.length > 0 ? periods : FALLBACK_PERIODS
 
   const scheduledSubjects = new Set(
     studentTimetableSlots
       .map((slot) => slot.subject?.name)
       .filter((subject): subject is string => Boolean(subject)),
-  );
+  )
 
-  const lessonCount = studentTimetableSlots.filter((slot) => Boolean(slot.subject?.name)).length;
+  const lessonCount = studentTimetableSlots.filter((slot) =>
+    Boolean(slot.subject?.name),
+  ).length
 
-  const firstClass =
-    visiblePeriods[0] ? `${visiblePeriods[0].startTime} - ${visiblePeriods[0].endTime}` : "N/A";
+  const firstClass = visiblePeriods[0]
+    ? `${visiblePeriods[0].startTime} - ${visiblePeriods[0].endTime}`
+    : 'N/A'
 
   return (
     <section className={styles.view}>
@@ -127,7 +124,9 @@ export default function StudentTimetable() {
             <p className={styles.boardEyebrow}>Week at a glance</p>
             <h3 className={styles.boardTitle}>Calendar timetable</h3>
           </div>
-          <div className={styles.boardMeta}>First class starts {firstClass}</div>
+          <div className={styles.boardMeta}>
+            First class starts {firstClass}
+          </div>
         </div>
 
         <div className={styles.calendarScroller}>
@@ -143,48 +142,59 @@ export default function StudentTimetable() {
             ))}
 
             {DAYS.map((day) => {
-              const daySchedule = studentTimetableSlots.filter((slot) => slot.day === day);
-              const lessonTotal = daySchedule.filter((slot) => Boolean(slot.subject?.name)).length;
+              const daySchedule = studentTimetableSlots.filter(
+                (slot) => slot.day === day,
+              )
+              const lessonTotal = daySchedule.filter((slot) =>
+                Boolean(slot.subject?.name),
+              ).length
 
               return (
                 <div key={day} className={styles.dayRow}>
                   <div className={styles.dayCell}>
                     <span className={styles.dayHeaderTitle}>{day}</span>
-                    <span className={styles.dayHeaderMeta}>{lessonTotal} lessons</span>
+                    <span className={styles.dayHeaderMeta}>
+                      {lessonTotal} lessons
+                    </span>
                   </div>
 
                   {visiblePeriods.map((period) => {
-                    const slot = daySchedule.find((entry) => entry.periodId === period.id);
-                    const subject = slot?.subject?.name;
-                    const teacher = slot?.teacher?.name;
-                    const isFree = !subject;
+                    const slot = daySchedule.find(
+                      (entry) => entry.periodId === period.id,
+                    )
+                    const subject = slot?.subject?.name
+                    const teacher = slot?.teacher?.name
+                    const isFree = !subject
 
                     return (
-                      <div key={`${day}-${period.label}`} className={styles.slotCell}>
+                      <div
+                        key={`${day}-${period.label}`}
+                        className={styles.slotCell}
+                      >
                         <div
                           className={`${styles.lessonCard} ${isFree ? styles.freeCard : formatSubjectTone(subject)}`}
                         >
                           <span className={styles.lessonState}>
-                            {isFree ? "Free slot" : "Scheduled"}
+                            {isFree ? 'Free slot' : 'Scheduled'}
                           </span>
                           <strong className={styles.lessonSubject}>
-                            {isFree ? "No class assigned" : subject}
+                            {isFree ? 'No class assigned' : subject}
                           </strong>
                           <span className={styles.lessonMeta}>
                             {isFree
                               ? `${period.startTime} - ${period.endTime}`
-                              : `${period.startTime} - ${period.endTime} · ${teacher || "Teacher unassigned"}`}
+                              : `${period.startTime} - ${period.endTime} · ${teacher || 'Teacher unassigned'}`}
                           </span>
                         </div>
                       </div>
-                    );
+                    )
                   })}
                 </div>
-              );
+              )
             })}
           </div>
         </div>
       </section>
     </section>
-  );
+  )
 }

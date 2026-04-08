@@ -60,10 +60,37 @@ export function Avatar({
 }
 
 // ── MetricCard ───────────────────────────────────────────────
-export function MetricCard({ label, value, sub, valueColor, style }: any) {
+export function MetricCard({
+  label,
+  value,
+  sub,
+  valueColor,
+  icon: Icon,
+  style,
+}: any) {
   return (
     <div className="metric-card" style={style}>
-      <div className="metric-label">{label}</div>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+        }}
+      >
+        <div className="metric-label">{label}</div>
+        {Icon && (
+          <div
+            style={{
+              padding: 6,
+              background: 'var(--bg-secondary)',
+              borderRadius: 8,
+              color: valueColor || 'var(--accent)',
+            }}
+          >
+            <Icon size={16} strokeWidth={2.5} />
+          </div>
+        )}
+      </div>
       <div
         className="metric-value"
         style={valueColor ? { color: valueColor } : {}}

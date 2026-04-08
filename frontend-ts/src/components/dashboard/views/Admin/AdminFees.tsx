@@ -8,6 +8,7 @@ import {
   useDeleteFee,
 } from '#/components/query/AdminQuery'
 import styles from './AdminFees.module.scss'
+import { useCurrency, type CurrencyCode } from '#/context/CurrencyContext'
 
 import { Badge, Input } from '#/components/ui'
 import {
@@ -22,18 +23,6 @@ import {
 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-function formatCFA(amount: number) {
-  if (typeof amount !== 'number') return 'CFA 0'
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'XOF',
-    minimumFractionDigits: 0,
-  })
-    .format(amount)
-    .replace('F CFA', 'CFA')
-    .replace('FCFA', 'CFA')
-}
-
 function FeePaymentModal({
   fee,
   yearGroup,
@@ -43,6 +32,7 @@ function FeePaymentModal({
   yearGroup: AdminFeeYearGroup
   onClose: () => void
 }) {
+  const { formatCurrency } = useCurrency()
   const upsertPayment = useUpsertFeePayment()
   const [drafts, setDrafts] = useState<
     Record<
@@ -92,7 +82,7 @@ function FeePaymentModal({
             <div className={styles.modalEyebrow}>Payment Ledger</div>
             <h3 className={styles.modalTitle}>{fee.title}</h3>
             <p className={styles.modalSubtitle}>
-              {yearGroup.name} · {formatCFA(fee.amount)} per student
+              {yearGroup.name} · {formatCurrency(fee.amount)} per student
             </p>
           </div>
           <button type="button" className={styles.modalClose} onClick={onClose}>
@@ -131,9 +121,9 @@ function FeePaymentModal({
                   </div>
 
                   <div className={styles.paymentSummary}>
-                    <span>Billed {formatCFA(fee.amount)}</span>
-                    <span>Paid {formatCFA(amountPaid)}</span>
-                    <span>Remaining {formatCFA(remaining)}</span>
+                    <span>Billed {formatCurrency(fee.amount)}</span>
+                    <span>Paid {formatCurrency(amountPaid)}</span>
+                    <span>Remaining {formatCurrency(remaining)}</span>
                   </div>
 
                   <div className={styles.paymentGrid}>
@@ -215,6 +205,7 @@ function FeePaymentModal({
 }
 
 export function AdminFees() {
+  const { currency, setCurrency, formatCurrency } = useCurrency()
   const { data: analytics, isLoading: analyticsLoading } =
     useGetAdminAnalytics()
   const { data: yearGroups = [], isLoading: feeLoading } = useGetFeeManagement()
@@ -234,17 +225,17 @@ export function AdminFees() {
     return [
       {
         label: 'Expected Revenue',
-        value: formatCFA(analytics.totalExpectedRevenue),
+        value: formatCurrency(analytics.totalExpectedRevenue),
         icon: <Receipt size={18} strokeWidth={2} />,
       },
       {
         label: 'Collected Revenue',
-        value: formatCFA(analytics.totalCollectedRevenue),
+        value: formatCurrency(analytics.totalCollectedRevenue),
         icon: <Banknote size={18} strokeWidth={2} />,
       },
       {
         label: 'Outstanding',
-        value: formatCFA(
+        value: formatCurrency(
           Math.max(
             (analytics.totalExpectedRevenue || 0) -
               (analytics.totalCollectedRevenue || 0),
@@ -313,7 +304,6 @@ export function AdminFees() {
   const activeFee =
     activeYearGroup?.fees.find((fee) => fee.id === paymentFeeId) || null
 
-
   const createFeeItem = () => {
     if (!activeYearGroup) return
     createFee.mutate(
@@ -340,6 +330,20 @@ export function AdminFees() {
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>Finance Workspace</div>
             <h1 className={styles.title}>Fee management</h1>
+            <div className={styles.currencyTabs}>
+              {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
+                (code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    className={`${styles.currencyTab} ${currency === code ? styles.currencyTabActive : ''}`}
+                    onClick={() => setCurrency(code)}
+                  >
+                    {code}
+                  </button>
+                ),
+              )}
+            </div>
             <p className={styles.copy}>
               Set up fee items for each year group, track partial payments
               student by student, and keep a clear view of what has been paid,
@@ -407,8 +411,8 @@ export function AdminFees() {
                     {yearGroup.fees.length} charges
                   </div>
                   <div className={styles.yearGroupValues}>
-                    <span>Expected {formatCFA(expected)}</span>
-                    <span>Collected {formatCFA(collected)}</span>
+                    <span>Expected {formatCurrency(expected)}</span>
+                    <span>Collected {formatCurrency(collected)}</span>
                   </div>
                 </button>
               )
@@ -522,15 +526,15 @@ export function AdminFees() {
                           <div className={styles.feeMetrics}>
                             <div>
                               <span>Per student</span>
-                              <strong>{formatCFA(fee.amount)}</strong>
+                              <strong>{formatCurrency(fee.amount)}</strong>
                             </div>
                             <div>
                               <span>Collected</span>
-                              <strong>{formatCFA(totalCollected)}</strong>
+                              <strong>{formatCurrency(totalCollected)}</strong>
                             </div>
                             <div>
                               <span>Expected total</span>
-                              <strong>{formatCFA(expectedTotal)}</strong>
+                              <strong>{formatCurrency(expectedTotal)}</strong>
                             </div>
                             <div>
                               <span>Fully paid students</span>

@@ -60,6 +60,7 @@ export function TeachGrading() {
     overall: '',
   })
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedYearGroup, setSelectedYearGroup] = useState<string>('All')
   const [activeSubjectId, setActiveSubjectId] = useState<string | null>(null)
 
   if (isLoading || !classes) {
@@ -97,13 +98,19 @@ export function TeachGrading() {
     return student?.grades.find((g) => g.subjectId.toString() === subjectId)
   }
 
+  const yearGroups = Array.from(new Set(classes.map((c) => c.name))).sort()
+
   const filteredStudents = studentsWithGrades.filter((s) => {
     const matchesSearch = s.name
       .toLowerCase()
       .includes(searchQuery.toLowerCase())
+    const matchesYearGroup =
+      selectedYearGroup === 'All' || s.className === selectedYearGroup
     const hasGrades = s.grades.length > 0
     // If searching, show all that match. If not searching, only show those with grades to keep it professional
-    return searchQuery ? matchesSearch : hasGrades && matchesSearch
+    return searchQuery
+      ? matchesSearch && matchesYearGroup
+      : hasGrades && matchesSearch && matchesYearGroup
   })
 
   const handleScoreChange = (field: keyof typeof scores, value: string) => {
@@ -193,7 +200,10 @@ export function TeachGrading() {
               {classCount} classes, {totalStudents} students
             </span>
           </div>
-          <button className={styles.addBtn} onClick={() => setIsModalOpen(true)}>
+          <button
+            className={styles.addBtn}
+            onClick={() => setIsModalOpen(true)}
+          >
             <Plus size={20} />
             Add Grades
           </button>
@@ -228,18 +238,31 @@ export function TeachGrading() {
               {filteredStudents.length === 1 ? '' : 's'}
             </span>
           </div>
-          <div className={styles.searchWrap}>
-            <Search
-              size={18}
-              className={styles.searchIcon}
-            />
-            <input
-              type="text"
-              placeholder="Search students or subjects..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className={styles.searchInput}
-            />
+          <div className={styles.tableActions}>
+            <div className={styles.filterWrap}>
+              <select
+                value={selectedYearGroup}
+                onChange={(e) => setSelectedYearGroup(e.target.value)}
+                className={styles.filterSelect}
+              >
+                <option value="All">All Year Groups</option>
+                {yearGroups.map((yg) => (
+                  <option key={yg} value={yg}>
+                    {yg}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className={styles.searchWrap}>
+              <Search size={18} className={styles.searchIcon} />
+              <input
+                type="text"
+                placeholder="Search students..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className={styles.searchInput}
+              />
+            </div>
           </div>
         </div>
         <table className={styles.table}>
@@ -354,10 +377,10 @@ export function TeachGrading() {
               })
             ) : (
               <tr>
-              <td colSpan={3} className={styles.emptyState}>
-                No students found.
-              </td>
-            </tr>
+                <td colSpan={3} className={styles.emptyState}>
+                  No students found.
+                </td>
+              </tr>
             )}
           </tbody>
         </table>
@@ -395,9 +418,7 @@ export function TeachGrading() {
               }}
             >
               <div>
-                <div
-                  className={styles.formGroup}
-                >
+                <div className={styles.formGroup}>
                   <label>Class / Year Group</label>
                   <select
                     value={selectedClassId}

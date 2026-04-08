@@ -5,7 +5,8 @@ import {
   useGetSchoolStructure,
 } from '#/components/query/AdminQuery'
 import { useGetAnnouncements } from '#/components/query/AuthQuery'
-import {Badge, Card, CardHeader, ProgressBar } from '#/components/ui'
+import { useCurrency, type CurrencyCode } from '#/context/CurrencyContext'
+import { Badge, Card, CardHeader, ProgressBar } from '#/components/ui'
 import type { Announcement } from '#/types/Types'
 import { useNavigate } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
@@ -73,17 +74,6 @@ const YG_ACCENTS = [
   },
 ]
 
-function formatCFA(amount: number) {
-  return new Intl.NumberFormat('fr-FR', {
-    style: 'currency',
-    currency: 'XOF',
-    minimumFractionDigits: 0,
-  })
-    .format(amount)
-    .replace('F CFA', 'CFA')
-    .replace('FCFA', 'CFA')
-}
-
 function tooltipValueToNumber(value: TooltipValueType | undefined) {
   const rawValue = Array.isArray(value) ? value[0] : value
   const parsedValue = Number(rawValue)
@@ -137,6 +127,7 @@ function StatTile({
 }
 
 export function AdminOverview() {
+  const { currency, setCurrency, formatCurrency } = useCurrency()
   const [isMounted, setIsMounted] = useState(false)
   useEffect(() => {
     setIsMounted(true)
@@ -215,8 +206,7 @@ export function AdminOverview() {
     year: 'numeric',
   })
 
-  const latestAnnouncement =
-    announcements.length > 0 ? announcements[0] : null
+  const latestAnnouncement = announcements.length > 0 ? announcements[0] : null
 
   // Prepare chart data
   const revenueData = [
@@ -242,6 +232,20 @@ export function AdminOverview() {
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>Sunridge Academy · Admin</div>
             <h1 className={styles.heroTitle}>Platform overview</h1>
+            <div className={styles.currencyTabs}>
+              {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
+                (code) => (
+                  <button
+                    key={code}
+                    type="button"
+                    className={`${styles.currencyTab} ${currency === code ? styles.currencyTabActive : ''}`}
+                    onClick={() => setCurrency(code)}
+                  >
+                    {code}
+                  </button>
+                ),
+              )}
+            </div>
             <p className={styles.heroLead}>
               You are supporting <strong>{analytics.students}</strong> active
               students across <strong>{analytics.yearGroups}</strong> year
@@ -332,12 +336,12 @@ export function AdminOverview() {
         <article className={styles.insight}>
           <div className={styles.insightLabel}>Fee collection</div>
           <div className={styles.insightValue}>
-            {feeCollectionPct}% · {formatCFA(analytics.totalCollectedRevenue)}{' '}
-            received
+            {feeCollectionPct}% ·{' '}
+            {formatCurrency(analytics.totalCollectedRevenue)} received
           </div>
           <p className={styles.insightSub}>
             {analytics.totalExpectedRevenue > 0
-              ? `${formatCFA(outstandingCFA)} still outstanding against expected term fees.`
+              ? `${formatCurrency(outstandingCFA)} still outstanding against expected term fees.`
               : 'No fee records yet — add amounts under Fee Management.'}
           </p>
           <div className={styles.insightBar}>
@@ -410,7 +414,7 @@ export function AdminOverview() {
           iconClass={styles.iconAmber}
           label="Fees collected"
           value={`${feeCollectionPct}%`}
-          sub={`${formatCFA(analytics.totalCollectedRevenue)} of ${formatCFA(analytics.totalExpectedRevenue)}`}
+          sub={`${formatCurrency(analytics.totalCollectedRevenue)} of ${formatCurrency(analytics.totalExpectedRevenue)}`}
           valueColor={feeCollectionPct >= 80 ? 'var(--green)' : 'var(--amber)'}
         />
         <StatTile
@@ -457,7 +461,9 @@ export function AdminOverview() {
                     ))}
                   </Pie>
                   <Tooltip
-                    formatter={(value) => formatCFA(tooltipValueToNumber(value))}
+                    formatter={(value) =>
+                      formatCurrency(tooltipValueToNumber(value))
+                    }
                     contentStyle={{
                       borderRadius: '8px',
                       border: 'none',

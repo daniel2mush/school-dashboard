@@ -7,6 +7,5 @@ const router = express.Router();
 
 router.get("/announcements", AuthenticateRequest, GetAnnouncements);
 router.get("/:id", AuthenticateRequest, GetUserProfile);
-router.delete("/:id", AuthenticateRequest, Logout)
 
 export default router;

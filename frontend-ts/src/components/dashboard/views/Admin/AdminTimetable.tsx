@@ -8,6 +8,7 @@ import {
   Plus,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import useUserStore from '#/components/store/UserStore'
 import styles from './AdminTimetable.module.scss'
 
 import { Trash2 } from 'lucide-react'
@@ -384,6 +385,7 @@ function ManagePeriodsModal({
 }
 
 export function AdminTimetable() {
+  const user = useUserStore((state) => state.user)
   const { data: yearGroups, isLoading } = useGetSchoolStructure()
   const [editState, setEditState] = useState<EditState | null>(null)
   const [managePeriodsYearGroup, setManagePeriodsYearGroup] =
@@ -400,7 +402,9 @@ export function AdminTimetable() {
 
     setSelectedYearGroupId((current) => {
       if (current === null) return yearGroups[0].id
-      const stillExists = yearGroups.some((yearGroup) => yearGroup.id === current)
+      const stillExists = yearGroups.some(
+        (yearGroup) => yearGroup.id === current,
+      )
       return stillExists ? current : yearGroups[0].id
     })
   }, [yearGroups])
@@ -432,9 +436,9 @@ export function AdminTimetable() {
 
   const activeDays = selectedYearGroup
     ? new Set(
-      selectedYearGroup.timetables
-        .filter((slot) => slot.subject?.name)
-        .map((slot) => slot.day),
+        selectedYearGroup.timetables
+          .filter((slot) => slot.subject?.name)
+          .map((slot) => slot.day),
       )
     : new Set<string>()
 
@@ -526,11 +530,14 @@ export function AdminTimetable() {
           <select
             className={styles.classSelect}
             value={String(selectedYearGroup.id)}
-            onChange={(event) => setSelectedYearGroupId(Number(event.target.value))}
+            onChange={(event) =>
+              setSelectedYearGroupId(Number(event.target.value))
+            }
           >
             {yearGroups.map((yearGroup) => (
               <option key={yearGroup.id} value={yearGroup.id}>
-                {yearGroup.name} {yearGroup.roomNumber ? `- Room ${yearGroup.roomNumber}` : ''}
+                {yearGroup.name}{' '}
+                {yearGroup.roomNumber ? `- Room ${yearGroup.roomNumber}` : ''}
               </option>
             ))}
           </select>
@@ -556,6 +563,23 @@ export function AdminTimetable() {
             </p>
           </div>
           <div className={styles.tableLegend}>
+            {user?.role === 'teacher' && (
+              <span>
+                <i
+                  className={styles.legendHighlight}
+                  style={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: 999,
+                    display: 'inline-block',
+                    background:
+                      'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    border: '1px solid #047857',
+                  }}
+                />
+                My Schedule
+              </span>
+            )}
             <span>
               <i className={styles.legendActive} />
               Scheduled
@@ -601,12 +625,18 @@ export function AdminTimetable() {
                   {DAYS.map((day) => {
                     const slot = timetableSlotsByDayAndPeriod[day]?.[period.id]
                     const isScheduled = Boolean(slot?.subject?.name)
+                    const isMySchedule =
+                      user?.role === 'teacher' && slot?.teacherId === user?.id
 
                     return (
                       <td
                         key={`${day}-${period.id}`}
                         className={`${styles.slotCell} ${
-                          isScheduled ? styles.slotCellActive : styles.slotCellIdle
+                          isMySchedule
+                            ? styles.slotCellHighlight
+                            : isScheduled
+                              ? styles.slotCellActive
+                              : styles.slotCellIdle
                         }`}
                         onClick={() =>
                           setEditState({
@@ -622,13 +652,19 @@ export function AdminTimetable() {
                               {slot.subject?.name || 'Free'}
                             </div>
                             <div className={styles.slotMeta}>
-                              <span>{slot.teacher?.name || 'Teacher unassigned'}</span>
+                              <span>
+                                {slot.teacher?.name || 'Teacher unassigned'}
+                              </span>
                               <span className={styles.dot}>•</span>
-                              <span>{selectedYearGroup.roomNumber || 'Room TBA'}</span>
+                              <span>
+                                {selectedYearGroup.roomNumber || 'Room TBA'}
+                              </span>
                             </div>
                           </div>
                         ) : (
-                          <span className={styles.emptyMark}>Click to assign</span>
+                          <span className={styles.emptyMark}>
+                            Click to assign
+                          </span>
                         )}
                       </td>
                     )
