@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -11,40 +8,187 @@ datasource db {
 }
 
 model User {
-  id             Int       @id @default(autoincrement())
-  email          String    @unique
-  password       String
-  name           String
-  initials       String?
-  gender         Gender?
-  dateOfBirth    DateTime?
-  phoneNumber    String?
-  address        String?
-  avatarUrl      String?
-  specialization String? // For teachers
-  enrollmentDate DateTime  @default(now()) // For students
-  role           Role      @default(STUDENT)
-  status         String    @default("Active")
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                   Int            @id @default(autoincrement())
+  email                String         @unique
+  password             String
+  name                 String
+  initials             String?
+  role                 Role           @default(STUDENT)
+  status               String         @default("Active")
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  enrolledYearGroupId  Int?
+  address              String?
+  avatarUrl            String?
+  dateOfBirth          DateTime?
+  enrollmentDate       DateTime       @default(now())
+  gender               Gender?
+  phoneNumber          String?
+  specialization       String?
+  announcements        Announcement[] @relation("Author")
+  attendance           Attendance[]
+  feePayments          FeePayment[]
+  grades               Grade[]        @relation("StudentGrades")
+  givenGrades          Grade[]        @relation("TeacherGrades")
+  materials            Material[]     @relation("TeacherMaterials")
+  refreshTokens        RefreshToken[]
+  taughtTimetableSlots Timetable[]    @relation("TeacherTimetableSlots")
+  enrolledYearGroup    YearGroup?     @relation("StudentYearGroup", fields: [enrolledYearGroupId], references: [id])
+  taughtYearGroups     YearGroup[]    @relation("TeacherYearGroups")
+}
 
-  // Relationships
-  // For students:
-  enrolledYearGroup   YearGroup?   @relation("StudentYearGroup", fields: [enrolledYearGroupId], references: [id])
-  enrolledYearGroupId Int?
-  grades              Grade[]      @relation("StudentGrades")
-  attendance          Attendance[]
-  feePayments         FeePayment[]
+model Subject {
+  id          Int         @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  grades      Grade[]
+  materials   Material[]
+  timetable   Timetable[]
+  yearGroups  YearGroup[] @relation("SubjectYearGroups")
+}
 
-  // For teachers:
-  taughtYearGroups     YearGroup[] @relation("TeacherYearGroups")
-  givenGrades          Grade[]     @relation("TeacherGrades")
-  taughtTimetableSlots Timetable[] @relation("TeacherTimetableSlots")
-  materials            Material[]  @relation("TeacherMaterials")
+model YearGroup {
+  id            Int            @id @default(autoincrement())
+  name          String
+  level         Level          @default(Primary)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  roomNumber    String?
+  capacity      Int?
+  announcements Announcement[] @relation("TargetYearGroup")
+  fees          Fee[]
+  materials     Material[]
+  timetables    Timetable[]
+  students      User[]         @relation("StudentYearGroup")
+  subjects      Subject[]      @relation("SubjectYearGroups")
+  teachers      User[]         @relation("TeacherYearGroups")
+}
 
-  // Announcements
-  announcements Announcement[] @relation("Author")
-  refreshTokens RefreshToken[]
+model Grade {
+  id            Int      @id @default(autoincrement())
+  score         Float?
+  grade         String?
+  studentId     Int
+  subjectId     Int
+  teacherId     Int
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  assignmentAvg Float?
+  midterm       Float?
+  projectFinal  Float?
+  test          Boolean
+  test2         Boolean
+  student       User     @relation("StudentGrades", fields: [studentId], references: [id])
+  subject       Subject  @relation(fields: [subjectId], references: [id])
+  teacher       User     @relation("TeacherGrades", fields: [teacherId], references: [id])
+}
+
+model Attendance {
+  id        Int              @id @default(autoincrement())
+  status    AttendanceStatus @default(P)
+  date      DateTime         @default(now())
+  studentId Int
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  student   User             @relation(fields: [studentId], references: [id])
+}
+
+model Announcement {
+  id                Int        @id @default(autoincrement())
+  title             String
+  content           String
+  priority          Priority   @default(Normal)
+  authorId          Int
+  targetType        TargetType @default(ALL)
+  targetYearGroupId Int?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+  author            User       @relation("Author", fields: [authorId], references: [id])
+  targetYearGroup   YearGroup? @relation("TargetYearGroup", fields: [targetYearGroupId], references: [id])
+}
+
+model Period {
+  id         Int         @id @default(autoincrement())
+  label      String
+  startTime  String
+  endTime    String
+  isBreak    Boolean     @default(false)
+  timetables Timetable[]
+}
+
+model Timetable {
+  id          Int       @id @default(autoincrement())
+  day         DayOfWeek
+  yearGroupId Int
+  periodId    Int
+  subjectId   Int?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  teacherId   Int?
+  period      Period    @relation(fields: [periodId], references: [id])
+  subject     Subject?  @relation(fields: [subjectId], references: [id])
+  teacher     User?     @relation("TeacherTimetableSlots", fields: [teacherId], references: [id])
+  yearGroup   YearGroup @relation(fields: [yearGroupId], references: [id])
+
+  @@unique([yearGroupId, day, periodId])
+}
+
+model Fee {
+  id          Int          @id @default(autoincrement())
+  amount      Float
+  yearGroupId Int
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  title       String
+  description String?
+  yearGroup   YearGroup    @relation(fields: [yearGroupId], references: [id])
+  payments    FeePayment[]
+}
+
+model FeePayment {
+  id            Int       @id @default(autoincrement())
+  feeId         Int
+  studentId     Int
+  amountPaid    Float     @default(0)
+  amountInWords String?
+  isFullyPaid   Boolean   @default(false)
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  fee           Fee       @relation(fields: [feeId], references: [id], onDelete: Cascade)
+  student       User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([feeId, studentId])
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  hashedToken String   @unique
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Material {
+  id          Int        @id @default(autoincrement())
+  title       String
+  description String?
+  fileUrl     String
+  fileType    String?
+  isPublished Boolean    @default(true)
+  subjectId   Int
+  teacherId   Int
+  yearGroupId Int?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  subject     Subject    @relation(fields: [subjectId], references: [id])
+  teacher     User       @relation("TeacherMaterials", fields: [teacherId], references: [id])
+  yearGroup   YearGroup? @relation(fields: [yearGroupId], references: [id])
 }
 
 enum Role {
@@ -59,38 +203,6 @@ enum Gender {
   Other
 }
 
-model Subject {
-  id          Int         @id @default(autoincrement())
-  name        String
-  description String?
-  yearGroups  YearGroup[] @relation("SubjectYearGroups")
-  grades      Grade[]
-  timetable   Timetable[]
-  materials   Material[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-}
-
-model YearGroup {
-  id         Int     @id @default(autoincrement())
-  name       String
-  level      Level   @default(Primary)
-  roomNumber String?
-  capacity   Int?
-
-  // Relationships
-  students      User[]         @relation("StudentYearGroup")
-  teachers      User[]         @relation("TeacherYearGroups")
-  subjects      Subject[]      @relation("SubjectYearGroups")
-  fees          Fee[]
-  timetables    Timetable[]
-  announcements Announcement[] @relation("TargetYearGroup")
-  materials     Material[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum Level {
   Primary
   JuniorSecondary
@@ -98,53 +210,11 @@ enum Level {
   University
 }
 
-model Grade {
-  id            Int      @id @default(autoincrement())
-  score         Float? // Final/Overall score
-  grade         String? // e.g., "A", "B+"
-  midterm       Float?
-  assignmentAvg Float?
-  projectFinal  Float?
-  student       User     @relation("StudentGrades", fields: [studentId], references: [id])
-  studentId     Int
-  subject       Subject  @relation(fields: [subjectId], references: [id])
-  subjectId     Int
-  teacher       User     @relation("TeacherGrades", fields: [teacherId], references: [id])
-  teacherId     Int
-  date          DateTime @default(now())
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model Attendance {
-  id        Int              @id @default(autoincrement())
-  status    AttendanceStatus @default(P)
-  date      DateTime         @default(now())
-  student   User             @relation(fields: [studentId], references: [id])
-  studentId Int
-  createdAt DateTime         @default(now())
-  updatedAt DateTime         @updatedAt
-}
-
 enum AttendanceStatus {
-  P // Present
-  A // Absent
-  T // Late
-  H // Holiday
-}
-
-model Announcement {
-  id                Int        @id @default(autoincrement())
-  title             String
-  content           String
-  priority          Priority   @default(Normal)
-  author            User       @relation("Author", fields: [authorId], references: [id])
-  authorId          Int
-  targetType        TargetType @default(ALL)
-  targetYearGroup   YearGroup? @relation("TargetYearGroup", fields: [targetYearGroupId], references: [id])
-  targetYearGroupId Int?
-  createdAt         DateTime   @default(now())
-  updatedAt         DateTime   @updatedAt
+  P
+  A
+  T
+  H
 }
 
 enum Priority {
@@ -159,33 +229,6 @@ enum TargetType {
   TEACHERS_ONLY
 }
 
-model Period {
-  id         Int         @id @default(autoincrement())
-  label      String // e.g., "Period 1"
-  startTime  String // e.g., "7:30"
-  endTime    String // e.g., "8:30"
-  isBreak    Boolean     @default(false)
-  timetables Timetable[]
-}
-
-model Timetable {
-  id          Int       @id @default(autoincrement())
-  day         DayOfWeek
-  yearGroup   YearGroup @relation(fields: [yearGroupId], references: [id])
-  yearGroupId Int
-  period      Period    @relation(fields: [periodId], references: [id])
-  periodId    Int
-  subject     Subject?  @relation(fields: [subjectId], references: [id])
-  subjectId   Int? // Null for free periods
-  teacher     User?     @relation("TeacherTimetableSlots", fields: [teacherId], references: [id])
-  teacherId   Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([yearGroupId, day, periodId])
-}
-
 enum DayOfWeek {
   Monday
   Tuesday
@@ -194,66 +237,4 @@ enum DayOfWeek {
   Friday
   Saturday
   Sunday
-}
-
-model Fee {
-  id          Int          @id @default(autoincrement())
-  title       String
-  description String?
-  amount      Float
-  yearGroup   YearGroup    @relation(fields: [yearGroupId], references: [id])
-  yearGroupId Int
-  payments    FeePayment[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-}
-
-model FeePayment {
-  id            Int       @id @default(autoincrement())
-  fee           Fee       @relation(fields: [feeId], references: [id], onDelete: Cascade)
-  feeId         Int
-  student       User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  studentId     Int
-  amountPaid    Float     @default(0)
-  amountInWords String?
-  isFullyPaid   Boolean   @default(false)
-  paidAt        DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  @@unique([feeId, studentId])
-}
-
-// refreshToken
-model RefreshToken {
-  id          String   @id @default(uuid())
-  hashedToken String   @unique
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Material {
-  id          Int     @id @default(autoincrement())
-  title       String
-  description String?
-  fileUrl     String
-  fileType    String? // e.g., "pdf", "docx"
-
-  isPublished Boolean @default(true)
-
-  subject   Subject @relation(fields: [subjectId], references: [id])
-  subjectId Int
-
-  teacher   User @relation("TeacherMaterials", fields: [teacherId], references: [id])
-  teacherId Int
-
-  yearGroup   YearGroup? @relation(fields: [yearGroupId], references: [id])
-  yearGroupId Int?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

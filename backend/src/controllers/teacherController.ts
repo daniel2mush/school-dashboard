@@ -3,6 +3,7 @@ import AppError from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendJson } from "../utils/sendJson.js";
 import { startOfDay, endOfDay } from "date-fns";
+import logger from "../utils/logger.js";
 
 // Fetch classes (Year Groups) assigned to this teacher
 export const GetTeacherClasses = asyncHandler(async (req, res) => {
@@ -61,7 +62,8 @@ export const GetTeacherClasses = asyncHandler(async (req, res) => {
 // Submit a grade for a student (Upsert logic)
 export const SubmitGrades = asyncHandler(async (req, res) => {
   const { userId, role } = req.user;
-  const { studentId, subjectId, score, grade, midterm, assignmentAvg, projectFinal } = req.body;
+
+  const { studentId, subjectId, score, grade, midterm, assignmentAvg, projectFinal } = req.body.data;
 
   if (role !== "TEACHER") {
     throw new AppError("Unauthorized access. Teachers only.", 403);

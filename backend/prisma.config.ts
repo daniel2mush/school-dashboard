@@ -11,5 +11,6 @@ export default defineConfig({
   },
   datasource: {
     url: process.env["DATABASE_URL"],
+    shadowDatabaseUrl: "postgresql://daniel:password@localhost:5432/shadow_db",
   },
 });

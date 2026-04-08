@@ -5,9 +5,12 @@ import { isAxiosError } from 'axios'
 export const Route = createFileRoute('/api/teacher/grades')({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const data = await request.json()
+
+        console.log(data, 'Data ')
         try {
-          const res = await axiosClient.post('/teacher/grades')
+          const res = await axiosClient.post('/teacher/grades', { data })
           return Response.json(res.data)
         } catch (error) {
           if (isAxiosError(error)) {
