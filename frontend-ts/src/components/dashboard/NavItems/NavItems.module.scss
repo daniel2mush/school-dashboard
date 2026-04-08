@@ -21,6 +21,25 @@
     transform: translateX(2px);
   }
 
+  &.activeNavItem {
+    background: linear-gradient(
+      135deg,
+      rgba(79, 70, 229, 0.12),
+      rgba(79, 70, 229, 0.04)
+    );
+    border-color: rgba(79, 70, 229, 0.16);
+    box-shadow: var(--shadow-sm);
+
+    .icon {
+      color: var(--accent);
+    }
+
+    .label {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+  }
+
   &:has(.active) {
     background: linear-gradient(
       135deg,

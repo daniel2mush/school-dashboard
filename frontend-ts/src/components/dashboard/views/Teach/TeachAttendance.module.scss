@@ -282,6 +282,7 @@
   grid-template-columns: 1.5fr 1fr;
   gap: 20px;
   align-items: stretch;
+
 }
 
 .registryCard {
@@ -293,6 +294,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  max-height: calc(100vh - 200px);
+  overflow-y: scroll;
 }
 
 .registryHeader {
@@ -357,7 +360,22 @@
 .table {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
+}
+
+.studentCol {
+  width: 35%;
+}
+
+.classCol {
+  width: 15%;
+}
+
+.attendanceCol {
+  width: 35%;
+}
+
+.recordsCol {
+  width: 15%;
 }
 
 .table th {
@@ -523,7 +541,6 @@
 .calendarTable {
   width: 100%;
   border-collapse: collapse;
-  table-layout: fixed;
   height: 100%;
 }
 

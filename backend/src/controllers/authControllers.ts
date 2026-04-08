@@ -253,8 +253,6 @@ export const Logout = asyncHandler(async (req, res) => {
 export const GenerateRefreshToken = asyncHandler(async (req, res) => {
   const refreshToken = req.cookies.refreshToken;
 
-  logger.warn(refreshToken, "This is the refresh token");
-
   if (!refreshToken) {
     throw new AppError("No refresh token found", 401);
   }
@@ -299,36 +297,15 @@ export const GenerateRefreshToken = asyncHandler(async (req, res) => {
     );
   }
 
-  // 3. Generate NEW tokens
+  // 3. Generate a new access token.
+  // Keep the same refresh token until logout/expiry so brief retries do not
+  // invalidate the session or create a rotation race.
   const newAccessToken = generateAccessToken(
     user.id,
     user.role,
     user.email,
     user.name,
   );
-  const newRefreshToken = generateRefreshToken(
-    user.id,
-    user.role,
-    user.email,
-    user.name,
-  );
-
-  // 4. Rotate tokens in Database (Atomically)
-  await prisma.$transaction([
-    // Delete the old one
-    prisma.refreshToken.delete({ where: { id: tokenRecord.id } }),
-    // Create the new one
-    prisma.refreshToken.create({
-      data: {
-        hashedToken: hashToken(newRefreshToken),
-        userId: user.id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      },
-    }),
-  ]);
-
-  // 5. Set new cookie
-  res.cookie("refreshToken", newRefreshToken, COOKIE_OPTIONS);
 
   const { password: _, ...userWithoutPassword } = user;
 

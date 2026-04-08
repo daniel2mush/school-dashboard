@@ -217,9 +217,8 @@ export function AdminAttendance() {
   const chartData = useMemo(() => {
     if (!stats) return []
     const counts = { P: 0, A: 0, T: 0, H: 0 }
-    const isTrackedStatus = (
-      status: string,
-    ): status is keyof typeof counts => status in counts
+    const isTrackedStatus = (status: string): status is keyof typeof counts =>
+      status in counts
 
     stats.studentStats.forEach((s) => {
       s.attendance_records.forEach((r) => {
@@ -510,171 +509,172 @@ export function AdminAttendance() {
           </div>
 
           <div className={styles.mainGrid}>
-          <div className={styles.registryCard}>
-            <div className={styles.registryHeader}>
-              <div className={styles.registryTitleBlock}>
-                <div className={styles.registryLabel}>Student Registry</div>
-                <div className={styles.registryCopy}>
-                  Search and filter your cohorts, then open a student to mark
-                  or review attendance history.
+            <div className={styles.registryCard}>
+              <div className={styles.registryHeader}>
+                <div className={styles.registryTitleBlock}>
+                  <div className={styles.registryLabel}>Student Registry</div>
+                  <div className={styles.registryCopy}>
+                    Search and filter your cohorts, then open a student to mark
+                    or review attendance history.
+                  </div>
+                </div>
+                <div className={styles.registryActions}>
+                  <div className={styles.search}>
+                    <Search size={16} />
+                    <input
+                      type="text"
+                      placeholder="Find student..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                  <div className={styles.filter}>
+                    <Filter size={16} />
+                    <select
+                      value={yearGroupFilter}
+                      onChange={(e) => setYearGroupFilter(e.target.value)}
+                    >
+                      {yearGroups.map((yg) => (
+                        <option key={yg} value={yg}>
+                          {yg}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div className={styles.registryActions}>
-                <div className={styles.search}>
-                  <Search size={16} />
-                  <input
-                    type="text"
-                    placeholder="Find student..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-                <div className={styles.filter}>
-                  <Filter size={16} />
-                  <select
-                    value={yearGroupFilter}
-                    onChange={(e) => setYearGroupFilter(e.target.value)}
-                  >
-                    {yearGroups.map((yg) => (
-                      <option key={yg} value={yg}>
-                        {yg}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+
+              <div className={styles.tableScroll}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th className={styles.studentCol}>Student</th>
+                      <th className={styles.yearCol}>Year</th>
+                      <th className={styles.attendanceCol}>Attendance</th>
+                      <th className={styles.recordsCol}>Records</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredStudents.map((s) => {
+                      const sStats = {
+                        present: s.attendance.present,
+                        absent: s.attendance.absent,
+                        late: s.attendance.tardy,
+                        total: s.attendance.total,
+                        rate:
+                          s.attendance.total > 0
+                            ? Math.round(
+                                (s.attendance.present / s.attendance.total) *
+                                  100,
+                              )
+                            : 0,
+                      }
+                      return (
+                        <tr
+                          key={s.studentId}
+                          className={
+                            selectedStudentId === s.studentId
+                              ? styles.selectedRow
+                              : ''
+                          }
+                          onClick={() => setSelectedStudentId(s.studentId)}
+                        >
+                          <td>
+                            <div className={styles.userCell}>
+                              <div className={styles.avatar}>
+                                {s.name.charAt(0)}
+                              </div>
+                              <div>
+                                <div className={styles.name}>{s.name}</div>
+                                <div className={styles.email}>{s.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <span className={styles.yearTag}>
+                              {s.yearGroupName}
+                            </span>
+                          </td>
+                          <td>
+                            <div className={styles.progressCell}>
+                              <div className={styles.progressInfo}>
+                                <span>{sStats.rate}%</span>
+                                <span className={styles.textRed}>
+                                  {sStats.present}P / {sStats.absent}A
+                                </span>
+                              </div>
+                              <div className={styles.progressBar}>
+                                <div
+                                  className={styles.progressFill}
+                                  style={{
+                                    width: `${sStats.rate}%`,
+                                    backgroundColor:
+                                      sStats.rate < 75 ? '#ef4444' : '#10b981',
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </td>
+                          <td className={styles.recordsCell}>{sStats.total}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
 
-            <div className={styles.tableScroll}>
-              <table className={styles.table}>
-                <thead>
-                  <tr>
-                    <th>Student</th>
-                    <th>Year</th>
-                    <th>Attendance</th>
-                    <th>Records</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredStudents.map((s) => {
-                    const sStats = {
-                      present: s.attendance.present,
-                      absent: s.attendance.absent,
-                      late: s.attendance.tardy,
-                      total: s.attendance.total,
-                      rate:
-                        s.attendance.total > 0
-                          ? Math.round(
-                              (s.attendance.present / s.attendance.total) * 100,
-                            )
-                          : 0,
-                    }
-                    return (
-                      <tr
-                        key={s.studentId}
-                        className={
-                          selectedStudentId === s.studentId
-                            ? styles.selectedRow
-                            : ''
-                        }
-                        onClick={() => setSelectedStudentId(s.studentId)}
-                      >
-                        <td>
-                          <div className={styles.userCell}>
-                            <div className={styles.avatar}>
-                              {s.name.charAt(0)}
-                            </div>
-                            <div>
-                              <div className={styles.name}>{s.name}</div>
-                              <div className={styles.email}>{s.email}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <span className={styles.yearTag}>
-                            {s.yearGroupName}
-                          </span>
-                        </td>
-                        <td>
-                          <div className={styles.progressCell}>
-                            <div className={styles.progressInfo}>
-                              <span>{sStats.rate}%</span>
-                              <span className={styles.textRed}>
-                                {sStats.present}P / {sStats.absent}A
-                              </span>
-                            </div>
-                            <div className={styles.progressBar}>
-                              <div
-                                className={styles.progressFill}
-                                style={{
-                                  width: `${sStats.rate}%`,
-                                  backgroundColor:
-                                    sStats.rate < 75 ? '#ef4444' : '#10b981',
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </td>
-                        <td className={styles.recordsCell}>{sStats.total}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+            <div
+              className={`${styles.calendarCard} ${!selectedStudent ? styles.hidden : ''}`}
+            >
+              {selectedStudent ? (
+                <>
+                  <div className={styles.calendarNav}>
+                    <div>
+                      <h4 className={styles.calendarName}>
+                        {selectedStudent.name}
+                      </h4>
+                      <p className={styles.calendarSub}>
+                        {selectedStudent.yearGroupName} • {monthNames[month]}{' '}
+                        {year}
+                      </p>
+                    </div>
+                    <div className={styles.navArrows}>
+                      <button onClick={prevMonth}>
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button onClick={nextMonth}>
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className={styles.legend}>
+                    <div className={styles.lItem}>
+                      <span className={styles.dotP} /> P
+                    </div>
+                    <div className={styles.lItem}>
+                      <span className={styles.dotA} /> A
+                    </div>
+                    <div className={styles.lItem}>
+                      <span className={styles.dotT} /> L
+                    </div>
+                    <div className={styles.lItem}>
+                      <span className={styles.dotH} /> H
+                    </div>
+                  </div>
+
+                  <div className={styles.calendarTableWrapper}>
+                    {renderCalendarTable()}
+                  </div>
+                </>
+              ) : (
+                <div className={styles.noSelection}>
+                  <CalendarIcon size={40} />
+                  <p>Select a student to view history</p>
+                </div>
+              )}
             </div>
-          </div>
-
-          <div
-            className={`${styles.calendarCard} ${!selectedStudent ? styles.hidden : ''}`}
-          >
-            {selectedStudent ? (
-              <>
-                <div className={styles.calendarNav}>
-                  <div>
-                    <h4 className={styles.calendarName}>
-                      {selectedStudent.name}
-                    </h4>
-                    <p className={styles.calendarSub}>
-                      {selectedStudent.yearGroupName} • {monthNames[month]}{' '}
-                      {year}
-                    </p>
-                  </div>
-                  <div className={styles.navArrows}>
-                    <button onClick={prevMonth}>
-                      <ChevronLeft size={16} />
-                    </button>
-                    <button onClick={nextMonth}>
-                      <ChevronRight size={16} />
-                    </button>
-                  </div>
-                </div>
-
-                <div className={styles.legend}>
-                  <div className={styles.lItem}>
-                    <span className={styles.dotP} /> P
-                  </div>
-                  <div className={styles.lItem}>
-                    <span className={styles.dotA} /> A
-                  </div>
-                  <div className={styles.lItem}>
-                    <span className={styles.dotT} /> L
-                  </div>
-                  <div className={styles.lItem}>
-                    <span className={styles.dotH} /> H
-                  </div>
-                </div>
-
-                <div className={styles.calendarTableWrapper}>
-                  {renderCalendarTable()}
-                </div>
-              </>
-            ) : (
-              <div className={styles.noSelection}>
-                <CalendarIcon size={40} />
-                <p>Select a student to view history</p>
-              </div>
-            )}
-          </div>
           </div>
         </>
       ) : (
@@ -715,8 +715,8 @@ export function AdminAttendance() {
             <table className={styles.markTable}>
               <thead>
                 <tr>
-                  <th>Student</th>
-                  <th>Year</th>
+                  <th className={styles.studentCol}>Student</th>
+                  <th className={styles.yearCol}>Year</th>
                   <th>Recent History</th>
                   <th className={styles.center}>Status</th>
                 </tr>

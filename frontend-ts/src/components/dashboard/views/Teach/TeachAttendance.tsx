@@ -425,11 +425,15 @@ export function TeachAttendance() {
       <div className={styles.summaryRail}>
         <div className={styles.summaryChip}>
           <span className={styles.statLabel}>Present</span>
-          <strong className={styles.statValue}>{attendanceTotals.present}</strong>
+          <strong className={styles.statValue}>
+            {attendanceTotals.present}
+          </strong>
         </div>
         <div className={styles.summaryChip}>
           <span className={styles.statLabel}>Absent</span>
-          <strong className={styles.statValue}>{attendanceTotals.absent}</strong>
+          <strong className={styles.statValue}>
+            {attendanceTotals.absent}
+          </strong>
         </div>
         <div className={styles.summaryChip}>
           <span className={styles.statLabel}>Late</span>
@@ -450,7 +454,9 @@ export function TeachAttendance() {
                   <h3 className={styles.cardTitle}>My Students' Status</h3>
                   <p className={styles.cardSub}>Term-to-date distribution</p>
                 </div>
-                <div className={styles.cardMeta}>{attendanceTotals.rate}% present</div>
+                <div className={styles.cardMeta}>
+                  {attendanceTotals.rate}% present
+                </div>
               </div>
               <div className={styles.chartContainer}>
                 {isMounted && (
@@ -596,10 +602,10 @@ export function TeachAttendance() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th>Student</th>
-                      <th>Class</th>
-                      <th>Attendance</th>
-                      <th>Records</th>
+                      <th className={styles.studentCol}>Student</th>
+                      <th className={styles.classCol}>Class</th>
+                      <th className={styles.attendanceCol}>Attendance</th>
+                      <th className={styles.recordsCol}>Records</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -751,8 +757,8 @@ export function TeachAttendance() {
             <table className={styles.markTable}>
               <thead>
                 <tr>
-                  <th>Student</th>
-                  <th>Class</th>
+                  <th className={styles.studentCol}>Student</th>
+                  <th className={styles.classCol}>Class</th>
                   <th>Recent History</th>
                   <th className={styles.center}>Status</th>
                 </tr>

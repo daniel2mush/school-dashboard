@@ -106,6 +106,8 @@ export const SubmitGrades = asyncHandler(async (req, res) => {
         midterm: midterm !== undefined ? Number(midterm) : null,
         assignmentAvg: assignmentAvg !== undefined ? Number(assignmentAvg) : null,
         projectFinal: projectFinal !== undefined ? Number(projectFinal) : null,
+        test: false,
+        test2: false,
         studentId: Number(studentId),
         subjectId: Number(subjectId),
         teacherId: userId
