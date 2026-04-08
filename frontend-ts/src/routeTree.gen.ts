@@ -13,8 +13,20 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard/index'
+import { Route as DashboardTeacherTtimetableRouteImport } from './routes/dashboard/teacher/ttimetable'
+import { Route as DashboardTeacherTsubjectsRouteImport } from './routes/dashboard/teacher/tsubjects'
+import { Route as DashboardTeacherTreportRouteImport } from './routes/dashboard/teacher/treport'
 import { Route as DashboardTeacherTmyRouteImport } from './routes/dashboard/teacher/tmy'
+import { Route as DashboardTeacherTgradesRouteImport } from './routes/dashboard/teacher/tgrades'
+import { Route as DashboardTeacherTfeesRouteImport } from './routes/dashboard/teacher/tfees'
+import { Route as DashboardTeacherTattendRouteImport } from './routes/dashboard/teacher/tattend'
+import { Route as DashboardTeacherTannRouteImport } from './routes/dashboard/teacher/tann'
+import { Route as DashboardStudentStimetableRouteImport } from './routes/dashboard/student/stimetable'
+import { Route as DashboardStudentSsubjectsRouteImport } from './routes/dashboard/student/ssubjects'
+import { Route as DashboardStudentSreportRouteImport } from './routes/dashboard/student/sreport'
+import { Route as DashboardStudentSfeesRouteImport } from './routes/dashboard/student/sfees'
 import { Route as DashboardStudentSdashRouteImport } from './routes/dashboard/student/sdash'
+import { Route as DashboardStudentSattRouteImport } from './routes/dashboard/student/satt'
 import { Route as DashboardAdminYeargroupsRouteImport } from './routes/dashboard/admin/yeargroups'
 import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard/admin/users'
 import { Route as DashboardAdminTimetableRouteImport } from './routes/dashboard/admin/timetable'
@@ -26,6 +38,8 @@ import { Route as DashboardAdminAnnouncementsRouteImport } from './routes/dashbo
 import { Route as DashboardAdminAnalyticsRouteImport } from './routes/dashboard/admin/analytics'
 import { Route as ApiUserAnnouncementsRouteImport } from './routes/api/user/announcements'
 import { Route as ApiUserIdRouteImport } from './routes/api/user/$id'
+import { Route as ApiTeacherGradesRouteImport } from './routes/api/teacher/grades'
+import { Route as ApiTeacherClassesRouteImport } from './routes/api/teacher/classes'
 import { Route as ApiAuthLoginRouteImport } from './routes/api/auth/login'
 import { Route as ApiAdminYearGroupsRouteImport } from './routes/api/admin/year-groups'
 import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
@@ -71,14 +85,78 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTeacherTtimetableRoute =
+  DashboardTeacherTtimetableRouteImport.update({
+    id: '/teacher/ttimetable',
+    path: '/teacher/ttimetable',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardTeacherTsubjectsRoute =
+  DashboardTeacherTsubjectsRouteImport.update({
+    id: '/teacher/tsubjects',
+    path: '/teacher/tsubjects',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardTeacherTreportRoute = DashboardTeacherTreportRouteImport.update({
+  id: '/teacher/treport',
+  path: '/teacher/treport',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardTeacherTmyRoute = DashboardTeacherTmyRouteImport.update({
   id: '/teacher/tmy',
   path: '/teacher/tmy',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTeacherTgradesRoute = DashboardTeacherTgradesRouteImport.update({
+  id: '/teacher/tgrades',
+  path: '/teacher/tgrades',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTeacherTfeesRoute = DashboardTeacherTfeesRouteImport.update({
+  id: '/teacher/tfees',
+  path: '/teacher/tfees',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTeacherTattendRoute = DashboardTeacherTattendRouteImport.update({
+  id: '/teacher/tattend',
+  path: '/teacher/tattend',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardTeacherTannRoute = DashboardTeacherTannRouteImport.update({
+  id: '/teacher/tann',
+  path: '/teacher/tann',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStudentStimetableRoute =
+  DashboardStudentStimetableRouteImport.update({
+    id: '/student/stimetable',
+    path: '/student/stimetable',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardStudentSsubjectsRoute =
+  DashboardStudentSsubjectsRouteImport.update({
+    id: '/student/ssubjects',
+    path: '/student/ssubjects',
+    getParentRoute: () => DashboardRoute,
+  } as any)
+const DashboardStudentSreportRoute = DashboardStudentSreportRouteImport.update({
+  id: '/student/sreport',
+  path: '/student/sreport',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStudentSfeesRoute = DashboardStudentSfeesRouteImport.update({
+  id: '/student/sfees',
+  path: '/student/sfees',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardStudentSdashRoute = DashboardStudentSdashRouteImport.update({
   id: '/student/sdash',
   path: '/student/sdash',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStudentSattRoute = DashboardStudentSattRouteImport.update({
+  id: '/student/satt',
+  path: '/student/satt',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardAdminYeargroupsRoute =
@@ -138,6 +216,16 @@ const ApiUserAnnouncementsRoute = ApiUserAnnouncementsRouteImport.update({
 const ApiUserIdRoute = ApiUserIdRouteImport.update({
   id: '/api/user/$id',
   path: '/api/user/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTeacherGradesRoute = ApiTeacherGradesRouteImport.update({
+  id: '/api/teacher/grades',
+  path: '/api/teacher/grades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTeacherClassesRoute = ApiTeacherClassesRouteImport.update({
+  id: '/api/teacher/classes',
+  path: '/api/teacher/classes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiAuthLoginRoute = ApiAuthLoginRouteImport.update({
@@ -284,6 +372,8 @@ export interface FileRoutesByFullPath {
   '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
   '/api/admin/year-groups': typeof ApiAdminYearGroupsRouteWithChildren
   '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/teacher/classes': typeof ApiTeacherClassesRoute
+  '/api/teacher/grades': typeof ApiTeacherGradesRoute
   '/api/user/$id': typeof ApiUserIdRoute
   '/api/user/announcements': typeof ApiUserAnnouncementsRoute
   '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
@@ -295,8 +385,20 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/satt': typeof DashboardStudentSattRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
+  '/dashboard/student/sfees': typeof DashboardStudentSfeesRoute
+  '/dashboard/student/sreport': typeof DashboardStudentSreportRoute
+  '/dashboard/student/ssubjects': typeof DashboardStudentSsubjectsRoute
+  '/dashboard/student/stimetable': typeof DashboardStudentStimetableRoute
+  '/dashboard/teacher/tann': typeof DashboardTeacherTannRoute
+  '/dashboard/teacher/tattend': typeof DashboardTeacherTattendRoute
+  '/dashboard/teacher/tfees': typeof DashboardTeacherTfeesRoute
+  '/dashboard/teacher/tgrades': typeof DashboardTeacherTgradesRoute
   '/dashboard/teacher/tmy': typeof DashboardTeacherTmyRoute
+  '/dashboard/teacher/treport': typeof DashboardTeacherTreportRoute
+  '/dashboard/teacher/tsubjects': typeof DashboardTeacherTsubjectsRoute
+  '/dashboard/teacher/ttimetable': typeof DashboardTeacherTtimetableRoute
   '/api/admin/fees/$id': typeof ApiAdminFeesIdRouteWithChildren
   '/api/admin/periods/$id': typeof ApiAdminPeriodsIdRoute
   '/api/admin/periods/assign-year-group': typeof ApiAdminPeriodsAssignYearGroupRoute
@@ -326,6 +428,8 @@ export interface FileRoutesByTo {
   '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
   '/api/admin/year-groups': typeof ApiAdminYearGroupsRouteWithChildren
   '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/teacher/classes': typeof ApiTeacherClassesRoute
+  '/api/teacher/grades': typeof ApiTeacherGradesRoute
   '/api/user/$id': typeof ApiUserIdRoute
   '/api/user/announcements': typeof ApiUserAnnouncementsRoute
   '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
@@ -337,8 +441,20 @@ export interface FileRoutesByTo {
   '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/satt': typeof DashboardStudentSattRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
+  '/dashboard/student/sfees': typeof DashboardStudentSfeesRoute
+  '/dashboard/student/sreport': typeof DashboardStudentSreportRoute
+  '/dashboard/student/ssubjects': typeof DashboardStudentSsubjectsRoute
+  '/dashboard/student/stimetable': typeof DashboardStudentStimetableRoute
+  '/dashboard/teacher/tann': typeof DashboardTeacherTannRoute
+  '/dashboard/teacher/tattend': typeof DashboardTeacherTattendRoute
+  '/dashboard/teacher/tfees': typeof DashboardTeacherTfeesRoute
+  '/dashboard/teacher/tgrades': typeof DashboardTeacherTgradesRoute
   '/dashboard/teacher/tmy': typeof DashboardTeacherTmyRoute
+  '/dashboard/teacher/treport': typeof DashboardTeacherTreportRoute
+  '/dashboard/teacher/tsubjects': typeof DashboardTeacherTsubjectsRoute
+  '/dashboard/teacher/ttimetable': typeof DashboardTeacherTtimetableRoute
   '/api/admin/fees/$id': typeof ApiAdminFeesIdRouteWithChildren
   '/api/admin/periods/$id': typeof ApiAdminPeriodsIdRoute
   '/api/admin/periods/assign-year-group': typeof ApiAdminPeriodsAssignYearGroupRoute
@@ -370,6 +486,8 @@ export interface FileRoutesById {
   '/api/admin/users': typeof ApiAdminUsersRouteWithChildren
   '/api/admin/year-groups': typeof ApiAdminYearGroupsRouteWithChildren
   '/api/auth/login': typeof ApiAuthLoginRoute
+  '/api/teacher/classes': typeof ApiTeacherClassesRoute
+  '/api/teacher/grades': typeof ApiTeacherGradesRoute
   '/api/user/$id': typeof ApiUserIdRoute
   '/api/user/announcements': typeof ApiUserAnnouncementsRoute
   '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
@@ -381,8 +499,20 @@ export interface FileRoutesById {
   '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/satt': typeof DashboardStudentSattRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
+  '/dashboard/student/sfees': typeof DashboardStudentSfeesRoute
+  '/dashboard/student/sreport': typeof DashboardStudentSreportRoute
+  '/dashboard/student/ssubjects': typeof DashboardStudentSsubjectsRoute
+  '/dashboard/student/stimetable': typeof DashboardStudentStimetableRoute
+  '/dashboard/teacher/tann': typeof DashboardTeacherTannRoute
+  '/dashboard/teacher/tattend': typeof DashboardTeacherTattendRoute
+  '/dashboard/teacher/tfees': typeof DashboardTeacherTfeesRoute
+  '/dashboard/teacher/tgrades': typeof DashboardTeacherTgradesRoute
   '/dashboard/teacher/tmy': typeof DashboardTeacherTmyRoute
+  '/dashboard/teacher/treport': typeof DashboardTeacherTreportRoute
+  '/dashboard/teacher/tsubjects': typeof DashboardTeacherTsubjectsRoute
+  '/dashboard/teacher/ttimetable': typeof DashboardTeacherTtimetableRoute
   '/api/admin/fees/$id': typeof ApiAdminFeesIdRouteWithChildren
   '/api/admin/periods/$id': typeof ApiAdminPeriodsIdRoute
   '/api/admin/periods/assign-year-group': typeof ApiAdminPeriodsAssignYearGroupRoute
@@ -415,6 +545,8 @@ export interface FileRouteTypes {
     | '/api/admin/users'
     | '/api/admin/year-groups'
     | '/api/auth/login'
+    | '/api/teacher/classes'
+    | '/api/teacher/grades'
     | '/api/user/$id'
     | '/api/user/announcements'
     | '/dashboard/admin/analytics'
@@ -426,8 +558,20 @@ export interface FileRouteTypes {
     | '/dashboard/admin/timetable'
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/satt'
     | '/dashboard/student/sdash'
+    | '/dashboard/student/sfees'
+    | '/dashboard/student/sreport'
+    | '/dashboard/student/ssubjects'
+    | '/dashboard/student/stimetable'
+    | '/dashboard/teacher/tann'
+    | '/dashboard/teacher/tattend'
+    | '/dashboard/teacher/tfees'
+    | '/dashboard/teacher/tgrades'
     | '/dashboard/teacher/tmy'
+    | '/dashboard/teacher/treport'
+    | '/dashboard/teacher/tsubjects'
+    | '/dashboard/teacher/ttimetable'
     | '/api/admin/fees/$id'
     | '/api/admin/periods/$id'
     | '/api/admin/periods/assign-year-group'
@@ -457,6 +601,8 @@ export interface FileRouteTypes {
     | '/api/admin/users'
     | '/api/admin/year-groups'
     | '/api/auth/login'
+    | '/api/teacher/classes'
+    | '/api/teacher/grades'
     | '/api/user/$id'
     | '/api/user/announcements'
     | '/dashboard/admin/analytics'
@@ -468,8 +614,20 @@ export interface FileRouteTypes {
     | '/dashboard/admin/timetable'
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/satt'
     | '/dashboard/student/sdash'
+    | '/dashboard/student/sfees'
+    | '/dashboard/student/sreport'
+    | '/dashboard/student/ssubjects'
+    | '/dashboard/student/stimetable'
+    | '/dashboard/teacher/tann'
+    | '/dashboard/teacher/tattend'
+    | '/dashboard/teacher/tfees'
+    | '/dashboard/teacher/tgrades'
     | '/dashboard/teacher/tmy'
+    | '/dashboard/teacher/treport'
+    | '/dashboard/teacher/tsubjects'
+    | '/dashboard/teacher/ttimetable'
     | '/api/admin/fees/$id'
     | '/api/admin/periods/$id'
     | '/api/admin/periods/assign-year-group'
@@ -500,6 +658,8 @@ export interface FileRouteTypes {
     | '/api/admin/users'
     | '/api/admin/year-groups'
     | '/api/auth/login'
+    | '/api/teacher/classes'
+    | '/api/teacher/grades'
     | '/api/user/$id'
     | '/api/user/announcements'
     | '/dashboard/admin/analytics'
@@ -511,8 +671,20 @@ export interface FileRouteTypes {
     | '/dashboard/admin/timetable'
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/satt'
     | '/dashboard/student/sdash'
+    | '/dashboard/student/sfees'
+    | '/dashboard/student/sreport'
+    | '/dashboard/student/ssubjects'
+    | '/dashboard/student/stimetable'
+    | '/dashboard/teacher/tann'
+    | '/dashboard/teacher/tattend'
+    | '/dashboard/teacher/tfees'
+    | '/dashboard/teacher/tgrades'
     | '/dashboard/teacher/tmy'
+    | '/dashboard/teacher/treport'
+    | '/dashboard/teacher/tsubjects'
+    | '/dashboard/teacher/ttimetable'
     | '/api/admin/fees/$id'
     | '/api/admin/periods/$id'
     | '/api/admin/periods/assign-year-group'
@@ -543,6 +715,8 @@ export interface RootRouteChildren {
   ApiAdminUsersRoute: typeof ApiAdminUsersRouteWithChildren
   ApiAdminYearGroupsRoute: typeof ApiAdminYearGroupsRouteWithChildren
   ApiAuthLoginRoute: typeof ApiAuthLoginRoute
+  ApiTeacherClassesRoute: typeof ApiTeacherClassesRoute
+  ApiTeacherGradesRoute: typeof ApiTeacherGradesRoute
   ApiUserIdRoute: typeof ApiUserIdRoute
   ApiUserAnnouncementsRoute: typeof ApiUserAnnouncementsRoute
 }
@@ -577,6 +751,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/teacher/ttimetable': {
+      id: '/dashboard/teacher/ttimetable'
+      path: '/teacher/ttimetable'
+      fullPath: '/dashboard/teacher/ttimetable'
+      preLoaderRoute: typeof DashboardTeacherTtimetableRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/teacher/tsubjects': {
+      id: '/dashboard/teacher/tsubjects'
+      path: '/teacher/tsubjects'
+      fullPath: '/dashboard/teacher/tsubjects'
+      preLoaderRoute: typeof DashboardTeacherTsubjectsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/teacher/treport': {
+      id: '/dashboard/teacher/treport'
+      path: '/teacher/treport'
+      fullPath: '/dashboard/teacher/treport'
+      preLoaderRoute: typeof DashboardTeacherTreportRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/teacher/tmy': {
       id: '/dashboard/teacher/tmy'
       path: '/teacher/tmy'
@@ -584,11 +779,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeacherTmyRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/teacher/tgrades': {
+      id: '/dashboard/teacher/tgrades'
+      path: '/teacher/tgrades'
+      fullPath: '/dashboard/teacher/tgrades'
+      preLoaderRoute: typeof DashboardTeacherTgradesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/teacher/tfees': {
+      id: '/dashboard/teacher/tfees'
+      path: '/teacher/tfees'
+      fullPath: '/dashboard/teacher/tfees'
+      preLoaderRoute: typeof DashboardTeacherTfeesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/teacher/tattend': {
+      id: '/dashboard/teacher/tattend'
+      path: '/teacher/tattend'
+      fullPath: '/dashboard/teacher/tattend'
+      preLoaderRoute: typeof DashboardTeacherTattendRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/teacher/tann': {
+      id: '/dashboard/teacher/tann'
+      path: '/teacher/tann'
+      fullPath: '/dashboard/teacher/tann'
+      preLoaderRoute: typeof DashboardTeacherTannRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/student/stimetable': {
+      id: '/dashboard/student/stimetable'
+      path: '/student/stimetable'
+      fullPath: '/dashboard/student/stimetable'
+      preLoaderRoute: typeof DashboardStudentStimetableRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/student/ssubjects': {
+      id: '/dashboard/student/ssubjects'
+      path: '/student/ssubjects'
+      fullPath: '/dashboard/student/ssubjects'
+      preLoaderRoute: typeof DashboardStudentSsubjectsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/student/sreport': {
+      id: '/dashboard/student/sreport'
+      path: '/student/sreport'
+      fullPath: '/dashboard/student/sreport'
+      preLoaderRoute: typeof DashboardStudentSreportRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/student/sfees': {
+      id: '/dashboard/student/sfees'
+      path: '/student/sfees'
+      fullPath: '/dashboard/student/sfees'
+      preLoaderRoute: typeof DashboardStudentSfeesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/student/sdash': {
       id: '/dashboard/student/sdash'
       path: '/student/sdash'
       fullPath: '/dashboard/student/sdash'
       preLoaderRoute: typeof DashboardStudentSdashRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/student/satt': {
+      id: '/dashboard/student/satt'
+      path: '/student/satt'
+      fullPath: '/dashboard/student/satt'
+      preLoaderRoute: typeof DashboardStudentSattRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/admin/yeargroups': {
@@ -666,6 +924,20 @@ declare module '@tanstack/react-router' {
       path: '/api/user/$id'
       fullPath: '/api/user/$id'
       preLoaderRoute: typeof ApiUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/teacher/grades': {
+      id: '/api/teacher/grades'
+      path: '/api/teacher/grades'
+      fullPath: '/api/teacher/grades'
+      preLoaderRoute: typeof ApiTeacherGradesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/teacher/classes': {
+      id: '/api/teacher/classes'
+      path: '/api/teacher/classes'
+      fullPath: '/api/teacher/classes'
+      preLoaderRoute: typeof ApiTeacherClassesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/auth/login': {
@@ -850,8 +1122,20 @@ interface DashboardRouteChildren {
   DashboardAdminTimetableRoute: typeof DashboardAdminTimetableRoute
   DashboardAdminUsersRoute: typeof DashboardAdminUsersRoute
   DashboardAdminYeargroupsRoute: typeof DashboardAdminYeargroupsRoute
+  DashboardStudentSattRoute: typeof DashboardStudentSattRoute
   DashboardStudentSdashRoute: typeof DashboardStudentSdashRoute
+  DashboardStudentSfeesRoute: typeof DashboardStudentSfeesRoute
+  DashboardStudentSreportRoute: typeof DashboardStudentSreportRoute
+  DashboardStudentSsubjectsRoute: typeof DashboardStudentSsubjectsRoute
+  DashboardStudentStimetableRoute: typeof DashboardStudentStimetableRoute
+  DashboardTeacherTannRoute: typeof DashboardTeacherTannRoute
+  DashboardTeacherTattendRoute: typeof DashboardTeacherTattendRoute
+  DashboardTeacherTfeesRoute: typeof DashboardTeacherTfeesRoute
+  DashboardTeacherTgradesRoute: typeof DashboardTeacherTgradesRoute
   DashboardTeacherTmyRoute: typeof DashboardTeacherTmyRoute
+  DashboardTeacherTreportRoute: typeof DashboardTeacherTreportRoute
+  DashboardTeacherTsubjectsRoute: typeof DashboardTeacherTsubjectsRoute
+  DashboardTeacherTtimetableRoute: typeof DashboardTeacherTtimetableRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -865,8 +1149,20 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdminTimetableRoute: DashboardAdminTimetableRoute,
   DashboardAdminUsersRoute: DashboardAdminUsersRoute,
   DashboardAdminYeargroupsRoute: DashboardAdminYeargroupsRoute,
+  DashboardStudentSattRoute: DashboardStudentSattRoute,
   DashboardStudentSdashRoute: DashboardStudentSdashRoute,
+  DashboardStudentSfeesRoute: DashboardStudentSfeesRoute,
+  DashboardStudentSreportRoute: DashboardStudentSreportRoute,
+  DashboardStudentSsubjectsRoute: DashboardStudentSsubjectsRoute,
+  DashboardStudentStimetableRoute: DashboardStudentStimetableRoute,
+  DashboardTeacherTannRoute: DashboardTeacherTannRoute,
+  DashboardTeacherTattendRoute: DashboardTeacherTattendRoute,
+  DashboardTeacherTfeesRoute: DashboardTeacherTfeesRoute,
+  DashboardTeacherTgradesRoute: DashboardTeacherTgradesRoute,
   DashboardTeacherTmyRoute: DashboardTeacherTmyRoute,
+  DashboardTeacherTreportRoute: DashboardTeacherTreportRoute,
+  DashboardTeacherTsubjectsRoute: DashboardTeacherTsubjectsRoute,
+  DashboardTeacherTtimetableRoute: DashboardTeacherTtimetableRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
@@ -975,6 +1271,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminUsersRoute: ApiAdminUsersRouteWithChildren,
   ApiAdminYearGroupsRoute: ApiAdminYearGroupsRouteWithChildren,
   ApiAuthLoginRoute: ApiAuthLoginRoute,
+  ApiTeacherClassesRoute: ApiTeacherClassesRoute,
+  ApiTeacherGradesRoute: ApiTeacherGradesRoute,
   ApiUserIdRoute: ApiUserIdRoute,
   ApiUserAnnouncementsRoute: ApiUserAnnouncementsRoute,
 }
@@ -983,10 +1281,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }

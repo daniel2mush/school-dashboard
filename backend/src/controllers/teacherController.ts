@@ -18,6 +18,19 @@ export const GetTeacherClasses = asyncHandler(async (req, res) => {
       taughtYearGroups: {
         include: {
           subjects: true,
+          timetables: {
+            include: {
+              period: true,
+              subject: true,
+              teacher: {
+                select: {
+                  id: true,
+                  name: true,
+                  initials: true
+                }
+              }
+            }
+          },
           students: {
             select: {
               id: true,
@@ -45,30 +58,60 @@ export const GetTeacherClasses = asyncHandler(async (req, res) => {
   );
 });
 
-// Submit a grade for a student
+// Submit a grade for a student (Upsert logic)
 export const SubmitGrades = asyncHandler(async (req, res) => {
   const { userId, role } = req.user;
-  const { studentId, subjectId, score, grade } = req.body;
+  const { studentId, subjectId, score, grade, midterm, assignmentAvg, projectFinal } = req.body;
 
   if (role !== "TEACHER") {
     throw new AppError("Unauthorized access. Teachers only.", 403);
   }
 
-  if (!studentId || !subjectId || score === undefined || !grade) {
-    throw new AppError("Missing required fields: studentId, subjectId, score, grade", 400);
+  if (studentId === undefined || studentId === null || subjectId === undefined || subjectId === null) {
+    throw new AppError("Missing required fields: studentId, subjectId", 400);
   }
 
-  const newGrade = await prisma.grade.create({
-    data: {
-      score: Number(score),
-      grade: String(grade),
+  // Check if a grade already exists for this student and subject
+  const existingGrade = await prisma.grade.findFirst({
+    where: {
       studentId: Number(studentId),
       subjectId: Number(subjectId),
-      teacherId: userId
-    }
+    },
   });
 
-  return sendJson(res, 201, true, "Grade submitted successfully", newGrade);
+  let savedGrade;
+  if (existingGrade) {
+    savedGrade = await prisma.grade.update({
+      where: { id: existingGrade.id },
+      data: {
+        score: score !== undefined ? Number(score) : undefined,
+        grade: grade ? String(grade) : undefined,
+        midterm: midterm !== undefined ? Number(midterm) : undefined,
+        assignmentAvg: assignmentAvg !== undefined ? Number(assignmentAvg) : undefined,
+        projectFinal: projectFinal !== undefined ? Number(projectFinal) : undefined,
+        teacherId: userId, // Update who last graded it
+      },
+    });
+  } else {
+    if (score === undefined || grade === undefined) {
+      throw new AppError("Missing required fields for a new grade: score, grade", 400);
+    }
+
+    savedGrade = await prisma.grade.create({
+      data: {
+        score: Number(score),
+        grade: String(grade),
+        midterm: midterm !== undefined ? Number(midterm) : null,
+        assignmentAvg: assignmentAvg !== undefined ? Number(assignmentAvg) : null,
+        projectFinal: projectFinal !== undefined ? Number(projectFinal) : null,
+        studentId: Number(studentId),
+        subjectId: Number(subjectId),
+        teacherId: userId
+      }
+    });
+  }
+
+  return sendJson(res, 201, true, "Grade saved successfully", savedGrade);
 });
 
 // Submit attendance for a student (Upsert logic)
@@ -117,4 +160,146 @@ export const SubmitAttendance = asyncHandler(async (req, res) => {
   }
 
   return sendJson(res, 201, true, "Attendance marked successfully", attendance);
+});
+
+// Fetch materials for a teacher
+export const GetTeacherMaterials = asyncHandler(async (req, res) => {
+  const { userId, role } = req.user;
+
+  if (role !== "TEACHER") {
+    throw new AppError("Unauthorized access. Teachers only.", 403);
+  }
+
+  const materials = await prisma.material.findMany({
+    where: { teacherId: userId },
+    include: {
+      subject: true,
+      yearGroup: true,
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return sendJson(res, 200, true, "Materials fetched successfully", materials);
+});
+
+// Upload material
+export const UploadMaterial = asyncHandler(async (req, res) => {
+  const { userId, role } = req.user;
+  const { title, description, fileUrl, subjectId, yearGroupId, fileType, isPublished } = req.body;
+
+  if (role !== "TEACHER") {
+    throw new AppError("Unauthorized access. Teachers only.", 403);
+  }
+
+  if (!title || !fileUrl || !subjectId) {
+    throw new AppError("Missing required fields: title, fileUrl, subjectId", 400);
+  }
+
+  const material = await prisma.material.create({
+    data: {
+      title,
+      description,
+      fileUrl,
+      fileType: fileType || "pdf",
+      subjectId: Number(subjectId),
+      yearGroupId: yearGroupId ? Number(yearGroupId) : null,
+      teacherId: userId,
+      isPublished: isPublished !== undefined ? Boolean(isPublished) : true,
+    },
+    include: {
+      subject: true,
+      yearGroup: true,
+    },
+  });
+
+  return sendJson(res, 201, true, "Material uploaded successfully", material);
+});
+
+// Toggle material publication status
+export const ToggleMaterialStatus = asyncHandler(async (req, res) => {
+  const { userId, role } = req.user;
+  const { id } = req.params;
+  const { isPublished } = req.body;
+
+  if (role !== "TEACHER") {
+    throw new AppError("Unauthorized access. Teachers only.", 403);
+  }
+
+  const material = await prisma.material.findUnique({
+    where: { id: Number(id) }
+  });
+
+  if (!material) {
+    throw new AppError("Material not found", 404);
+  }
+
+  if (material.teacherId !== userId) {
+    throw new AppError("Unauthorized. You do not own this material.", 403);
+  }
+
+  const updatedMaterial = await prisma.material.update({
+    where: { id: Number(id) },
+    data: { isPublished: Boolean(isPublished) },
+    include: {
+      subject: true,
+      yearGroup: true,
+    },
+  });
+
+  return sendJson(res, 200, true, "Material status updated", updatedMaterial);
+});
+
+// Create a new announcement from a teacher
+export const CreateTeacherAnnouncement = asyncHandler(async (req, res) => {
+  const { userId, role } = req.user;
+  const { title, content, targetYearGroupId, targetType, priority } = req.body;
+
+  if (role !== "TEACHER") {
+    throw new AppError("Unauthorized access. Teachers only.", 403);
+  }
+
+  if (!title || !content || !targetYearGroupId) {
+    throw new AppError("Missing required fields: title, content, targetYearGroupId", 400);
+  }
+
+  if (targetType && targetType !== "YEAR_GROUP") {
+    throw new AppError("Teachers can only send announcements to their classes.", 403);
+  }
+
+  // Verify the teacher is assigned to the target year group
+  const teacher = await prisma.user.findFirst({
+    where: {
+      id: userId,
+      taughtYearGroups: {
+        some: { id: Number(targetYearGroupId) }
+      }
+    }
+  });
+
+  if (!teacher) {
+    throw new AppError("You are not authorized to send announcements to this year group.", 403);
+  }
+
+  const announcement = await prisma.announcement.create({
+    data: {
+      title,
+      content,
+      authorId: userId,
+      targetType: "YEAR_GROUP",
+      targetYearGroupId: Number(targetYearGroupId),
+      priority: priority || "Normal",
+    },
+    include: {
+      author: {
+        select: {
+          id: true,
+          name: true,
+          role: true,
+        }
+      },
+      targetYearGroup: true,
+    }
+  });
+
+  return sendJson(res, 201, true, "Announcement broadcasted successfully", announcement);
 });

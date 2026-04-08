@@ -94,14 +94,31 @@ export const GetAnnouncements = asyncHandler(async (req, res) => {
     return sendJson(res, 200, true, "Announcements fetched", announcements);
   }
 
-  // Get user's year group if student
-  let userYearGroupId: number | null = null;
+  // Resolve the audience scope for the current user.
+  let studentYearGroupId: number | null = null;
+  let teacherYearGroupIds: number[] = [];
+
   if (role === "STUDENT") {
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { enrolledYearGroupId: true },
     });
-    userYearGroupId = user?.enrolledYearGroupId || null;
+    studentYearGroupId = user?.enrolledYearGroupId || null;
+  }
+
+  if (role === "TEACHER") {
+    const teacher = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        taughtYearGroups: {
+          select: {
+            id: true,
+          },
+        },
+      },
+    });
+
+    teacherYearGroupIds = teacher?.taughtYearGroups.map((yearGroup) => yearGroup.id) || [];
   }
 
   const announcements = await prisma.announcement.findMany({
@@ -109,13 +126,23 @@ export const GetAnnouncements = asyncHandler(async (req, res) => {
       OR: [
         { targetType: TargetType.ALL },
         ...(role === "TEACHER"
-          ? [{ targetType: TargetType.TEACHERS_ONLY }]
+          ? [
+              { targetType: TargetType.TEACHERS_ONLY },
+              ...(teacherYearGroupIds.length > 0
+                ? [
+                    {
+                      targetType: TargetType.YEAR_GROUP,
+                      targetYearGroupId: { in: teacherYearGroupIds },
+                    },
+                  ]
+                : []),
+            ]
           : []),
-        ...(userYearGroupId
+        ...(studentYearGroupId
           ? [
               {
                 targetType: TargetType.YEAR_GROUP,
-                targetYearGroupId: userYearGroupId,
+                targetYearGroupId: studentYearGroupId,
               },
             ]
           : []),
@@ -123,6 +150,12 @@ export const GetAnnouncements = asyncHandler(async (req, res) => {
     },
     include: {
       author: { select: { name: true, role: true } },
+      targetYearGroup: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
     orderBy: { createdAt: "desc" },
   });

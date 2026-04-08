@@ -150,4 +150,5 @@ export interface Announcement {
   targetYearGroupId: number | null
   createdAt: string
   author?: { name: string; role: string }
+  targetYearGroup?: { id: number; name: string } | null
 }

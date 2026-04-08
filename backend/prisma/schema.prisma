@@ -37,9 +37,10 @@ model User {
   feePayments         FeePayment[]
 
   // For teachers:
-  taughtYearGroups    YearGroup[] @relation("TeacherYearGroups")
-  givenGrades         Grade[]     @relation("TeacherGrades")
+  taughtYearGroups     YearGroup[] @relation("TeacherYearGroups")
+  givenGrades          Grade[]     @relation("TeacherGrades")
   taughtTimetableSlots Timetable[] @relation("TeacherTimetableSlots")
+  materials            Material[]  @relation("TeacherMaterials")
 
   // Announcements
   announcements Announcement[] @relation("Author")
@@ -65,6 +66,7 @@ model Subject {
   yearGroups  YearGroup[] @relation("SubjectYearGroups")
   grades      Grade[]
   timetable   Timetable[]
+  materials   Material[]
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 }
@@ -83,6 +85,7 @@ model YearGroup {
   fees          Fee[]
   timetables    Timetable[]
   announcements Announcement[] @relation("TargetYearGroup")
+  materials     Material[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -96,18 +99,21 @@ enum Level {
 }
 
 model Grade {
-  id        Int      @id @default(autoincrement())
-  score     Float
-  grade     String // e.g., "A", "B+"
-  student   User     @relation("StudentGrades", fields: [studentId], references: [id])
-  studentId Int
-  subject   Subject  @relation(fields: [subjectId], references: [id])
-  subjectId Int
-  teacher   User     @relation("TeacherGrades", fields: [teacherId], references: [id])
-  teacherId Int
-  date      DateTime @default(now())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            Int      @id @default(autoincrement())
+  score         Float? // Final/Overall score
+  grade         String? // e.g., "A", "B+"
+  midterm       Float?
+  assignmentAvg Float?
+  projectFinal  Float?
+  student       User     @relation("StudentGrades", fields: [studentId], references: [id])
+  studentId     Int
+  subject       Subject  @relation(fields: [subjectId], references: [id])
+  subjectId     Int
+  teacher       User     @relation("TeacherGrades", fields: [teacherId], references: [id])
+  teacherId     Int
+  date          DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Attendance {
@@ -203,22 +209,22 @@ model Fee {
 }
 
 model FeePayment {
-  id            Int      @id @default(autoincrement())
-  fee           Fee      @relation(fields: [feeId], references: [id], onDelete: Cascade)
+  id            Int       @id @default(autoincrement())
+  fee           Fee       @relation(fields: [feeId], references: [id], onDelete: Cascade)
   feeId         Int
-  student       User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  student       User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
   studentId     Int
-  amountPaid    Float    @default(0)
+  amountPaid    Float     @default(0)
   amountInWords String?
-  isFullyPaid   Boolean  @default(false)
+  isFullyPaid   Boolean   @default(false)
   paidAt        DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@unique([feeId, studentId])
 }
 
-//refreshToken
+// refreshToken
 model RefreshToken {
   id          String   @id @default(uuid())
   hashedToken String   @unique
@@ -228,4 +234,26 @@ model RefreshToken {
 
   userId Int
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Material {
+  id          Int     @id @default(autoincrement())
+  title       String
+  description String?
+  fileUrl     String
+  fileType    String? // e.g., "pdf", "docx"
+
+  isPublished Boolean @default(true)
+
+  subject   Subject @relation(fields: [subjectId], references: [id])
+  subjectId Int
+
+  teacher   User @relation("TeacherMaterials", fields: [teacherId], references: [id])
+  teacherId Int
+
+  yearGroup   YearGroup? @relation(fields: [yearGroupId], references: [id])
+  yearGroupId Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

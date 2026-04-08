@@ -10,7 +10,7 @@ export default function Sidebar() {
 
   if (!user) return null
 
-  const nav = NAV_CONFIG[user.role] || []
+  const nav = NAV_CONFIG[user.role]
 
   return (
     <aside className={styles.sidebar}>

@@ -388,6 +388,22 @@ export function AdminTimetable() {
   const [editState, setEditState] = useState<EditState | null>(null)
   const [managePeriodsYearGroup, setManagePeriodsYearGroup] =
     useState<AdminYearGroupStructure | null>(null)
+  const [selectedYearGroupId, setSelectedYearGroupId] = useState<number | null>(
+    null,
+  )
+
+  useEffect(() => {
+    if (!yearGroups || yearGroups.length === 0) {
+      setSelectedYearGroupId(null)
+      return
+    }
+
+    setSelectedYearGroupId((current) => {
+      if (current === null) return yearGroups[0].id
+      const stillExists = yearGroups.some((yearGroup) => yearGroup.id === current)
+      return stillExists ? current : yearGroups[0].id
+    })
+  }, [yearGroups])
 
   if (isLoading || !yearGroups) {
     return (
@@ -395,48 +411,85 @@ export function AdminTimetable() {
     )
   }
 
-  const totalScheduledLessons = yearGroups.reduce(
-    (count, yearGroup) =>
-      count + yearGroup.timetables.filter((slot) => slot.subject?.name).length,
-    0,
-  )
+  const selectedYearGroup =
+    yearGroups.find((yearGroup) => yearGroup.id === selectedYearGroupId) ||
+    yearGroups[0] ||
+    null
 
-  const scheduledSubjects = new Set(
-    yearGroups.flatMap((yearGroup) =>
-      yearGroup.timetables
-        .map((slot) => slot.subject?.name)
-        .filter((subject): subject is string => Boolean(subject)),
-    ),
-  )
+  const periods = selectedYearGroup ? getPeriods(selectedYearGroup) : []
+
+  const totalScheduledLessons = selectedYearGroup
+    ? selectedYearGroup.timetables.filter((slot) => slot.subject?.name).length
+    : 0
+
+  const scheduledSubjects = selectedYearGroup
+    ? new Set(
+        selectedYearGroup.timetables
+          .map((slot) => slot.subject?.name)
+          .filter((subject): subject is string => Boolean(subject)),
+      )
+    : new Set<string>()
+
+  const activeDays = selectedYearGroup
+    ? new Set(
+      selectedYearGroup.timetables
+        .filter((slot) => slot.subject?.name)
+        .map((slot) => slot.day),
+      )
+    : new Set<string>()
+
+  const timetableSlotsByDayAndPeriod = selectedYearGroup
+    ? DAYS.reduce(
+        (acc, day) => {
+          acc[day] = {}
+          return acc
+        },
+        {} as Record<
+          string,
+          Record<number, (typeof selectedYearGroup.timetables)[number]>
+        >,
+      )
+    : {}
+
+  if (selectedYearGroup) {
+    selectedYearGroup.timetables.forEach((slot) => {
+      timetableSlotsByDayAndPeriod[slot.day][slot.periodId] = slot
+    })
+  }
+
+  if (!selectedYearGroup) {
+    return <div className={styles.view}>No year groups available.</div>
+  }
 
   return (
     <section className={styles.view}>
-      <header className={styles.hero}>
-        <div className={styles.heroCopy}>
-          <div className={styles.eyebrow}>Institutional Oversight</div>
-          <h2 className={styles.title}>
-            A clearer view of the master timetable
-          </h2>
+      <header className={styles.pageHero}>
+        <div className={styles.heroContent}>
+          <div className={styles.eyebrow}>
+            <Sparkles size={14} />
+            Institutional oversight
+          </div>
+          <h2 className={styles.title}>Year group timetable</h2>
           <p className={styles.copy}>
-            Review every year group in one polished scheduling board with
-            stronger hierarchy, cleaner density, and faster subject scanning.
+            Select a class, review its weekly schedule, and click any slot to
+            assign or change the lesson details.
           </p>
         </div>
 
         <div className={styles.heroBadge}>
-          <Sparkles size={18} />
-          <span>Admin schedule board</span>
+          <Layers3 size={18} />
+          <span>{yearGroups.length} classes</span>
         </div>
       </header>
 
       <section className={styles.summaryGrid}>
         <article className={styles.summaryCard}>
           <div className={styles.summaryIcon}>
-            <Layers3 size={18} />
+            <CalendarRange size={18} />
           </div>
           <div>
-            <div className={styles.summaryLabel}>Year groups</div>
-            <div className={styles.summaryValue}>{yearGroups.length}</div>
+            <div className={styles.summaryLabel}>Selected class</div>
+            <div className={styles.summaryValue}>{selectedYearGroup.name}</div>
           </div>
         </article>
 
@@ -452,122 +505,139 @@ export function AdminTimetable() {
 
         <article className={styles.summaryCard}>
           <div className={styles.summaryIcon}>
-            <CalendarRange size={18} />
+            <Layers3 size={18} />
           </div>
           <div>
-            <div className={styles.summaryLabel}>Subjects in rotation</div>
+            <div className={styles.summaryLabel}>Subjects in use</div>
             <div className={styles.summaryValue}>{scheduledSubjects.size}</div>
           </div>
         </article>
       </section>
 
-      <div className={styles.timetableGrid}>
-        {yearGroups.map((yearGroup) => {
-          const populatedSlots = yearGroup.timetables.filter(
-            (slot) => slot.subject?.name,
-          ).length
-          const periods = getPeriods(yearGroup)
+      <section className={styles.selectorRow}>
+        <div className={styles.selectorInfo}>
+          <div className={styles.selectorLabel}>Choose class</div>
+          <div className={styles.selectorCopy}>
+            Switch between year groups to edit one timetable at a time.
+          </div>
+        </div>
 
-          return (
-            <article key={yearGroup.id} className={styles.timetableCard}>
-              <div className={styles.cardHeader}>
-                <div>
-                  <p className={styles.cardEyebrow}>{yearGroup.level}</p>
-                  <h3 className={styles.cardTitle}>{yearGroup.name}</h3>
-                </div>
-                <div className={styles.cardActions}>
-                  <span className={styles.cardBadge}>
-                    {populatedSlots}/{DAYS.length * periods.length} filled
-                  </span>
-                  <button
-                    type="button"
-                    className={styles.iconButton}
-                    onClick={() => setManagePeriodsYearGroup(yearGroup)}
-                    title="Manage Periods"
+        <div className={styles.selectorActions}>
+          <select
+            className={styles.classSelect}
+            value={String(selectedYearGroup.id)}
+            onChange={(event) => setSelectedYearGroupId(Number(event.target.value))}
+          >
+            {yearGroups.map((yearGroup) => (
+              <option key={yearGroup.id} value={yearGroup.id}>
+                {yearGroup.name} {yearGroup.roomNumber ? `- Room ${yearGroup.roomNumber}` : ''}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            className={styles.manageButton}
+            onClick={() => setManagePeriodsYearGroup(selectedYearGroup)}
+          >
+            <MoreHorizontal size={16} />
+            Manage periods
+          </button>
+        </div>
+      </section>
+
+      <div className={styles.tableShell}>
+        <div className={styles.tableHeader}>
+          <div>
+            <h2>{selectedYearGroup.name} timetable</h2>
+            <p>
+              Click any cell to assign a subject or teacher. Highlighted days
+              show where this class is already scheduled.
+            </p>
+          </div>
+          <div className={styles.tableLegend}>
+            <span>
+              <i className={styles.legendActive} />
+              Scheduled
+            </span>
+            <span>
+              <i className={styles.legendIdle} />
+              Free
+            </span>
+          </div>
+        </div>
+
+        <div className={styles.tableWrap}>
+          <table className={styles.timetableTable}>
+            <thead>
+              <tr>
+                <th className={styles.timeHeader}>Period</th>
+                {DAYS.map((day) => (
+                  <th
+                    key={day}
+                    className={`${styles.dayHeader} ${
+                      activeDays.has(day) ? styles.dayHeaderActive : ''
+                    }`}
                   >
-                    <MoreHorizontal size={18} />
-                  </button>
-                </div>
-              </div>
+                    <span className={styles.dayLabel}>{day}</span>
+                    <span className={styles.dayMeta}>
+                      {activeDays.has(day) ? 'Has lessons' : 'No lessons'}
+                    </span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
 
-              <div className={styles.cardMeta}>
-                <span className={styles.metaPill}>
-                  Room {yearGroup.roomNumber || 'TBA'}
-                </span>
-                <span className={styles.metaPill}>
-                  {yearGroup.subjects.length} subjects
-                </span>
-                <span className={styles.metaPill}>
-                  {yearGroup.teachers.length} teachers
-                </span>
-              </div>
+            <tbody>
+              {periods.map((period) => (
+                <tr key={period.id}>
+                  <td className={styles.periodCell}>
+                    <div className={styles.periodLabel}>{period.label}</div>
+                    <div className={styles.periodTime}>
+                      {period.startTime} - {period.endTime}
+                    </div>
+                  </td>
 
-              <div className={styles.tableWrapper}>
-                <table className={styles.timetableTable}>
-                  <thead>
-                    <tr>
-                      <th className={styles.timeHeader}>Day / Period</th>
-                      {periods.map((period) => (
-                        <th key={period.id} className={styles.periodHeader}>
-                          <div className={styles.periodLabel}>
-                            {period.label}
+                  {DAYS.map((day) => {
+                    const slot = timetableSlotsByDayAndPeriod[day]?.[period.id]
+                    const isScheduled = Boolean(slot?.subject?.name)
+
+                    return (
+                      <td
+                        key={`${day}-${period.id}`}
+                        className={`${styles.slotCell} ${
+                          isScheduled ? styles.slotCellActive : styles.slotCellIdle
+                        }`}
+                        onClick={() =>
+                          setEditState({
+                            yearGroup: selectedYearGroup,
+                            day,
+                            periodId: period.id,
+                          })
+                        }
+                      >
+                        {slot ? (
+                          <div className={styles.slotContent}>
+                            <div className={styles.slotSubject}>
+                              {slot.subject?.name || 'Free'}
+                            </div>
+                            <div className={styles.slotMeta}>
+                              <span>{slot.teacher?.name || 'Teacher unassigned'}</span>
+                              <span className={styles.dot}>•</span>
+                              <span>{selectedYearGroup.roomNumber || 'Room TBA'}</span>
+                            </div>
                           </div>
-                          <div className={styles.periodTime}>
-                            {period.startTime} - {period.endTime}
-                          </div>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {DAYS.map((day) => (
-                      <tr key={day}>
-                        <td className={styles.dayCell}>
-                          <span className={styles.dayLabel}>{day}</span>
-                        </td>
-                        {periods.map((period) => {
-                          const slot = yearGroup.timetables.find(
-                            (item) =>
-                              item.day === day && item.periodId === period.id,
-                          )
-                          const subjectName = slot?.subject?.name
-                          const teacherName = slot?.teacher?.name
-
-                          return (
-                            <td
-                              key={`${day}-${period.id}`}
-                              className={`${styles.slotCell} ${
-                                subjectName ? styles.populated : styles.empty
-                              }`}
-                              onClick={() =>
-                                setEditState({
-                                  yearGroup,
-                                  day,
-                                  periodId: period.id,
-                                })
-                              }
-                            >
-                              <div className={styles.slotContent}>
-                                <strong className={styles.subjectName}>
-                                  {subjectName || 'Free'}
-                                </strong>
-                                <span className={styles.teacherName}>
-                                  {subjectName
-                                    ? teacherName || 'Teacher unassigned'
-                                    : 'No teacher'}
-                                </span>
-                              </div>
-                            </td>
-                          )
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </article>
-          )
-        })}
+                        ) : (
+                          <span className={styles.emptyMark}>Click to assign</span>
+                        )}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {editState ? (

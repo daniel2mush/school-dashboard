@@ -23,13 +23,20 @@ export function Badge({
 }
 
 // ── Avatar ───────────────────────────────────────────────────
-export function Avatar({ color, size = 24, fontSize = 9 }: any) {
+export function Avatar({
+  color,
+  size = 24,
+  fontSize = 9,
+  initials: providedInitials,
+}: any) {
   const user = useUserStore().user
 
-  const initials = user?.name
-    .split(' ')
-    .map((name) => name[0])
-    .join('')
+  const initials =
+    providedInitials ||
+    user?.name
+      .split(' ')
+      .map((name: string) => name[0])
+      .join('')
   return (
     <div
       className="avatar"
@@ -37,8 +44,14 @@ export function Avatar({ color, size = 24, fontSize = 9 }: any) {
         width: size,
         height: size,
         fontSize,
-        background: color,
+        background: color || 'var(--accent)',
         flexShrink: 0,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '50%',
+        color: 'white',
+        fontWeight: 600,
       }}
     >
       {initials}

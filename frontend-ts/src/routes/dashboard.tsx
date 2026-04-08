@@ -8,7 +8,6 @@ import useUserStore from '#/components/store/UserStore'
 import DashboardHeader from '#/components/dashboard/DashboardHeader/DashboardHeader'
 import Sidebar from '#/components/dashboard/Sidebar/Sidebar'
 import styles from './dashboard/Dashboard.module.scss'
-import type { User } from '#/types/Types'
 import { getSectionLabel } from '#/components/constants/navigation'
 
 export const Route = createFileRoute('/dashboard')({

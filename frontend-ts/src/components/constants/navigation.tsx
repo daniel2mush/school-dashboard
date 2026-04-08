@@ -63,11 +63,12 @@ export const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     { id: 'tmy', label: 'My Year Groups', icon: <Layers size={20} /> },
     {
       id: 'tsubjects',
-      label: 'Subjects & Content',
+      label: 'Class Content',
       icon: <BookOpen size={20} />,
     },
     { id: 'tgrades', label: 'Grading', icon: <ClipboardCheck size={20} /> },
     { id: 'tattend', label: 'Attendance', icon: <UserCheck size={20} /> },
+    { id: 'ttimetable', label: 'Timetable', icon: <CalendarDays size={20} /> },
     { section: 'Communication' },
     { id: 'tann', label: 'Announcements', icon: <Megaphone size={20} /> },
   ],
