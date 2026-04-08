@@ -100,50 +100,129 @@
   letter-spacing: 0.05em;
 }
 
-.historyContainer {
+.calendarContainer {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: 20px;
-  overflow: hidden;
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
 }
 
-.historyHeader {
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border-light);
-  font-weight: 600;
-  color: var(--text-primary);
-  background: var(--bg-secondary);
+.calendarHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
-.timeline {
-  padding: 0 24px;
-}
-
-.timelineRow {
+.monthDisplay {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 16px 0;
-  border-bottom: 1px dashed var(--border-light);
+  gap: 12px;
+}
 
-  &:last-child {
-    border-bottom: none;
+.monthTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 180px;
+  text-align: center;
+}
+
+.filters {
+  display: flex;
+  gap: 8px;
+}
+
+.select {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  cursor: pointer;
+
+  &:focus {
+    border-color: var(--accent);
   }
 }
 
-.dateInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 24px;
 }
 
-.dateString {
-  font-size: 1rem;
+.dayHeader {
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  padding: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.calendarDay {
+  aspect-ratio: 1;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-secondary);
+  position: relative;
+  transition: all 0.2s;
+
+  &:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+}
+
+.emptyDay {
+  aspect-ratio: 1;
+}
+
+.dayNumber {
+  font-size: 0.95rem;
   font-weight: 500;
   color: var(--text-primary);
 }
 
-.statusWrapper {
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-bottom: 4px;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+  flex-wrap: wrap;
+}
+
+.legendItem {
   display: flex;
   align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }

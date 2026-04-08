@@ -1,16 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import styles from './LoginScreen.module.scss'
-import {
-  
-  loginSchema
-} from '#/components/validation/authValidation'
-import type {LoginFormData} from '#/components/validation/authValidation';
+import { loginSchema } from '#/components/validation/authValidation'
+import type { LoginFormData } from '#/components/validation/authValidation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '#/components/ui/Input/Input'
 import { Button } from '#/components/ui/Button/Button'
 import AuthImage from '#/components/AuthImage/AuthImage'
 import { useLoginUser } from '#/components/query/AuthQuery'
+import { Mail, Lock } from 'lucide-react'
 
 export const Route = createFileRoute('/login/')({
   component: RouteComponent,
@@ -57,6 +55,7 @@ function RouteComponent() {
               type="email"
               placeholder="Enter your email"
               fullWidth
+              leftIcon={<Mail size={18} />}
               {...register('email')}
               error={errors.email?.message}
             />
@@ -65,6 +64,7 @@ function RouteComponent() {
               type="password"
               placeholder="Enter your password"
               fullWidth
+              leftIcon={<Lock size={18} />}
               {...register('password')}
               error={errors.password?.message}
             />

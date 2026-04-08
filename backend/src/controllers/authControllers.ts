@@ -146,7 +146,6 @@ const studentInclude = {
         select: { id: true, name: true, email: true },
       },
     },
-    take: 10,
     orderBy: { date: "desc" as const },
   },
   attendance: {

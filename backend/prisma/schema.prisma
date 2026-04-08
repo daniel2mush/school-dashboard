@@ -79,6 +79,8 @@ model Grade {
   assignmentAvg Float?
   midterm       Float?
   projectFinal  Float?
+  performance   String?
+  teacherReport String?
   test          Boolean
   test2         Boolean
   student       User     @relation("StudentGrades", fields: [studentId], references: [id])

@@ -63,7 +63,7 @@ export const GetTeacherClasses = asyncHandler(async (req, res) => {
 export const SubmitGrades = asyncHandler(async (req, res) => {
   const { userId, role } = req.user;
 
-  const { studentId, subjectId, score, grade, midterm, assignmentAvg, projectFinal } = req.body.data;
+  const { studentId, subjectId, score, grade, midterm, assignmentAvg, projectFinal, performance, teacherReport } = req.body;
 
   if (role !== "TEACHER") {
     throw new AppError("Unauthorized access. Teachers only.", 403);
@@ -91,6 +91,8 @@ export const SubmitGrades = asyncHandler(async (req, res) => {
         midterm: midterm !== undefined ? Number(midterm) : undefined,
         assignmentAvg: assignmentAvg !== undefined ? Number(assignmentAvg) : undefined,
         projectFinal: projectFinal !== undefined ? Number(projectFinal) : undefined,
+        performance: performance ? String(performance) : undefined,
+        teacherReport: teacherReport ? String(teacherReport) : undefined,
         teacherId: userId, // Update who last graded it
       },
     });
@@ -106,6 +108,8 @@ export const SubmitGrades = asyncHandler(async (req, res) => {
         midterm: midterm !== undefined ? Number(midterm) : null,
         assignmentAvg: assignmentAvg !== undefined ? Number(assignmentAvg) : null,
         projectFinal: projectFinal !== undefined ? Number(projectFinal) : null,
+        performance: performance ? String(performance) : null,
+        teacherReport: teacherReport ? String(teacherReport) : null,
         test: false,
         test2: false,
         studentId: Number(studentId),

@@ -1,45 +1,132 @@
-import { Badge } from '@/components/ui'
+import { Badge, Button } from '@/components/ui'
 import styles from './StudentAttendance.module.scss'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
+import { useState, useMemo } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
 // Formatter for nicer dates
-const formatDate = (dateStr: string) => {
+const formatDate = (date: Date) => {
   try {
     return new Intl.DateTimeFormat('en-GB', {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
       year: 'numeric',
-    }).format(new Date(dateStr))
+    }).format(date)
   } catch {
-    return dateStr
+    return date.toDateString()
   }
 }
 
-const getStatusBadge = (status: string) => {
+const getStatusColor = (status: string) => {
   switch (status) {
     case 'P':
-      return <Badge variant="green">Present</Badge>
+      return 'var(--green)'
     case 'A':
-      return <Badge variant="red">Absent</Badge>
+      return 'var(--red)'
     case 'T':
-      return <Badge variant="amber">Tardy / Late</Badge>
+      return 'var(--amber)'
     case 'H':
-      return <Badge variant="blue">Holiday</Badge>
+      return 'var(--blue)'
     default:
-      return <Badge variant="gray">Unknown</Badge>
+      return 'transparent'
+  }
+}
+
+const getStatusLabel = (status: string) => {
+  switch (status) {
+    case 'P':
+      return 'Present'
+    case 'A':
+      return 'Absent'
+    case 'T':
+      return 'Late'
+    case 'H':
+      return 'Holiday'
+    default:
+      return 'Unknown'
   }
 }
 
 export function StudentAttendance() {
   const currentData = useCurrentStudent()
+  const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
+
+  const months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ]
+
+  const years = useMemo(() => {
+    const current = new Date().getFullYear()
+    const result = []
+    for (let i = current - 2; i <= current + 1; i++) {
+      result.push(i)
+    }
+    return result
+  }, [])
 
   if (!currentData) return null
 
   const { student } = currentData
   const attendanceRecords = student.attendance || []
 
-  const total = attendanceRecords.length
+  // Create a map of date string (YYYY-MM-DD) to attendance record
+  const attendanceMap = useMemo(() => {
+    const map: Record<string, any> = {}
+    attendanceRecords.forEach((record: any) => {
+      const date = new Date(record.date)
+      const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+      map[dateKey] = record
+    })
+    return map
+  }, [attendanceRecords])
+
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay() // 0 = Sunday
+
+  const calendarDays = useMemo(() => {
+    const days = []
+    // Add empty slots for days before the first day of the month
+    for (let i = 0; i < firstDayOfMonth; i++) {
+      days.push(null)
+    }
+    // Add days of the month
+    for (let i = 1; i <= daysInMonth; i++) {
+      days.push(i)
+    }
+    return days
+  }, [daysInMonth, firstDayOfMonth])
+
+  const handlePrevMonth = () => {
+    if (currentMonth === 0) {
+      setCurrentMonth(11)
+      setCurrentYear((prev) => prev - 1)
+    } else {
+      setCurrentMonth((prev) => prev - 1)
+    }
+  }
+
+  const handleNextMonth = () => {
+    if (currentMonth === 11) {
+      setCurrentMonth(0)
+      setCurrentYear((prev) => prev + 1)
+    } else {
+      setCurrentMonth((prev) => prev + 1)
+    }
+  }
+
   const presentCount = attendanceRecords.filter(
     (a: any) => a.status === 'P',
   ).length
@@ -79,31 +166,103 @@ export function StudentAttendance() {
         </div>
       </div>
 
-      <div className={styles.historyContainer}>
-        <div className={styles.historyHeader}>Recent History</div>
-        {attendanceRecords.length === 0 ? (
-          <div className={styles.emptyState}>
-            No attendance records found yet.
+      <div className={styles.calendarContainer}>
+        <div className={styles.calendarHeader}>
+          <div className={styles.monthDisplay}>
+            <Button variant="ghost" size="icon" onClick={handlePrevMonth}>
+              <ChevronLeft size={20} />
+            </Button>
+            <h3 className={styles.monthTitle}>
+              {months[currentMonth]} {currentYear}
+            </h3>
+            <Button variant="ghost" size="icon" onClick={handleNextMonth}>
+              <ChevronRight size={20} />
+            </Button>
           </div>
-        ) : (
-          <div className={styles.timeline}>
-            {attendanceRecords.map((record: any) => (
-              <div
-                key={record.id || record.date}
-                className={styles.timelineRow}
-              >
-                <div className={styles.dateInfo}>
-                  <div className={styles.dateString}>
-                    {formatDate(record.date)}
-                  </div>
-                </div>
-                <div className={styles.statusWrapper}>
-                  {getStatusBadge(record.status)}
-                </div>
+          <div className={styles.filters}>
+            <select
+              className={styles.select}
+              value={currentMonth}
+              onChange={(e) => setCurrentMonth(parseInt(e.target.value))}
+            >
+              {months.map((month, index) => (
+                <option key={month} value={index}>
+                  {month}
+                </option>
+              ))}
+            </select>
+            <select
+              className={styles.select}
+              value={currentYear}
+              onChange={(e) => setCurrentYear(parseInt(e.target.value))}
+            >
+              {years.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className={styles.calendarGrid}>
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            <div key={day} className={styles.dayHeader}>
+              {day}
+            </div>
+          ))}
+          {calendarDays.map((day, index) => {
+            if (day === null)
+              return <div key={`empty-${index}`} className={styles.emptyDay} />
+
+            const dateKey = `${currentYear}-${currentMonth}-${day}`
+            const record = attendanceMap[dateKey]
+
+            return (
+              <div key={day} className={styles.calendarDay}>
+                <span className={styles.dayNumber}>{day}</span>
+                {record && (
+                  <div
+                    className={styles.statusDot}
+                    style={{ backgroundColor: getStatusColor(record.status) }}
+                    title={getStatusLabel(record.status)}
+                  />
+                )}
               </div>
-            ))}
+            )
+          })}
+        </div>
+
+        <div className={styles.legend}>
+          <div className={styles.legendItem}>
+            <div
+              className={styles.dot}
+              style={{ backgroundColor: 'var(--green)' }}
+            />
+            <span>Present</span>
           </div>
-        )}
+          <div className={styles.legendItem}>
+            <div
+              className={styles.dot}
+              style={{ backgroundColor: 'var(--red)' }}
+            />
+            <span>Absent</span>
+          </div>
+          <div className={styles.legendItem}>
+            <div
+              className={styles.dot}
+              style={{ backgroundColor: 'var(--amber)' }}
+            />
+            <span>Late</span>
+          </div>
+          <div className={styles.legendItem}>
+            <div
+              className={styles.dot}
+              style={{ backgroundColor: 'var(--blue)' }}
+            />
+            <span>Holiday</span>
+          </div>
+        </div>
       </div>
     </section>
   )

@@ -61,6 +61,8 @@ export const useSubmitGrade = () => {
       midterm?: number
       assignmentAvg?: number
       projectFinal?: number
+      performance?: string
+      teacherReport?: string
     }) => {
       const res = await fetch('/api/teacher/grades', {
         method: 'POST',

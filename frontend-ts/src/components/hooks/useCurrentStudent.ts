@@ -79,6 +79,8 @@ export default function useCurrentStudent() {
       score: g.score,
       grade: g.grade,
       teacher: g.teacher?.name || 'Teacher',
+      performance: g.performance,
+      teacherReport: g.teacherReport,
     })) || []
 
   // Assuming announcements and timetables might come from yearGroup eventually,

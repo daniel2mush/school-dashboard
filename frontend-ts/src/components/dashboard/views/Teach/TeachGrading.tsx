@@ -58,6 +58,8 @@ export function TeachGrading() {
     assignmentAvg: '',
     projectFinal: '',
     overall: '',
+    performance: '',
+    teacherReport: '',
   })
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedYearGroup, setSelectedYearGroup] = useState<string>('All')
@@ -129,6 +131,8 @@ export function TeachGrading() {
         assignmentAvg: existing.assignmentAvg?.toString() || '',
         projectFinal: existing.projectFinal?.toString() || '',
         overall: existing.score?.toString() || '',
+        performance: existing.performance || '',
+        teacherReport: existing.teacherReport || '',
       })
     } else {
       setScores({
@@ -136,6 +140,8 @@ export function TeachGrading() {
         assignmentAvg: '',
         projectFinal: '',
         overall: '',
+        performance: '',
+        teacherReport: '',
       })
     }
   }
@@ -171,6 +177,8 @@ export function TeachGrading() {
         projectFinal: scores.projectFinal
           ? Number(scores.projectFinal)
           : undefined,
+        performance: scores.performance || undefined,
+        teacherReport: scores.teacherReport || undefined,
       },
       {
         onSuccess: () => {
@@ -563,6 +571,48 @@ export function TeachGrading() {
                             handleScoreChange('overall', e.target.value)
                           }
                           required
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>
+                          Performance Comment (e.g., Excellent, Good)
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Performance comment"
+                          value={scores.performance}
+                          onChange={(e) =>
+                            setScores((prev) => ({
+                              ...prev,
+                              performance: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Teacher Report / Remarks</label>
+                        <textarea
+                          placeholder="Enter student remarks..."
+                          value={scores.teacherReport}
+                          rows={4}
+                          onChange={(e) =>
+                            setScores((prev) => ({
+                              ...prev,
+                              teacherReport: e.target.value,
+                            }))
+                          }
+                          style={{
+                            width: '100%',
+                            padding: '12px',
+                            borderRadius: '8px',
+                            border: '1px solid var(--border-light)',
+                            background: 'var(--bg-primary)',
+                            color: 'var(--text-primary)',
+                            fontSize: '0.9rem',
+                            resize: 'vertical',
+                          }}
                         />
                       </div>
 

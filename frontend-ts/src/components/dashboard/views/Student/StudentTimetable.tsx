@@ -1,6 +1,7 @@
 import { BookOpen, CalendarRange, Clock3, Sparkles } from 'lucide-react'
 import styles from './StudentTimetable.module.scss'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
+import { useMemo } from 'react'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
@@ -35,24 +36,33 @@ export function StudentTimetable() {
 
   const { studentTimetableSlots, yearGroup } = currentData
 
-  const periods = Array.from(
-    new Map(
-      studentTimetableSlots
-        .filter((slot) => !slot.period.isBreak)
-        .sort((left, right) => left.periodId - right.periodId)
-        .map((slot) => [
-          slot.periodId,
-          {
-            id: slot.periodId,
-            label: slot.period.label,
-            startTime: slot.period.startTime,
-            endTime: slot.period.endTime,
-          },
-        ]),
-    ).values(),
-  )
+  const periods = useMemo(() => {
+    const pMap = new Map()
+    studentTimetableSlots.forEach((slot) => {
+      if (slot.period && !slot.period.isBreak) {
+        pMap.set(slot.periodId, slot.period)
+      }
+    })
+    return Array.from(pMap.values()).sort((a: any, b: any) => {
+      const [hA, mA] = a.startTime.split(':').map(Number)
+      const [hB, mB] = b.startTime.split(':').map(Number)
+      return hA * 60 + mA - (hB * 60 + mB)
+    })
+  }, [studentTimetableSlots])
 
-  const visiblePeriods = periods.length > 0 ? periods : FALLBACK_PERIODS
+  // Map slots for easy lookup: day -> periodId -> slot
+  const slotsByDayAndPeriod = useMemo(() => {
+    const map: Record<string, Record<number, any>> = {}
+    studentTimetableSlots.forEach((slot) => {
+      if (!map[slot.day]) map[slot.day] = {}
+      map[slot.day][slot.periodId] = slot
+    })
+    return map
+  }, [studentTimetableSlots])
+
+  const lessonCount = studentTimetableSlots.filter((slot) =>
+    Boolean(slot.subject?.name),
+  ).length
 
   const scheduledSubjects = new Set(
     studentTimetableSlots
@@ -60,12 +70,8 @@ export function StudentTimetable() {
       .filter((subject): subject is string => Boolean(subject)),
   )
 
-  const lessonCount = studentTimetableSlots.filter((slot) =>
-    Boolean(slot.subject?.name),
-  ).length
-
-  const firstClass = visiblePeriods[0]
-    ? `${visiblePeriods[0].startTime} - ${visiblePeriods[0].endTime}`
+  const firstClass = periods[0]
+    ? `${periods[0].startTime} - ${periods[0].endTime}`
     : 'N/A'
 
   return (
@@ -129,69 +135,68 @@ export function StudentTimetable() {
           </div>
         </div>
 
-        <div className={styles.calendarScroller}>
-          <div className={styles.calendarGrid}>
-            <div className={styles.cornerCell}>Day</div>
-            {visiblePeriods.map((period) => (
-              <div key={period.id} className={styles.periodHeaderCell}>
-                <span className={styles.periodHeaderTitle}>{period.label}</span>
-                <span className={styles.periodHeaderMeta}>
-                  {period.startTime} - {period.endTime}
-                </span>
+        <div className={styles.tableWrapper}>
+          <div className={styles.miniGrid}>
+            <div className={styles.cornerCell}>
+              <CalendarRange size={18} />
+            </div>
+            {DAYS.map((day) => (
+              <div key={day} className={styles.dayColumnHeader}>
+                <span className={styles.dayLabel}>{day}</span>
+                <span className={styles.dayShort}>{day.slice(0, 3)}</span>
               </div>
             ))}
 
-            {DAYS.map((day) => {
-              const daySchedule = studentTimetableSlots.filter(
-                (slot) => slot.day === day,
-              )
-              const lessonTotal = daySchedule.filter((slot) =>
-                Boolean(slot.subject?.name),
-              ).length
-
-              return (
-                <div key={day} className={styles.dayRow}>
-                  <div className={styles.dayCell}>
-                    <span className={styles.dayHeaderTitle}>{day}</span>
-                    <span className={styles.dayHeaderMeta}>
-                      {lessonTotal} lessons
-                    </span>
+            {periods.map((period: any) => (
+              <div key={period.id} className={styles.dayRow}>
+                <div className={styles.periodHeaderCell}>
+                  <div className={styles.periodLabel}>{period.label}</div>
+                  <div className={styles.periodTime}>
+                    {period.startTime} - {period.endTime}
                   </div>
-
-                  {visiblePeriods.map((period) => {
-                    const slot = daySchedule.find(
-                      (entry) => entry.periodId === period.id,
-                    )
-                    const subject = slot?.subject?.name
-                    const teacher = slot?.teacher?.name
-                    const isFree = !subject
-
-                    return (
-                      <div
-                        key={`${day}-${period.label}`}
-                        className={styles.slotCell}
-                      >
-                        <div
-                          className={`${styles.lessonCard} ${isFree ? styles.freeCard : formatSubjectTone(subject)}`}
-                        >
-                          <span className={styles.lessonState}>
-                            {isFree ? 'Free slot' : 'Scheduled'}
-                          </span>
-                          <strong className={styles.lessonSubject}>
-                            {isFree ? 'No class assigned' : subject}
-                          </strong>
-                          <span className={styles.lessonMeta}>
-                            {isFree
-                              ? `${period.startTime} - ${period.endTime}`
-                              : `${period.startTime} - ${period.endTime} · ${teacher || 'Teacher unassigned'}`}
-                          </span>
-                        </div>
-                      </div>
-                    )
-                  })}
                 </div>
-              )
-            })}
+
+                {DAYS.map((day) => {
+                  const slot = slotsByDayAndPeriod[day]?.[period.id]
+                  const subject = slot?.subject?.name
+                  const teacher = slot?.teacher?.name
+                  const isFree = !subject
+
+                  return (
+                    <div
+                      key={`${day}-${period.id}`}
+                      className={`${styles.slot} ${
+                        !isFree ? styles.populated : styles.empty
+                      }`}
+                    >
+                      {!isFree ? (
+                        <>
+                          <div className={styles.slotValue}>{subject}</div>
+                          <div className={styles.slotMeta}>
+                            {teacher || 'No teacher'}
+                          </div>
+                        </>
+                      ) : (
+                        <div className={styles.slotValue}>-</div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className={styles.legend}>
+          <div className={styles.legendItem}>
+            <span
+              className={`${styles.legendColor} ${styles.populated}`}
+            ></span>
+            <span>Scheduled lessons</span>
+          </div>
+          <div className={styles.legendItem}>
+            <span className={`${styles.legendColor} ${styles.empty}`}></span>
+            <span>Free periods</span>
           </div>
         </div>
       </section>

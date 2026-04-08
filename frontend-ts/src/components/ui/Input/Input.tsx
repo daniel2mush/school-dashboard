@@ -1,31 +1,38 @@
-import { forwardRef } from "react";
+import { forwardRef, ReactNode } from 'react'
 
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-  error?: string;
-  fullWidth?: boolean;
+  label?: string
+  error?: string
+  fullWidth?: boolean
+  leftIcon?: ReactNode
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, fullWidth, className = "", ...props }, ref) => {
-    const containerClasses = ["form-group", fullWidth ? "fullWidth" : ""]
+  ({ label, error, fullWidth, leftIcon, className = '', ...props }, ref) => {
+    const containerClasses = ['form-group', fullWidth ? 'fullWidth' : '']
       .filter(Boolean)
-      .join(" ");
+      .join(' ')
 
-    const inputClasses = ["input", error ? "has-error" : "", className]
+    const inputClasses = [
+      'input',
+      error ? 'has-error' : '',
+      leftIcon ? 'has-left-icon' : '',
+      className,
+    ]
       .filter(Boolean)
-      .join(" ");
+      .join(' ')
 
     return (
       <div className={containerClasses}>
         {label && <label className="form-label">{label}</label>}
         <div className="input-wrapper">
+          {leftIcon && <div className="input-left-icon">{leftIcon}</div>}
           <input ref={ref} className={inputClasses} {...props} />
         </div>
         {error && <span className="error-text">{error}</span>}
       </div>
-    );
+    )
   },
-);
+)
 
-Input.displayName = "Input";
+Input.displayName = 'Input'

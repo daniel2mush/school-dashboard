@@ -13,14 +13,23 @@
   box-shadow: var(--shadow-card);
   overflow: hidden;
   margin-bottom: 24px;
+  padding: 24px;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .card-header {
-  padding: 20px 24px;
+  padding: 0 0 20px 0;
   border-bottom: 1px solid var(--border-light);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 .card-title {
@@ -91,7 +100,31 @@
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card);
+    border-color: var(--accent-light);
+    &::before {
+      opacity: 1;
+    }
+  }
 }
 
 .metric-label {
@@ -315,6 +348,24 @@
 
 .input-wrapper {
   position: relative;
+  display: flex;
+  align-items: center;
+
+  .input-left-icon {
+    position: absolute;
+    left: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-tertiary);
+    pointer-events: none;
+    z-index: 1;
+
+    svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
 }
 
 .input {
@@ -328,6 +379,10 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow-sm);
   font-family: inherit;
+
+  &.has-left-icon {
+    padding-left: 40px;
+  }
 
   &:focus {
     outline: none;
@@ -451,11 +506,14 @@
   --accent-hover: #4338ca;
   --accent-bg: #eef2ff;
   --accent-text: #3730a3;
+  --accent-light: rgba(79, 70, 229, 0.4);
+  --accent-rgb: 79, 70, 233;
 
   /* Semantic Colors - Context Aware */
   --green: #059669;
   --green-bg: #ecfdf5;
   --green-text: #065f46;
+  --green-rgb: 5, 150, 105;
 
   --amber: #d97706;
   --amber-bg: #fef3c7;
@@ -464,6 +522,7 @@
   --red: #dc2626;
   --red-bg: #fef2f2;
   --red-text: #991b1b;
+  --red-rgb: 220, 38, 38;
 
   --purple: #7c3aed;
   --purple-bg: #f5f3ff;
@@ -551,10 +610,13 @@
   --accent-hover: #4f46e5;
   --accent-bg: rgba(99, 102, 241, 0.15);
   --accent-text: #a5b4fc;
+  --accent-light: rgba(99, 102, 241, 0.4);
+  --accent-rgb: 99, 102, 241;
 
   --green: #10b981;
   --green-bg: rgba(16, 185, 129, 0.15);
   --green-text: #6ee7b7;
+  --green-rgb: 16, 185, 129;
 
   --amber: #f59e0b;
   --amber-bg: rgba(245, 158, 11, 0.15);
