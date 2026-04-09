@@ -1,0 +1,14 @@
+// components/StudentFeesStatus/StudentFeesStatus.module.scss
+// Only layout lives here now — everything else moved to sub-components.
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.cardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}

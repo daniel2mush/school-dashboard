@@ -13,6 +13,7 @@ import '../styles.scss'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { Providers } from '#/components/client/QueryClient'
+import { SchoolDataProvider } from '#/components/providers/SchoolDataProvider'
 import { ThemeProvider } from '#/components/theme/ThemeProvider'
 import { CurrencyProvider } from '../context/CurrencyContext'
 
@@ -53,9 +54,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="">
         <ThemeProvider>
-          <CurrencyProvider>
-            <Providers>{children}</Providers>
-          </CurrencyProvider>
+          <SchoolDataProvider>
+            <CurrencyProvider>
+              <Providers>{children}</Providers>
+            </CurrencyProvider>
+          </SchoolDataProvider>
         </ThemeProvider>
         <Toaster richColors={true} />
         <TanStackDevtools
