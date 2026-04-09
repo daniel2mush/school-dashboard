@@ -31,6 +31,8 @@ import {
   DeleteFee,
   GetFeeManagementOverview,
   UpsertFeePayment,
+  GetSchoolSettings,
+  UpdateSchoolSettings,
 } from "../controllers/adminController.js";
 import { AuthenticateRequest } from "../middleware/authenticate.js";
 
@@ -49,6 +51,8 @@ router.post(
   AdminResetUserPassword,
 );
 router.get("/structure", AuthenticateRequest, GetSchoolStructure);
+router.get("/school-settings", AuthenticateRequest, GetSchoolSettings);
+router.patch("/school-settings", AuthenticateRequest, UpdateSchoolSettings);
 
 // Global actions
 router.post("/announcements", AuthenticateRequest, CreateAnnouncement);

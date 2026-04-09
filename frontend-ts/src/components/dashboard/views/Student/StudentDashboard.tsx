@@ -22,6 +22,8 @@ import {
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 import { useGetAnnouncements } from '#/components/query/AuthQuery.ts'
 import { useCurrency } from '#/context/CurrencyContext.tsx'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
+import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 
 const PERIODS = [
   { label: 'Period 1', time: '7:30 – 8:30' },
@@ -40,6 +42,8 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
   const currentData = useCurrentStudent()
   const { data: announcements } = useGetAnnouncements()
   const { formatCurrency } = useCurrency()
+  const { t } = useDashboardTranslation()
+  const { school } = useSchoolData()
 
   if (!currentData) return null
 
@@ -47,11 +51,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
     currentData
 
   const feePct = Math.round((student.fees.paid / student.fees.total) * 100)
-  const todayLessons = (Object.values(studentTimetable)[0] as string[]) || []
-  const strongestSubject = [...studentGrades].sort(
-    (left, right) => right.score - left.score,
-  )[0]
-
+  const todayLessons = Object.values(studentTimetable)[0]
   const today = new Date().toLocaleDateString('en-GB', {
     weekday: 'long',
     day: 'numeric',
@@ -66,12 +66,12 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>{yearGroup.name}</div>
             <h1 className={styles.heroTitle}>
-              Welcome back, {student.name.split(' ')[0]}
+              {t('student.dashboard.welcomeBack')}, {student.name.split(' ')[0]}
             </h1>
             <p className={styles.heroLead}>
-              You have <strong>{todayLessons.length}</strong> classes scheduled
-              for today. Your current attendance is{' '}
-              <strong>{student.att}%</strong>.
+              {t('student.dashboard.heroLead')
+                .replace('{count}', String(todayLessons.length))
+                .replace('{attendance}', String(student.att))}
             </p>
             <div className={styles.heroMeta}>
               <span className={styles.metaChip}>
@@ -80,7 +80,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               </span>
               <span className={styles.metaChip}>
                 <School size={12} strokeWidth={2} />
-                Term 2 · 2026
+                {school.term} · {school.year}
               </span>
             </div>
           </div>
@@ -89,13 +89,13 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               className="btn btn-primary"
               onClick={() => onNavigate?.('stimetable')}
             >
-              <Clock size={16} /> My Timetable
+              <Clock size={16} /> {t('student.dashboard.myTimetable')}
             </button>
             <button
               className="btn btn-secondary"
               onClick={() => onNavigate?.('sreport')}
             >
-              <TrendingUp size={16} /> Report Card
+              <TrendingUp size={16} /> {t('student.dashboard.reportCard')}
             </button>
           </div>
         </div>
@@ -103,30 +103,33 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
 
       <div className={styles.metricsGrid}>
         <MetricCard
-          label="Current Year"
+          label={t('student.dashboard.currentYear')}
           value={yearGroup.name}
           sub={yearGroup.level}
           icon={GraduationCap}
           valueColor="var(--accent)"
         />
         <MetricCard
-          label="Attendance"
+          label={t('student.dashboard.attendance')}
           value={`${student.att}%`}
-          sub="Present rate"
+          sub={t('student.dashboard.presentRate')}
           icon={UserCheck}
           valueColor="var(--green)"
         />
         <MetricCard
-          label="Fees Status"
+          label={t('student.dashboard.feesStatus')}
           value={`${feePct}%`}
-          sub={`Paid: ${formatCurrency(student.fees.paid)}`}
+          sub={t('student.dashboard.amountPaid').replace(
+            '{amount}',
+            formatCurrency(student.fees.paid),
+          )}
           icon={Banknote}
           valueColor={feePct >= 80 ? 'var(--green)' : 'var(--amber)'}
         />
         <MetricCard
-          label="Classes Today"
+          label={t('student.dashboard.classesToday')}
           value={todayLessons.length}
-          sub="Scheduled periods"
+          sub={t('student.dashboard.scheduledPeriods')}
           icon={BookOpen}
         />
       </div>
@@ -135,8 +138,8 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
         <div className={styles.mainContent}>
           <Card>
             <CardHeader
-              title="My Subjects"
-              action="Details"
+              title={t('student.dashboard.mySubjects')}
+              action={t('student.dashboard.details')}
               onAction={() => onNavigate?.('ssubjects')}
             />
             <div className={styles.subjectsList}>
@@ -149,7 +152,9 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
                     <div className={styles.subjectInfo}>
                       <div className={styles.subjectName}>{subject}</div>
                       <div className={styles.subjectTeacher}>
-                        {teacher ? teacher.name : 'Teacher to be assigned'}
+                        {teacher
+                          ? teacher.name
+                          : t('student.dashboard.teacherToBeAssigned')}
                       </div>
                     </div>
                   </div>
@@ -160,21 +165,23 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
 
           <Card>
             <CardHeader
-              title="Fee overview"
-              action="Pay fees"
+              title={t('student.dashboard.feeOverview')}
+              action={t('student.dashboard.payFees')}
               onAction={() => onNavigate?.('sfees')}
             />
             <div className={styles.feePreview}>
               <div className={styles.feeInfo}>
                 <div className={styles.feeMain}>
-                  <div className={styles.feeLabel}>Total Balance</div>
+                  <div className={styles.feeLabel}>
+                    {t('student.dashboard.totalBalance')}
+                  </div>
                   <div className={styles.feeValue}>
                     {formatCurrency(student.fees.total - student.fees.paid)}
                   </div>
                 </div>
                 <div className={styles.feeProgress}>
                   <div className={styles.progressLabel}>
-                    <span>Payment progress</span>
+                    <span>{t('student.dashboard.paymentProgress')}</span>
                     <span>{feePct}%</span>
                   </div>
                   <ProgressBar pct={feePct} color="var(--accent)" height={8} />
@@ -186,7 +193,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
 
         <div className={styles.sidebar}>
           <Card>
-            <CardHeader title="School Announcements" />
+            <CardHeader title={t('student.dashboard.schoolAnnouncements')} />
             <div className={styles.annList}>
               {announcements?.slice(0, 3).map((ann) => (
                 <div key={ann.id} className={styles.announcementRow}>
@@ -207,13 +214,15 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
                 </div>
               ))}
               {(!announcements || announcements.length === 0) && (
-                <div className={styles.emptyState}>No active announcements</div>
+                <div className={styles.emptyState}>
+                  {t('student.dashboard.noActiveAnnouncements')}
+                </div>
               )}
             </div>
           </Card>
 
           <Card>
-            <CardHeader title="Today's Schedule" />
+            <CardHeader title={t('student.dashboard.todaysSchedule')} />
             <div className={styles.scheduleList}>
               {todayLessons.slice(0, 4).map((subject, index) => (
                 <div key={`${subject}-${index}`} className={styles.classRow}>
@@ -229,18 +238,20 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
                 </div>
               ))}
               {todayLessons.length === 0 && (
-                <div className={styles.emptyState}>No classes today</div>
+                <div className={styles.emptyState}>
+                  {t('student.dashboard.noClassesToday')}
+                </div>
               )}
             </div>
           </Card>
 
           <Card>
-            <CardHeader title="Quick Links" />
+            <CardHeader title={t('student.dashboard.quickLinks')} />
             <div className={styles.actionsList}>
               {[
-                ['sreport', 'View my report card'],
-                ['stimetable', 'Weekly timetable'],
-                ['sfees', 'Fees & finances'],
+                ['sreport', t('student.dashboard.viewReport')],
+                ['stimetable', t('student.dashboard.weeklyTimetable')],
+                ['sfees', t('student.dashboard.feesAndFinances')],
               ].map(([page, label]) => (
                 <button
                   key={page}

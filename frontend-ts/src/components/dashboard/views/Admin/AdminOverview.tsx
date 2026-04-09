@@ -5,7 +5,8 @@ import {
   useGetSchoolStructure,
 } from '#/components/query/AdminQuery'
 import { useGetAnnouncements } from '#/components/query/AuthQuery'
-import { useCurrency, type CurrencyCode } from '#/context/CurrencyContext'
+import { useCurrency } from '#/context/CurrencyContext'
+import type { CurrencyCode } from '#/context/CurrencyContext'
 import { Badge, Card, CardHeader, ProgressBar } from '#/components/ui'
 import type { Announcement } from '#/types/Types'
 import { useNavigate } from '@tanstack/react-router'
@@ -39,6 +40,8 @@ import {
   Bar,
 } from 'recharts'
 import type { TooltipValueType } from 'recharts'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
+import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 import styles from './AdminOverview.module.scss'
 
 const YG_ACCENTS = [
@@ -128,6 +131,8 @@ function StatTile({
 
 export function AdminOverview() {
   const { currency, setCurrency, formatCurrency } = useCurrency()
+  const { t } = useDashboardTranslation()
+  const { school } = useSchoolData()
   const [isMounted, setIsMounted] = useState(false)
   useEffect(() => {
     setIsMounted(true)
@@ -211,11 +216,15 @@ export function AdminOverview() {
   // Prepare chart data
   const revenueData = [
     {
-      name: 'Collected',
+      name: t('admin.overview.revenueCollected'),
       value: analytics.totalCollectedRevenue,
       fill: '#10b981',
     },
-    { name: 'Outstanding', value: outstandingCFA, fill: '#f59e0b' },
+    {
+      name: t('admin.overview.revenueOutstanding'),
+      value: outstandingCFA,
+      fill: '#f59e0b',
+    },
   ]
 
   const enrollmentData =
@@ -231,7 +240,10 @@ export function AdminOverview() {
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>Sunridge Academy · Admin</div>
-            <h1 className={styles.heroTitle}>Platform overview</h1>
+            <div className={styles.eyebrow}>
+              {school.name} · {t('admin.overview.eyebrow')}
+            </div>
+            <h1 className={styles.heroTitle}>{t('admin.overview.title')}</h1>
             <div className={styles.currencyTabs}>
               {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
                 (code) => (
@@ -247,15 +259,17 @@ export function AdminOverview() {
               )}
             </div>
             <p className={styles.heroLead}>
-              You are supporting <strong>{analytics.students}</strong> active
-              students across <strong>{analytics.yearGroups}</strong> year
-              groups with <strong>{analytics.teachers}</strong> teachers and{' '}
-              <strong>{analytics.subjects}</strong> subjects on record.
+              {t('admin.overview.heroLead')
+                .replace('{students}', String(analytics.students))
+                .replace('{yearGroups}', String(analytics.yearGroups))
+                .replace('{teachers}', String(analytics.teachers))
+                .replace('{subjects}', String(analytics.subjects))}
               {largestYear ? (
                 <>
                   {' '}
-                  The largest cohort is <strong>{largestYear.name}</strong> (
-                  {largestYear._count.students} students).
+                  {t('admin.overview.largestCohort')
+                    .replace('{name}', largestYear.name)
+                    .replace('{count}', String(largestYear._count.students))}
                 </>
               ) : null}
             </p>
@@ -266,15 +280,17 @@ export function AdminOverview() {
               </span>
               <span className={styles.metaChip}>
                 <School size={12} strokeWidth={2} aria-hidden />
-                Term 2 · 2026
+                {school.term} · {school.year}
               </span>
               {latestAnnouncement ? (
                 <span className={styles.metaChip}>
                   <Megaphone size={12} strokeWidth={2} aria-hidden />
-                  Latest broadcast{' '}
-                  {new Date(latestAnnouncement.createdAt).toLocaleDateString(
-                    'en-GB',
-                    { day: 'numeric', month: 'short' },
+                  {t('admin.overview.latestBroadcast').replace(
+                    '{date}',
+                    new Date(latestAnnouncement.createdAt).toLocaleDateString(
+                      'en-GB',
+                      { day: 'numeric', month: 'short' },
+                    ),
                   )}
                 </span>
               ) : null}
@@ -290,7 +306,7 @@ export function AdminOverview() {
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
               >
                 <Megaphone size={15} strokeWidth={2} />
-                New announcement
+                {t('admin.overview.newAnnouncement')}
               </span>
             </button>
             <button
@@ -302,7 +318,7 @@ export function AdminOverview() {
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
               >
                 <Layers size={15} strokeWidth={2} />
-                Year groups
+                {t('admin.overview.yearGroups')}
               </span>
             </button>
             <button
@@ -314,7 +330,7 @@ export function AdminOverview() {
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
               >
                 <Sparkles size={15} strokeWidth={2} />
-                Analytics
+                {t('admin.overview.analytics')}
               </span>
             </button>
             <button
@@ -325,7 +341,8 @@ export function AdminOverview() {
               <span
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
               >
-                <BookText size={15} strokeWidth={2} /> Curriculum
+                <BookText size={15} strokeWidth={2} />{' '}
+                {t('admin.overview.curriculum')}
               </span>
             </button>
           </div>
@@ -334,15 +351,21 @@ export function AdminOverview() {
 
       <div className={styles.insights}>
         <article className={styles.insight}>
-          <div className={styles.insightLabel}>Fee collection</div>
+          <div className={styles.insightLabel}>
+            {t('admin.overview.feeCollection')}
+          </div>
           <div className={styles.insightValue}>
             {feeCollectionPct}% ·{' '}
-            {formatCurrency(analytics.totalCollectedRevenue)} received
+            {formatCurrency(analytics.totalCollectedRevenue)}{' '}
+            {t('admin.overview.receivedSuffix')}
           </div>
           <p className={styles.insightSub}>
             {analytics.totalExpectedRevenue > 0
-              ? `${formatCurrency(outstandingCFA)} still outstanding against expected term fees.`
-              : 'No fee records yet — add amounts under Fee Management.'}
+              ? t('admin.overview.outstandingAgainstFees').replace(
+                  '{amount}',
+                  formatCurrency(outstandingCFA),
+                )
+              : t('admin.overview.noFeeRecords')}
           </p>
           <div className={styles.insightBar}>
             <div
@@ -357,32 +380,45 @@ export function AdminOverview() {
         </article>
 
         <article className={styles.insight}>
-          <div className={styles.insightLabel}>People balance</div>
+          <div className={styles.insightLabel}>
+            {t('admin.overview.peopleBalance')}
+          </div>
           <div className={styles.insightValue}>
             {studentTeacherRatio === '—'
-              ? 'Add teachers to see ratio'
-              : `${studentTeacherRatio} students per teacher`}
+              ? t('admin.overview.addTeachersToSeeRatio')
+              : t('admin.overview.studentsPerTeacher').replace(
+                  '{ratio}',
+                  studentTeacherRatio,
+                )}
           </div>
           <p className={styles.insightSub}>
-            Average class load ≈ {avgStudentsPerYear} students per year group
+            {t('admin.overview.averageClassLoad').replace(
+              '{avg}',
+              avgStudentsPerYear,
+            )}
             {totalSubjectLinks > 0
-              ? ` · ${totalSubjectLinks} subject–year links across the timetable`
+              ? ` · ${t('admin.overview.subjectYearLinks').replace('{count}', String(totalSubjectLinks))}`
               : ''}
             .
           </p>
         </article>
 
         <article className={styles.insight}>
-          <div className={styles.insightLabel}>Attendance signal</div>
+          <div className={styles.insightLabel}>
+            {t('admin.overview.attendanceSignal')}
+          </div>
           <div className={styles.insightValue}>
             {analytics.attendancePresentPct === null
-              ? 'No marks recorded'
-              : `${analytics.attendancePresentPct}% present`}
+              ? t('admin.overview.noMarksRecorded')
+              : t('admin.overview.presentPct').replace(
+                  '{pct}',
+                  String(analytics.attendancePresentPct),
+                )}
           </div>
           <p className={styles.insightSub}>
             {analytics.attendancePresentPct === null
-              ? 'Once teachers record P / A / T, a school-wide present rate appears here.'
-              : 'Share of present marks among present + absent + late entries in the database.'}
+              ? t('admin.overview.attendanceAwaiting')
+              : t('admin.overview.attendanceShare')}
           </p>
         </article>
       </div>
@@ -391,28 +427,28 @@ export function AdminOverview() {
         <StatTile
           icon={Layers}
           iconClass={styles.iconIndigo}
-          label="Year groups"
+          label={t('admin.overview.yearGroups')}
           value={analytics.yearGroups}
-          sub="Configured levels"
+          sub={t('admin.overview.configuredLevels')}
         />
         <StatTile
           icon={Users}
           iconClass={styles.iconEmerald}
-          label="Students"
+          label={t('role.STUDENT')}
           value={analytics.students}
-          sub="Active accounts"
+          sub={t('admin.overview.activeAccounts')}
         />
         <StatTile
           icon={GraduationCap}
           iconClass={styles.iconViolet}
-          label="Teaching staff"
+          label={t('role.TEACHER')}
           value={analytics.teachers}
-          sub="Active teachers"
+          sub={t('admin.overview.activeTeachers')}
         />
         <StatTile
           icon={Banknote}
           iconClass={styles.iconAmber}
-          label="Fees collected"
+          label={t('admin.overview.feesCollected')}
           value={`${feeCollectionPct}%`}
           sub={`${formatCurrency(analytics.totalCollectedRevenue)} of ${formatCurrency(analytics.totalExpectedRevenue)}`}
           valueColor={feeCollectionPct >= 80 ? 'var(--green)' : 'var(--amber)'}
@@ -420,7 +456,7 @@ export function AdminOverview() {
         <StatTile
           icon={UserCheck}
           iconClass={styles.iconSky}
-          label="Attendance"
+          label={t('admin.overview.attendance')}
           value={
             analytics.attendancePresentPct === null
               ? '—'
@@ -428,8 +464,8 @@ export function AdminOverview() {
           }
           sub={
             analytics.attendancePresentPct === null
-              ? 'Awaiting data'
-              : 'Present ÷ (P+A+T)'
+              ? t('admin.overview.awaitingData')
+              : t('admin.overview.presentFormula')
           }
           valueColor="var(--accent)"
         />
@@ -437,7 +473,7 @@ export function AdminOverview() {
 
       <div className={styles.overviewCharts}>
         <Card>
-          <CardHeader title="Revenue Overview" />
+          <CardHeader title={t('admin.overview.revenueOverview')} />
           <div style={{ height: 250, padding: '1rem', minWidth: 0 }}>
             {isMounted && (
               <ResponsiveContainer
@@ -478,7 +514,7 @@ export function AdminOverview() {
         </Card>
 
         <Card>
-          <CardHeader title="Enrollment by Year Group" />
+          <CardHeader title={t('admin.overview.enrollmentByYearGroup')} />
           <div style={{ height: 250, padding: '1rem', minWidth: 0 }}>
             {isMounted && (
               <ResponsiveContainer

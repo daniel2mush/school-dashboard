@@ -193,6 +193,17 @@ model Material {
   yearGroup   YearGroup? @relation(fields: [yearGroupId], references: [id])
 }
 
+model SchoolSetting {
+  id        Int      @id @default(1)
+  name      String
+  term      String
+  year      String
+  language  String   @default("en")
+  logo      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum Role {
   STUDENT
   TEACHER

@@ -1,5 +1,6 @@
 import { Download } from 'lucide-react'
 import { useMemo, useRef } from 'react'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 import styles from './StudentReportCard.module.scss'
@@ -16,6 +17,7 @@ import type { GradeRecord } from './StudentReportCard.utils'
 
 export function StudentReportCard() {
   const currentData = useCurrentStudent()
+  const { t } = useDashboardTranslation()
   const { school } = useSchoolData()
   const reportRef = useRef<HTMLDivElement>(null)
 
@@ -52,7 +54,7 @@ export function StudentReportCard() {
       <div className={styles.actionsRow}>
         <button className={styles.downloadBtn} onClick={handleDownload}>
           <Download size={20} />
-          Download PDF
+          {t('student.report.downloadPdf')}
         </button>
       </div>
 

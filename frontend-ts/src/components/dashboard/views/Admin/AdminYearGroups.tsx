@@ -18,11 +18,13 @@ import {
   Users,
   UserRoundPlus,
 } from 'lucide-react'
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useState } from 'react'
+import type { CSSProperties } from 'react'
 import {
   useGetSchoolStructure,
   useGetAllUsers,
 } from '#/components/query/AdminQuery'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
 function formatLevel(level: string) {
   return level.replace(/([a-z])([A-Z])/g, '$1 $2')
@@ -64,6 +66,7 @@ const CARD_ACCENTS = [
 export function AdminYearGroups() {
   const { data: yearGroups, isLoading } = useGetSchoolStructure()
   const { data: allUsers, isLoading: usersLoading } = useGetAllUsers()
+  const { t } = useDashboardTranslation()
 
   const [createOpen, setCreateOpen] = useState(false)
   const [editForId, setEditForId] = useState<number | null>(null)
@@ -97,7 +100,7 @@ export function AdminYearGroups() {
       : undefined
 
   if (isLoading || usersLoading || !yearGroups || !allUsers) {
-    return <div className={styles.view}>Loading cohort structure…</div>
+    return <div className={styles.view}>{t('admin.yearGroups.loading')}</div>
   }
 
   return (
@@ -105,23 +108,25 @@ export function AdminYearGroups() {
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <div className={styles.eyebrow}>Structure</div>
-            <h1 className={styles.title}>Year groups</h1>
-            <p className={styles.copy}>
-              Cohorts anchor enrolment, staffing, fees, and timetables. Create a
-              group, then assign teachers and move students as your school
-              evolves.
-            </p>
+            <div className={styles.eyebrow}>
+              {t('admin.yearGroups.eyebrow')}
+            </div>
+            <h1 className={styles.title}>{t('admin.yearGroups.title')}</h1>
+            <p className={styles.copy}>{t('admin.yearGroups.copy')}</p>
             <div className={styles.heroStats}>
               <span className={styles.heroStat}>
                 <LayoutGrid size={14} strokeWidth={2} aria-hidden />
-                {yearGroups.length} cohort
-                {yearGroups.length === 1 ? '' : 's'}
+                {t('admin.yearGroups.cohortsCount').replace(
+                  '{count}',
+                  String(yearGroups.length),
+                )}
               </span>
               <span className={styles.heroStat}>
                 <Users size={14} strokeWidth={2} aria-hidden />
-                {yearGroups.reduce((n, y) => n + y._count.students, 0)} students
-                enrolled
+                {t('admin.yearGroups.studentsEnrolled').replace(
+                  '{count}',
+                  String(yearGroups.reduce((n, y) => n + y._count.students, 0)),
+                )}
               </span>
             </div>
           </div>
@@ -131,7 +136,7 @@ export function AdminYearGroups() {
             onClick={() => setCreateOpen(true)}
           >
             <Plus size={18} strokeWidth={2} />
-            New year group
+            {t('admin.yearGroups.newYearGroup')}
           </button>
         </div>
       </header>
@@ -141,17 +146,18 @@ export function AdminYearGroups() {
           <div className={styles.emptyIcon}>
             <LayoutGrid size={32} strokeWidth={1.5} />
           </div>
-          <h2 className={styles.emptyTitle}>No cohorts yet</h2>
+          <h2 className={styles.emptyTitle}>
+            {t('admin.yearGroups.noCohorts')}
+          </h2>
           <p className={styles.emptyText}>
-            Start by creating your first year group. You can refine subjects and
-            fees from other admin sections.
+            {t('admin.yearGroups.noCohortsCopy')}
           </p>
           <button
             type="button"
             className="btn btn-primary"
             onClick={() => setCreateOpen(true)}
           >
-            Create year group
+            {t('admin.yearGroups.createYearGroup')}
           </button>
         </div>
       ) : (
@@ -183,7 +189,9 @@ export function AdminYearGroups() {
                         <span className={styles.level}>
                           {formatLevel(yg.level)}
                         </span>
-                        <Badge variant="green">Active</Badge>
+                        <Badge variant="green">
+                          {t('admin.yearGroups.active')}
+                        </Badge>
                       </div>
                       {yg.roomNumber ? (
                         <div className={styles.room}>
@@ -202,7 +210,7 @@ export function AdminYearGroups() {
                     <button
                       type="button"
                       className={styles.menuTrigger}
-                      aria-label="Cohort actions"
+                      aria-label={t('admin.yearGroups.cohortActions')}
                       aria-expanded={menuOpenId === yg.id}
                       onClick={(e) => {
                         e.stopPropagation()
@@ -227,7 +235,7 @@ export function AdminYearGroups() {
                           }}
                         >
                           <Edit size={15} strokeWidth={2} />
-                          Edit details
+                          {t('admin.yearGroups.editDetails')}
                         </button>
                         <button
                           type="button"
@@ -239,7 +247,7 @@ export function AdminYearGroups() {
                           }}
                         >
                           <UserRoundPlus size={15} strokeWidth={2} />
-                          Assign teachers
+                          {t('admin.yearGroups.assignTeachers')}
                         </button>
                         <button
                           type="button"
@@ -251,7 +259,7 @@ export function AdminYearGroups() {
                           }}
                         >
                           <BookOpen size={15} strokeWidth={2} />
-                          Manage subjects
+                          {t('admin.yearGroups.manageSubjects')}
                         </button>
                         <button
                           type="button"
@@ -263,7 +271,7 @@ export function AdminYearGroups() {
                           }}
                         >
                           <Users size={15} strokeWidth={2} />
-                          Move student
+                          {t('admin.yearGroups.moveStudent')}
                         </button>
                       </div>
                     ) : null}
@@ -281,7 +289,9 @@ export function AdminYearGroups() {
                       <div className={styles.statValue}>
                         {yg._count.students}
                       </div>
-                      <div className={styles.statLabel}>Students</div>
+                      <div className={styles.statLabel}>
+                        {t('admin.yearGroups.students')}
+                      </div>
                     </div>
                   </div>
                   <div className={styles.statBlock}>
@@ -294,7 +304,9 @@ export function AdminYearGroups() {
                       <div className={styles.statValue}>
                         {yg._count.teachers}
                       </div>
-                      <div className={styles.statLabel}>Teachers</div>
+                      <div className={styles.statLabel}>
+                        {t('admin.yearGroups.teachers')}
+                      </div>
                     </div>
                   </div>
                   <div className={styles.statBlock}>
@@ -307,31 +319,37 @@ export function AdminYearGroups() {
                       <div className={styles.statValue}>
                         {yg.subjects.length}
                       </div>
-                      <div className={styles.statLabel}>Subjects</div>
+                      <div className={styles.statLabel}>
+                        {t('admin.yearGroups.subjects')}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.teachersBlock}>
-                  <div className={styles.blockLabel}>Teaching team</div>
+                  <div className={styles.blockLabel}>
+                    {t('admin.yearGroups.teachingTeam')}
+                  </div>
                   {yg.teachers.length === 0 ? (
-                    <p className={styles.muted}>No teachers assigned.</p>
+                    <p className={styles.muted}>
+                      {t('admin.yearGroups.noTeachersAssigned')}
+                    </p>
                   ) : (
                     <div className={styles.teacherChips}>
-                      {yg.teachers.map((t) => {
-                        const initials = t.name
+                      {yg.teachers.map((teacher) => {
+                        const initials = teacher.name
                           .split(/\s+/)
                           .map((p) => p[0])
                           .join('')
                           .slice(0, 2)
                           .toUpperCase()
                         return (
-                          <span key={t.id} className={styles.teacherChip}>
+                          <span key={teacher.id} className={styles.teacherChip}>
                             <span className={styles.teacherChipAvatar}>
                               {initials}
                             </span>
                             <span className={styles.teacherChipName}>
-                              {t.name}
+                              {teacher.name}
                             </span>
                           </span>
                         )
@@ -341,7 +359,9 @@ export function AdminYearGroups() {
                 </div>
 
                 <div className={styles.subjectsBlock}>
-                  <div className={styles.blockLabel}>Curriculum</div>
+                  <div className={styles.blockLabel}>
+                    {t('admin.yearGroups.curriculum')}
+                  </div>
                   {yg.subjects.length > 0 ? (
                     <div className={styles.subjectsList}>
                       {yg.subjects.map((sub) => (
@@ -352,8 +372,7 @@ export function AdminYearGroups() {
                     </div>
                   ) : (
                     <p className={styles.muted}>
-                      No subjects linked — attach from subject management when
-                      ready.
+                      {t('admin.yearGroups.noSubjectsLinked')}
                     </p>
                   )}
                 </div>

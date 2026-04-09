@@ -3,25 +3,29 @@ import {
   CalendarRange,
   Layers3,
   MoreHorizontal,
-  Sparkles,
-  X,
   Plus,
+  Sparkles,
+  Trash2,
+  X,
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import useUserStore from '#/components/store/UserStore'
 import styles from './AdminTimetable.module.scss'
-
-import { Trash2 } from 'lucide-react'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import {
   useUpsertTimetableSlot,
   useCreatePeriod,
   useDeletePeriod,
   useAssignPeriodToYearGroup,
   useGetSchoolStructure,
-  type AdminYearGroupStructure,
 } from '#/components/query/AdminQuery'
+import type { AdminYearGroupStructure } from '#/components/query/AdminQuery'
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+
+function getDayTranslationKey(day: string) {
+  return `admin.timetable.days.${day.toLowerCase()}` as const
+}
 
 type EditState = {
   yearGroup: AdminYearGroupStructure
@@ -33,7 +37,7 @@ function getPeriods(yearGroup: AdminYearGroupStructure) {
   const periods = Array.from(
     new Map(
       yearGroup.timetables
-        .filter((slot) => slot.period && !slot.period.isBreak)
+        .filter((slot) => !slot.period.isBreak)
         .map((slot) => [
           slot.periodId,
           {
@@ -385,6 +389,7 @@ function ManagePeriodsModal({
 }
 
 export function AdminTimetable() {
+  const { t } = useDashboardTranslation()
   const user = useUserStore((state) => state.user)
   const { data: yearGroups, isLoading } = useGetSchoolStructure()
   const [editState, setEditState] = useState<EditState | null>(null)
@@ -410,60 +415,51 @@ export function AdminTimetable() {
   }, [yearGroups])
 
   if (isLoading || !yearGroups) {
+    return <div className={styles.view}>{t('admin.timetable.loading')}</div>
+  }
+
+  if (yearGroups.length === 0) {
     return (
-      <div className={styles.view}>Loading school schedule registry...</div>
+      <div className={styles.view}>{t('admin.timetable.noYearGroups')}</div>
     )
   }
 
   const selectedYearGroup =
     yearGroups.find((yearGroup) => yearGroup.id === selectedYearGroupId) ||
-    yearGroups[0] ||
-    null
+    yearGroups[0]
 
-  const periods = selectedYearGroup ? getPeriods(selectedYearGroup) : []
+  const periods = getPeriods(selectedYearGroup)
 
-  const totalScheduledLessons = selectedYearGroup
-    ? selectedYearGroup.timetables.filter((slot) => slot.subject?.name).length
-    : 0
+  const totalScheduledLessons = selectedYearGroup.timetables.filter((slot) =>
+    Boolean(slot.subject.name),
+  ).length
 
-  const scheduledSubjects = selectedYearGroup
-    ? new Set(
-        selectedYearGroup.timetables
-          .map((slot) => slot.subject?.name)
-          .filter((subject): subject is string => Boolean(subject)),
-      )
-    : new Set<string>()
+  const scheduledSubjects = new Set(
+    selectedYearGroup.timetables
+      .map((slot) => slot.subject.name)
+      .filter((subject): subject is string => Boolean(subject)),
+  )
 
-  const activeDays = selectedYearGroup
-    ? new Set(
-        selectedYearGroup.timetables
-          .filter((slot) => slot.subject?.name)
-          .map((slot) => slot.day),
-      )
-    : new Set<string>()
+  const activeDays = new Set(
+    selectedYearGroup.timetables
+      .filter((slot) => Boolean(slot.subject.name))
+      .map((slot) => slot.day),
+  )
 
-  const timetableSlotsByDayAndPeriod = selectedYearGroup
-    ? DAYS.reduce(
-        (acc, day) => {
-          acc[day] = {}
-          return acc
-        },
-        {} as Record<
-          string,
-          Record<number, (typeof selectedYearGroup.timetables)[number]>
-        >,
-      )
-    : {}
+  const timetableSlotsByDayAndPeriod = DAYS.reduce(
+    (acc, day) => {
+      acc[day] = {}
+      return acc
+    },
+    {} as Record<
+      string,
+      Partial<Record<number, (typeof selectedYearGroup.timetables)[number]>>
+    >,
+  )
 
-  if (selectedYearGroup) {
-    selectedYearGroup.timetables.forEach((slot) => {
-      timetableSlotsByDayAndPeriod[slot.day][slot.periodId] = slot
-    })
-  }
-
-  if (!selectedYearGroup) {
-    return <div className={styles.view}>No year groups available.</div>
-  }
+  selectedYearGroup.timetables.forEach((slot) => {
+    timetableSlotsByDayAndPeriod[slot.day][slot.periodId] = slot
+  })
 
   return (
     <section className={styles.view}>
@@ -471,18 +467,20 @@ export function AdminTimetable() {
         <div className={styles.heroContent}>
           <div className={styles.eyebrow}>
             <Sparkles size={14} />
-            Institutional oversight
+            {t('admin.timetable.eyebrow')}
           </div>
-          <h2 className={styles.title}>Year group timetable</h2>
-          <p className={styles.copy}>
-            Select a class, review its weekly schedule, and click any slot to
-            assign or change the lesson details.
-          </p>
+          <h2 className={styles.title}>{t('admin.timetable.title')}</h2>
+          <p className={styles.copy}>{t('admin.timetable.copy')}</p>
         </div>
 
         <div className={styles.heroBadge}>
           <Layers3 size={18} />
-          <span>{yearGroups.length} classes</span>
+          <span>
+            {t('admin.timetable.classesCount').replace(
+              '{count}',
+              String(yearGroups.length),
+            )}
+          </span>
         </div>
       </header>
 
@@ -492,7 +490,9 @@ export function AdminTimetable() {
             <CalendarRange size={18} />
           </div>
           <div>
-            <div className={styles.summaryLabel}>Selected class</div>
+            <div className={styles.summaryLabel}>
+              {t('admin.timetable.selectedClass')}
+            </div>
             <div className={styles.summaryValue}>{selectedYearGroup.name}</div>
           </div>
         </article>
@@ -502,7 +502,9 @@ export function AdminTimetable() {
             <Blocks size={18} />
           </div>
           <div>
-            <div className={styles.summaryLabel}>Scheduled lessons</div>
+            <div className={styles.summaryLabel}>
+              {t('admin.timetable.scheduledLessons')}
+            </div>
             <div className={styles.summaryValue}>{totalScheduledLessons}</div>
           </div>
         </article>
@@ -512,7 +514,9 @@ export function AdminTimetable() {
             <Layers3 size={18} />
           </div>
           <div>
-            <div className={styles.summaryLabel}>Subjects in use</div>
+            <div className={styles.summaryLabel}>
+              {t('admin.timetable.subjectsInUse')}
+            </div>
             <div className={styles.summaryValue}>{scheduledSubjects.size}</div>
           </div>
         </article>
@@ -520,9 +524,11 @@ export function AdminTimetable() {
 
       <section className={styles.selectorRow}>
         <div className={styles.selectorInfo}>
-          <div className={styles.selectorLabel}>Choose class</div>
+          <div className={styles.selectorLabel}>
+            {t('admin.timetable.chooseClass')}
+          </div>
           <div className={styles.selectorCopy}>
-            Switch between year groups to edit one timetable at a time.
+            {t('admin.timetable.chooseClassCopy')}
           </div>
         </div>
 
@@ -548,7 +554,7 @@ export function AdminTimetable() {
             onClick={() => setManagePeriodsYearGroup(selectedYearGroup)}
           >
             <MoreHorizontal size={16} />
-            Manage periods
+            {t('admin.timetable.managePeriods')}
           </button>
         </div>
       </section>
@@ -556,11 +562,13 @@ export function AdminTimetable() {
       <div className={styles.tableShell}>
         <div className={styles.tableHeader}>
           <div>
-            <h2>{selectedYearGroup.name} timetable</h2>
-            <p>
-              Click any cell to assign a subject or teacher. Highlighted days
-              show where this class is already scheduled.
-            </p>
+            <h2>
+              {t('admin.timetable.yearGroupTimetable').replace(
+                '{name}',
+                selectedYearGroup.name,
+              )}
+            </h2>
+            <p>{t('admin.timetable.tableCopy')}</p>
           </div>
           <div className={styles.tableLegend}>
             {user?.role === 'teacher' && (
@@ -595,7 +603,9 @@ export function AdminTimetable() {
           <table className={styles.timetableTable}>
             <thead>
               <tr>
-                <th className={styles.timeHeader}>Period</th>
+                <th className={styles.timeHeader}>
+                  {t('admin.timetable.period')}
+                </th>
                 {DAYS.map((day) => (
                   <th
                     key={day}
@@ -603,9 +613,13 @@ export function AdminTimetable() {
                       activeDays.has(day) ? styles.dayHeaderActive : ''
                     }`}
                   >
-                    <span className={styles.dayLabel}>{day}</span>
+                    <span className={styles.dayLabel}>
+                      {t(getDayTranslationKey(day))}
+                    </span>
                     <span className={styles.dayMeta}>
-                      {activeDays.has(day) ? 'Has lessons' : 'No lessons'}
+                      {activeDays.has(day)
+                        ? t('admin.timetable.hasLessons')
+                        : t('admin.timetable.noLessons')}
                     </span>
                   </th>
                 ))}
@@ -623,10 +637,10 @@ export function AdminTimetable() {
                   </td>
 
                   {DAYS.map((day) => {
-                    const slot = timetableSlotsByDayAndPeriod[day]?.[period.id]
-                    const isScheduled = Boolean(slot?.subject?.name)
+                    const slot = timetableSlotsByDayAndPeriod[day][period.id]
+                    const isScheduled = Boolean(slot?.subject.name)
                     const isMySchedule =
-                      user?.role === 'teacher' && slot?.teacherId === user?.id
+                      user?.role === 'teacher' && slot?.teacherId === user.id
 
                     return (
                       <td
@@ -649,11 +663,11 @@ export function AdminTimetable() {
                         {slot ? (
                           <div className={styles.slotContent}>
                             <div className={styles.slotSubject}>
-                              {slot.subject?.name || 'Free'}
+                              {slot.subject.name || 'Free'}
                             </div>
                             <div className={styles.slotMeta}>
                               <span>
-                                {slot.teacher?.name || 'Teacher unassigned'}
+                                {slot.teacher.name || 'Teacher unassigned'}
                               </span>
                               <span className={styles.dot}>•</span>
                               <span>

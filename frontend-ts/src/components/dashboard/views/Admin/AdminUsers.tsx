@@ -4,8 +4,10 @@ import {
   useDeleteAdminUser,
   useResetUserPassword,
   useUpdateAdminUser,
-  type AdminDirectoryUser,
-  type CredentialsPayload,
+} from '#/components/query/AdminQuery'
+import type {
+  AdminDirectoryUser,
+  CredentialsPayload,
 } from '#/components/query/AdminQuery'
 import useUserStore from '#/components/store/UserStore'
 import { Badge } from '#/components/ui'
@@ -34,10 +36,11 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
-function formatDate(dateStr: string) {
+function formatDate(dateStr: string, language: 'en' | 'fr') {
   try {
-    return new Intl.DateTimeFormat('en-GB', {
+    return new Intl.DateTimeFormat(language === 'fr' ? 'fr-FR' : 'en-GB', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -62,6 +65,7 @@ function statusBadgeVariant(
 }
 
 export function AdminUsers() {
+  const { t, language } = useDashboardTranslation()
   const { user: me } = useUserStore()
   const { data: users, isLoading } = useGetAllUsers()
   const { mutate: updateStatus } = useUpdateUserStatus()
@@ -116,18 +120,21 @@ export function AdminUsers() {
   const openResetPassword = (u: AdminDirectoryUser) => {
     if (
       !window.confirm(
-        `Generate a new temporary password for ${u.name}? They will be signed out everywhere.`,
+        t('admin.users.confirmResetPassword').replace('{name}', u.name),
       )
     ) {
       return
     }
     resetPassword(u.id, {
       onSuccess: (data) => {
-        toast.success('New temporary password generated')
+        toast.success(t('admin.users.newPasswordGenerated'))
         setCredentials({
           ...data,
-          title: 'New login password',
-          subtitle: `${u.name} · share this password once.`,
+          title: t('admin.users.newLoginPassword'),
+          subtitle: t('admin.users.sharePasswordOnce').replace(
+            '{name}',
+            u.name,
+          ),
         })
       },
     })
@@ -135,7 +142,7 @@ export function AdminUsers() {
 
   const toggleAccess = (u: AdminDirectoryUser) => {
     if (u.id === me?.id) {
-      toast.error('You cannot change your own access from here.')
+      toast.error(t('admin.users.cannotChangeOwnAccess'))
       return
     }
     const next = u.status === 'Active' ? 'Suspended' : 'Active'
@@ -143,7 +150,7 @@ export function AdminUsers() {
   }
 
   if (isLoading || !users) {
-    return <div className={styles.view}>Loading directory…</div>
+    return <div className={styles.view}>{t('admin.users.loading')}</div>
   }
 
   const renderRow = (u: AdminDirectoryUser, kind: 'teacher' | 'student') => {
@@ -159,7 +166,9 @@ export function AdminUsers() {
           <div>
             <div className={styles.userName}>
               {u.name}
-              {isSelf ? <span className={styles.youBadge}>You</span> : null}
+              {isSelf ? (
+                <span className={styles.youBadge}>{t('admin.users.you')}</span>
+              ) : null}
             </div>
             <div className={styles.userEmail}>{u.email}</div>
           </div>
@@ -170,13 +179,17 @@ export function AdminUsers() {
         <div className={styles.metaCell}>
           {kind === 'student' ? (
             <span className={styles.placement}>
-              {u.enrolledYearGroup?.name ?? '—'}
+              {u.enrolledYearGroup.name || t('admin.users.notAvailable')}
             </span>
           ) : (
-            <span className={styles.placement}>{u.specialization || '—'}</span>
+            <span className={styles.placement}>
+              {u.specialization || t('admin.users.notAvailable')}
+            </span>
           )}
         </div>
-        <div className={styles.dateCell}>{formatDate(u.createdAt)}</div>
+        <div className={styles.dateCell}>
+          {formatDate(u.createdAt, language)}
+        </div>
         <div className={styles.actionsCell}>
           <div
             className={styles.menuHost}
@@ -186,7 +199,7 @@ export function AdminUsers() {
             <button
               type="button"
               className={styles.iconBtn}
-              aria-label="User actions"
+              aria-label={t('admin.users.userActions')}
               aria-expanded={menuUserId === u.id}
               onClick={(e) => {
                 e.stopPropagation()
@@ -202,12 +215,12 @@ export function AdminUsers() {
                   className={styles.dropdownItem}
                   onClick={() => {
                     void navigator.clipboard.writeText(u.email)
-                    toast.success('Email copied')
+                    toast.success(t('admin.users.emailCopied'))
                     setMenuUserId(null)
                   }}
                 >
                   <Mail size={15} strokeWidth={2} />
-                  Copy email
+                  {t('admin.users.copyEmail')}
                 </button>
                 <button
                   type="button"
@@ -218,7 +231,7 @@ export function AdminUsers() {
                   }}
                 >
                   <UserPlus size={15} strokeWidth={2} />
-                  New temporary password
+                  {t('admin.users.newTemporaryPassword')}
                 </button>
                 <button
                   type="button"
@@ -230,7 +243,9 @@ export function AdminUsers() {
                   }}
                 >
                   <UserMinus size={15} strokeWidth={2} />
-                  {u.status === 'Active' ? 'Restrict login' : 'Restore login'}
+                  {u.status === 'Active'
+                    ? t('admin.users.restrictLogin')
+                    : t('admin.users.restoreLogin')}
                 </button>
                 <button
                   type="button"
@@ -243,7 +258,7 @@ export function AdminUsers() {
                     setDeleteTarget(u)
                   }}
                 >
-                  Delete user
+                  {t('admin.users.deleteUser')}
                 </button>
               </div>
             ) : null}
@@ -258,13 +273,9 @@ export function AdminUsers() {
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div>
-            <div className={styles.eyebrow}>People</div>
-            <h1 className={styles.title}>Staff &amp; students</h1>
-            <p className={styles.copy}>
-              Provision accounts with school email and an initial password.
-              Restrict login anytime; passwords can be regenerated — they are
-              never shown again after this screen unless you reset them.
-            </p>
+            <div className={styles.eyebrow}>{t('admin.users.eyebrow')}</div>
+            <h1 className={styles.title}>{t('admin.users.title')}</h1>
+            <p className={styles.copy}>{t('admin.users.copy')}</p>
           </div>
         </div>
       </header>
@@ -273,13 +284,13 @@ export function AdminUsers() {
         <div className={styles.adminStrip}>
           <div className={styles.adminStripHead}>
             <Shield size={16} strokeWidth={2} />
-            <span>Administrators</span>
+            <span>{t('admin.users.administrators')}</span>
           </div>
           <div className={styles.adminChips}>
             {admins.map((a) => (
               <span key={a.id} className={styles.adminChip}>
                 {a.name}
-                {a.id === me?.id ? ' (you)' : ''}
+                {a.id === me?.id ? ` (${t('admin.users.youLower')})` : ''}
               </span>
             ))}
           </div>
@@ -294,9 +305,14 @@ export function AdminUsers() {
                 <GraduationCap size={20} strokeWidth={2} />
               </div>
               <div>
-                <h2 className={styles.cardTitle}>Teaching staff</h2>
+                <h2 className={styles.cardTitle}>
+                  {t('admin.users.teachingStaff')}
+                </h2>
                 <p className={styles.cardSub}>
-                  {teachers.length} teacher{teachers.length === 1 ? '' : 's'}
+                  {t('admin.users.teachersCount').replace(
+                    '{count}',
+                    String(teachers.length),
+                  )}
                 </p>
               </div>
             </div>
@@ -305,7 +321,7 @@ export function AdminUsers() {
                 <Search size={14} className={styles.searchIcon} />
                 <input
                   type="text"
-                  placeholder="Search staff..."
+                  placeholder={t('admin.users.searchStaff')}
                   value={teacherSearch}
                   onChange={(e) => setTeacherSearch(e.target.value)}
                 />
@@ -316,20 +332,20 @@ export function AdminUsers() {
                 onClick={() => setAddTeacherOpen(true)}
               >
                 <Plus size={17} strokeWidth={2} />
-                Add teacher
+                {t('admin.users.addTeacher')}
               </button>
             </div>
           </div>
           <div className={styles.table}>
             <div className={styles.tableHead}>
-              <div>Person</div>
-              <div>Access</div>
-              <div>Focus</div>
-              <div>Joined</div>
+              <div>{t('admin.users.person')}</div>
+              <div>{t('admin.users.access')}</div>
+              <div>{t('admin.users.focus')}</div>
+              <div>{t('admin.users.joined')}</div>
               <div />
             </div>
             {teachers.length === 0 ? (
-              <div className={styles.empty}>No teachers yet.</div>
+              <div className={styles.empty}>{t('admin.users.noTeachers')}</div>
             ) : (
               teachers.map((u) => renderRow(u, 'teacher'))
             )}
@@ -343,10 +359,14 @@ export function AdminUsers() {
                 <Users size={20} strokeWidth={2} />
               </div>
               <div>
-                <h2 className={styles.cardTitle}>Students</h2>
+                <h2 className={styles.cardTitle}>
+                  {t('admin.users.students')}
+                </h2>
                 <p className={styles.cardSub}>
-                  {students.length} enrolled learner
-                  {students.length === 1 ? '' : 's'}
+                  {t('admin.users.studentsCount').replace(
+                    '{count}',
+                    String(students.length),
+                  )}
                 </p>
               </div>
             </div>
@@ -355,7 +375,7 @@ export function AdminUsers() {
                 <Search size={14} className={styles.searchIcon} />
                 <input
                   type="text"
-                  placeholder="Search students..."
+                  placeholder={t('admin.users.searchStudents')}
                   value={studentSearch}
                   onChange={(e) => setStudentSearch(e.target.value)}
                 />
@@ -366,20 +386,20 @@ export function AdminUsers() {
                 onClick={() => setAddStudentOpen(true)}
               >
                 <Plus size={17} strokeWidth={2} />
-                Add student
+                {t('admin.users.addStudent')}
               </button>
             </div>
           </div>
           <div className={styles.table}>
             <div className={styles.tableHead}>
-              <div>Person</div>
-              <div>Access</div>
-              <div>Cohort</div>
-              <div>Joined</div>
+              <div>{t('admin.users.person')}</div>
+              <div>{t('admin.users.access')}</div>
+              <div>{t('admin.users.cohort')}</div>
+              <div>{t('admin.users.joined')}</div>
               <div />
             </div>
             {students.length === 0 ? (
-              <div className={styles.empty}>No students yet.</div>
+              <div className={styles.empty}>{t('admin.users.noStudents')}</div>
             ) : (
               students.map((u) => renderRow(u, 'student'))
             )}
@@ -393,9 +413,8 @@ export function AdminUsers() {
           onCredentials={(c) =>
             setCredentials({
               ...c,
-              title: 'Teacher login details',
-              subtitle:
-                'Share securely. They can change this password after sign-in.',
+              title: t('admin.users.teacherLoginDetails'),
+              subtitle: t('admin.users.teacherLoginSubtitle'),
             })
           }
         />
@@ -406,8 +425,8 @@ export function AdminUsers() {
           onCredentials={(c) =>
             setCredentials({
               ...c,
-              title: 'Student login details',
-              subtitle: 'Share with the student or guardian.',
+              title: t('admin.users.studentLoginDetails'),
+              subtitle: t('admin.users.studentLoginSubtitle'),
             })
           }
         />
@@ -478,9 +497,9 @@ function UserProfileDrawer({
   const { mutate: updateProfile, isPending: isUpdating } = useUpdateAdminUser()
   const [name, setName] = useState(user.name)
   const [email, setEmail] = useState(user.email)
-  const [gender, setGender] = useState(user.gender || '')
-  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber || '')
-  const [address, setAddress] = useState(user.address || '')
+  const [gender, setGender] = useState(user.gender)
+  const [phoneNumber, setPhoneNumber] = useState(user.phoneNumber)
+  const [address, setAddress] = useState(user.address)
   const [dateOfBirth, setDateOfBirth] = useState(
     user.dateOfBirth
       ? new Date(user.dateOfBirth).toISOString().split('T')[0]
@@ -491,9 +510,9 @@ function UserProfileDrawer({
   useEffect(() => {
     setName(user.name)
     setEmail(user.email)
-    setGender(user.gender || '')
-    setPhoneNumber(user.phoneNumber || '')
-    setAddress(user.address || '')
+    setGender(user.gender)
+    setPhoneNumber(user.phoneNumber)
+    setAddress(user.address)
     setDateOfBirth(
       user.dateOfBirth
         ? new Date(user.dateOfBirth).toISOString().split('T')[0]
@@ -510,7 +529,7 @@ function UserProfileDrawer({
             role: 'TEACHER' as const,
             name,
             email,
-            gender: (gender || null) as any,
+            gender: gender as any,
             phoneNumber: phoneNumber || null,
             address: address || null,
             dateOfBirth: dateOfBirth
@@ -523,7 +542,7 @@ function UserProfileDrawer({
             role: 'STUDENT' as const,
             name,
             email,
-            gender: (gender || null) as any,
+            gender: gender as any,
             phoneNumber: phoneNumber || null,
             address: address || null,
             dateOfBirth: dateOfBirth

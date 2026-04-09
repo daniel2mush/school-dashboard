@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui'
 import styles from './StudentSubjects.module.scss'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
 // Simple user icon SVG
 const UserIcon = () => (
@@ -20,6 +21,7 @@ const UserIcon = () => (
 
 export function StudentSubjects() {
   const currentData = useCurrentStudent()
+  const { t } = useDashboardTranslation()
 
   if (!currentData) return null
 
@@ -28,17 +30,16 @@ export function StudentSubjects() {
   return (
     <section className={styles.view}>
       <div className={styles.panel}>
-        <div className={styles.eyebrow}>Subjects</div>
-        <h2 className={styles.title}>Current classes and coursework</h2>
+        <div className={styles.eyebrow}>{t('student.subjects.eyebrow')}</div>
+        <h2 className={styles.title}>{t('student.subjects.title')}</h2>
         <p className={styles.copy}>
-          Keep up with your {yearGroup.name} subjects, teachers, and current
-          performance.
+          {t('student.subjects.copy').replace('{yearGroup}', yearGroup.name)}
         </p>
       </div>
 
       {yearGroup.subjects.length === 0 ? (
         <div className={styles.emptyState}>
-          No subjects have been assigned to your year group yet.
+          {t('student.subjects.noSubjects')}
         </div>
       ) : (
         <div className={styles.grid}>
@@ -57,17 +58,21 @@ export function StudentSubjects() {
                     <h3 className={styles.subjectName}>{subjectName}</h3>
                     <div className={styles.teacherName}>
                       <UserIcon />
-                      {teacher ? teacher.name : 'Teacher to be assigned'}
+                      {teacher
+                        ? teacher.name
+                        : t('student.subjects.teacherToBeAssigned')}
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.cardFooter}>
-                  <span className={styles.gradeLabel}>Current Standing</span>
+                  <span className={styles.gradeLabel}>
+                    {t('student.subjects.currentStanding')}
+                  </span>
                   {gradeInfo ? (
                     <Badge variant="blue">{gradeInfo.grade}</Badge>
                   ) : (
-                    <Badge variant="gray">No Data</Badge>
+                    <Badge variant="gray">{t('student.subjects.noData')}</Badge>
                   )}
                 </div>
               </div>

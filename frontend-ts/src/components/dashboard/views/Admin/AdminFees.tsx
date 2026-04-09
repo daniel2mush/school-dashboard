@@ -1,16 +1,20 @@
 import {
-  type AdminFeeRecord,
-  type AdminFeeYearGroup,
   useUpsertFeePayment,
   useGetAdminAnalytics,
   useGetFeeManagement,
   useCreateFee,
   useDeleteFee,
 } from '#/components/query/AdminQuery'
+import type {
+  AdminFeeRecord,
+  AdminFeeYearGroup,
+} from '#/components/query/AdminQuery'
 import styles from './AdminFees.module.scss'
-import { useCurrency, type CurrencyCode } from '#/context/CurrencyContext'
+import { useCurrency } from '#/context/CurrencyContext'
+import type { CurrencyCode } from '#/context/CurrencyContext'
 
 import { Badge, Input } from '#/components/ui'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import {
   AlertCircle,
   Banknote,
@@ -32,6 +36,7 @@ function FeePaymentModal({
   yearGroup: AdminFeeYearGroup
   onClose: () => void
 }) {
+  const { t, language } = useDashboardTranslation()
   const { formatCurrency } = useCurrency()
   const upsertPayment = useUpsertFeePayment()
   const [drafts, setDrafts] = useState<
@@ -79,10 +84,16 @@ function FeePaymentModal({
       >
         <header className={styles.modalHead}>
           <div>
-            <div className={styles.modalEyebrow}>Payment Ledger</div>
+            <div className={styles.modalEyebrow}>
+              {t('admin.fees.paymentLedger')}
+            </div>
             <h3 className={styles.modalTitle}>{fee.title}</h3>
             <p className={styles.modalSubtitle}>
-              {yearGroup.name} · {formatCurrency(fee.amount)} per student
+              {yearGroup.name} ·{' '}
+              {t('admin.fees.perStudentAmount').replace(
+                '{amount}',
+                formatCurrency(fee.amount),
+              )}
             </p>
           </div>
           <button type="button" className={styles.modalClose} onClick={onClose}>
@@ -116,19 +127,36 @@ function FeePaymentModal({
                         fullyPaid ? 'green' : remaining > 0 ? 'amber' : 'gray'
                       }
                     >
-                      {fullyPaid ? 'Fully paid' : 'Outstanding'}
+                      {fullyPaid
+                        ? t('admin.fees.fullyPaid')
+                        : t('admin.fees.outstanding')}
                     </Badge>
                   </div>
 
                   <div className={styles.paymentSummary}>
-                    <span>Billed {formatCurrency(fee.amount)}</span>
-                    <span>Paid {formatCurrency(amountPaid)}</span>
-                    <span>Remaining {formatCurrency(remaining)}</span>
+                    <span>
+                      {t('admin.fees.billedAmount').replace(
+                        '{amount}',
+                        formatCurrency(fee.amount),
+                      )}
+                    </span>
+                    <span>
+                      {t('admin.fees.paidAmount').replace(
+                        '{amount}',
+                        formatCurrency(amountPaid),
+                      )}
+                    </span>
+                    <span>
+                      {t('admin.fees.remainingAmount').replace(
+                        '{amount}',
+                        formatCurrency(remaining),
+                      )}
+                    </span>
                   </div>
 
                   <div className={styles.paymentGrid}>
                     <Input
-                      label="Amount paid"
+                      label={t('admin.fees.amountPaid')}
                       value={draft.amountPaid}
                       onChange={(event) =>
                         setDrafts((prev) => ({
@@ -139,11 +167,11 @@ function FeePaymentModal({
                           },
                         }))
                       }
-                      placeholder="20,000"
+                      placeholder={t('admin.fees.amountPlaceholder')}
                       fullWidth
                     />
                     <Input
-                      label="Amount in words"
+                      label={t('admin.fees.amountInWords')}
                       value={draft.amountInWords}
                       onChange={(event) =>
                         setDrafts((prev) => ({
@@ -154,7 +182,7 @@ function FeePaymentModal({
                           },
                         }))
                       }
-                      placeholder="Twenty thousand CFA"
+                      placeholder={t('admin.fees.amountInWordsPlaceholder')}
                       fullWidth
                     />
                   </div>
@@ -173,7 +201,7 @@ function FeePaymentModal({
                         }))
                       }
                     />
-                    <span>Mark this expense as fully paid</span>
+                    <span>{t('admin.fees.markExpenseFullyPaid')}</span>
                   </label>
 
                   <div className={styles.paymentActions}>
@@ -183,13 +211,15 @@ function FeePaymentModal({
                       onClick={() => saveStudentPayment(student.id)}
                       disabled={upsertPayment.isPending}
                     >
-                      Save payment
+                      {t('admin.fees.savePayment')}
                     </button>
                     {payment?.updatedAt ? (
                       <span className={styles.paymentMeta}>
-                        Updated{' '}
-                        {new Date(payment.updatedAt).toLocaleDateString(
-                          'en-GB',
+                        {t('admin.fees.updatedOn').replace(
+                          '{date}',
+                          new Date(payment.updatedAt).toLocaleDateString(
+                            language === 'fr' ? 'fr-FR' : 'en-GB',
+                          ),
                         )}
                       </span>
                     ) : null}
@@ -205,6 +235,7 @@ function FeePaymentModal({
 }
 
 export function AdminFees() {
+  const { t } = useDashboardTranslation()
   const { currency, setCurrency, formatCurrency } = useCurrency()
   const { data: analytics, isLoading: analyticsLoading } =
     useGetAdminAnalytics()
@@ -224,17 +255,17 @@ export function AdminFees() {
     if (!analytics) return []
     return [
       {
-        label: 'Expected Revenue',
+        label: t('admin.fees.expectedRevenue'),
         value: formatCurrency(analytics.totalExpectedRevenue),
         icon: <Receipt size={18} strokeWidth={2} />,
       },
       {
-        label: 'Collected Revenue',
+        label: t('admin.fees.collectedRevenue'),
         value: formatCurrency(analytics.totalCollectedRevenue),
         icon: <Banknote size={18} strokeWidth={2} />,
       },
       {
-        label: 'Outstanding',
+        label: t('admin.fees.outstanding'),
         value: formatCurrency(
           Math.max(
             (analytics.totalExpectedRevenue || 0) -
@@ -245,14 +276,14 @@ export function AdminFees() {
         icon: <CreditCard size={18} strokeWidth={2} />,
       },
     ]
-  }, [analytics])
+  }, [analytics, formatCurrency, t])
 
   if (analyticsLoading || feeLoading) {
     return (
       <div className={styles.view}>
         <div className={styles.loadingState}>
           <div className={styles.spinner} />
-          <p>Loading fee workspace…</p>
+          <p>{t('admin.fees.loading')}</p>
         </div>
       </div>
     )
@@ -265,18 +296,15 @@ export function AdminFees() {
           <div className={styles.emptyIcon}>
             <AlertCircle size={48} />
           </div>
-          <h2>No cohorts found</h2>
-          <p>
-            You need to create at least one year group from the Structure tab
-            before you can manage fees.
-          </p>
+          <h2>{t('admin.fees.noCohorts')}</h2>
+          <p>{t('admin.fees.noCohortsCopy')}</p>
           <div style={{ marginTop: 24 }}>
             <button
               type="button"
               className="btn btn-primary"
               onClick={() => window.location.reload()}
             >
-              Refresh data
+              {t('admin.fees.refreshData')}
             </button>
           </div>
         </div>
@@ -291,8 +319,8 @@ export function AdminFees() {
           <div className={styles.emptyIcon}>
             <AlertCircle size={48} />
           </div>
-          <h2>Analytics missing</h2>
-          <p>Could not load financial analytics. Please try again later.</p>
+          <h2>{t('admin.fees.analyticsMissing')}</h2>
+          <p>{t('admin.fees.analyticsMissingCopy')}</p>
         </div>
       </div>
     )
@@ -301,11 +329,9 @@ export function AdminFees() {
   const activeYearGroup =
     yearGroups.find((yearGroup) => yearGroup.id === selectedYearGroupId) ||
     yearGroups[0]
-  const activeFee =
-    activeYearGroup?.fees.find((fee) => fee.id === paymentFeeId) || null
+  const activeFee = activeYearGroup.fees.find((fee) => fee.id === paymentFeeId)
 
   const createFeeItem = () => {
-    if (!activeYearGroup) return
     createFee.mutate(
       {
         yearGroupId: activeYearGroup.id,
@@ -328,8 +354,8 @@ export function AdminFees() {
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <div className={styles.eyebrow}>Finance Workspace</div>
-            <h1 className={styles.title}>Fee management</h1>
+            <div className={styles.eyebrow}>{t('admin.fees.eyebrow')}</div>
+            <h1 className={styles.title}>{t('admin.fees.title')}</h1>
             <div className={styles.currencyTabs}>
               {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
                 (code) => (
@@ -344,21 +370,22 @@ export function AdminFees() {
                 ),
               )}
             </div>
-            <p className={styles.copy}>
-              Set up fee items for each year group, track partial payments
-              student by student, and keep a clear view of what has been paid,
-              what is still outstanding, and which expenses are fully settled.
-            </p>
+            <p className={styles.copy}>{t('admin.fees.copy')}</p>
           </div>
           <div className={styles.heroMeta}>
             <span className={styles.metaChip}>
               <Users size={14} strokeWidth={2} aria-hidden />
-              {yearGroups.length} year groups
+              {t('admin.fees.yearGroupsCount').replace(
+                '{count}',
+                String(yearGroups.length),
+              )}
             </span>
             <span className={styles.metaChip}>
               <CheckCircle2 size={14} strokeWidth={2} aria-hidden />
-              {analytics.studentsWithOutstandingFees} students still owe at
-              least one item
+              {t('admin.fees.studentsWithOutstandingFees').replace(
+                '{count}',
+                String(analytics.studentsWithOutstandingFees),
+              )}
             </span>
           </div>
         </div>
@@ -379,8 +406,8 @@ export function AdminFees() {
       <div className={styles.workspace}>
         <aside className={styles.yearGroupRail}>
           <div className={styles.sectionHead}>
-            <h2>Year groups</h2>
-            <span>Select a cohort</span>
+            <h2>{t('admin.fees.yearGroups')}</h2>
+            <span>{t('admin.fees.selectCohort')}</span>
           </div>
           <div className={styles.yearGroupList}>
             {yearGroups.map((yearGroup) => {
@@ -402,17 +429,28 @@ export function AdminFees() {
                 <button
                   key={yearGroup.id}
                   type="button"
-                  className={`${styles.yearGroupCard} ${activeYearGroup?.id === yearGroup.id ? styles.yearGroupCardActive : ''}`}
+                  className={`${styles.yearGroupCard} ${activeYearGroup.id === yearGroup.id ? styles.yearGroupCardActive : ''}`}
                   onClick={() => setSelectedYearGroupId(yearGroup.id)}
                 >
                   <div className={styles.yearGroupName}>{yearGroup.name}</div>
                   <div className={styles.yearGroupMeta}>
-                    {yearGroup.students.length} students ·{' '}
-                    {yearGroup.fees.length} charges
+                    {t('admin.fees.yearGroupMeta')
+                      .replace('{students}', String(yearGroup.students.length))
+                      .replace('{charges}', String(yearGroup.fees.length))}
                   </div>
                   <div className={styles.yearGroupValues}>
-                    <span>Expected {formatCurrency(expected)}</span>
-                    <span>Collected {formatCurrency(collected)}</span>
+                    <span>
+                      {t('admin.fees.expectedAmount').replace(
+                        '{amount}',
+                        formatCurrency(expected),
+                      )}
+                    </span>
+                    <span>
+                      {t('admin.fees.collectedAmount').replace(
+                        '{amount}',
+                        formatCurrency(collected),
+                      )}
+                    </span>
                   </div>
                 </button>
               )
@@ -421,154 +459,150 @@ export function AdminFees() {
         </aside>
 
         <div className={styles.mainPanel}>
-          {activeYearGroup ? (
-            <>
-              <div className={styles.panelHeader}>
-                <div>
-                  <div className={styles.sectionEyebrow}>Fee setup</div>
-                  <h2>{activeYearGroup.name}</h2>
-                  <p>
-                    Add expense lines that apply to every student in this year
-                    group, then record payment against each item individually.
-                  </p>
+          <>
+            <div className={styles.panelHeader}>
+              <div>
+                <div className={styles.sectionEyebrow}>
+                  {t('admin.fees.feeSetup')}
                 </div>
+                <h2>{activeYearGroup.name}</h2>
+                <p>{t('admin.fees.feeSetupCopy')}</p>
               </div>
+            </div>
 
-              <section className={styles.createCard}>
-                <div className={styles.sectionHead}>
-                  <h3>Add fee item</h3>
-                  <span>Examples: School fees, exams, books, transport</span>
-                </div>
-                <div className={styles.createGrid}>
-                  <Input
-                    label="Fee title"
-                    value={title}
-                    onChange={(event) => setTitle(event.target.value)}
-                    placeholder="e.g. Term 2 School Fees"
-                    fullWidth
-                  />
-                  <Input
-                    label="Amount"
-                    value={amount}
-                    onChange={(event) => setAmount(event.target.value)}
-                    placeholder="20,000"
-                    fullWidth
-                  />
-                </div>
+            <section className={styles.createCard}>
+              <div className={styles.sectionHead}>
+                <h3>{t('admin.fees.addFeeItem')}</h3>
+                <span>{t('admin.fees.addFeeItemExamples')}</span>
+              </div>
+              <div className={styles.createGrid}>
                 <Input
-                  label="Description"
-                  value={description}
-                  onChange={(event) => setDescription(event.target.value)}
-                  placeholder="Optional note about this charge"
+                  label={t('admin.fees.feeTitle')}
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  placeholder={t('admin.fees.feeTitlePlaceholder')}
                   fullWidth
                 />
-                <div className={styles.createActions}>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={createFeeItem}
-                    disabled={
-                      createFee.isPending || !title.trim() || !amount.trim()
-                    }
-                  >
-                    <Plus size={16} strokeWidth={2} />
-                    Add fee item
-                  </button>
+                <Input
+                  label={t('admin.fees.amount')}
+                  value={amount}
+                  onChange={(event) => setAmount(event.target.value)}
+                  placeholder={t('admin.fees.amountPlaceholder')}
+                  fullWidth
+                />
+              </div>
+              <Input
+                label={t('admin.fees.description')}
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                placeholder={t('admin.fees.descriptionPlaceholder')}
+                fullWidth
+              />
+              <div className={styles.createActions}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={createFeeItem}
+                  disabled={
+                    createFee.isPending || !title.trim() || !amount.trim()
+                  }
+                >
+                  <Plus size={16} strokeWidth={2} />
+                  {t('admin.fees.addFeeItem')}
+                </button>
+              </div>
+            </section>
+
+            <section className={styles.feesBoard}>
+              <div className={styles.sectionHead}>
+                <h3>{t('admin.fees.chargeList')}</h3>
+                <span>
+                  {t('admin.fees.activeFeeItems').replace(
+                    '{count}',
+                    String(activeYearGroup.fees.length),
+                  )}
+                </span>
+              </div>
+
+              {activeYearGroup.fees.length === 0 ? (
+                <div className={styles.emptyState}>
+                  {t('admin.fees.noFeeItems')}
                 </div>
-              </section>
+              ) : (
+                <div className={styles.feeList}>
+                  {activeYearGroup.fees.map((fee) => {
+                    const totalCollected = fee.payments.reduce(
+                      (sum, payment) => sum + payment.amountPaid,
+                      0,
+                    )
+                    const expectedTotal =
+                      fee.amount * activeYearGroup.students.length
+                    const paidStudents = fee.payments.filter(
+                      (payment) =>
+                        payment.isFullyPaid || payment.amountPaid >= fee.amount,
+                    ).length
 
-              <section className={styles.feesBoard}>
-                <div className={styles.sectionHead}>
-                  <h3>Charge list</h3>
-                  <span>{activeYearGroup.fees.length} active fee items</span>
+                    return (
+                      <article key={fee.id} className={styles.feeCard}>
+                        <div className={styles.feeCardTop}>
+                          <div>
+                            <h4>{fee.title}</h4>
+                            <p>
+                              {fee.description ||
+                                t('admin.fees.defaultDescription')}
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            className={styles.deleteBtn}
+                            onClick={() => deleteFee.mutate(fee.id)}
+                            disabled={deleteFee.isPending}
+                          >
+                            <Trash2 size={16} strokeWidth={2} />
+                          </button>
+                        </div>
+
+                        <div className={styles.feeMetrics}>
+                          <div>
+                            <span>{t('admin.fees.perStudent')}</span>
+                            <strong>{formatCurrency(fee.amount)}</strong>
+                          </div>
+                          <div>
+                            <span>{t('admin.fees.collected')}</span>
+                            <strong>{formatCurrency(totalCollected)}</strong>
+                          </div>
+                          <div>
+                            <span>{t('admin.fees.expectedTotal')}</span>
+                            <strong>{formatCurrency(expectedTotal)}</strong>
+                          </div>
+                          <div>
+                            <span>{t('admin.fees.fullyPaidStudents')}</span>
+                            <strong>
+                              {paidStudents}/{activeYearGroup.students.length}
+                            </strong>
+                          </div>
+                        </div>
+
+                        <div className={styles.feeActions}>
+                          <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={() => setPaymentFeeId(fee.id)}
+                          >
+                            {t('admin.fees.recordPayments')}
+                          </button>
+                        </div>
+                      </article>
+                    )
+                  })}
                 </div>
-
-                {activeYearGroup.fees.length === 0 ? (
-                  <div className={styles.emptyState}>
-                    No fee items yet. Add a charge for this year group to start
-                    tracking payments.
-                  </div>
-                ) : (
-                  <div className={styles.feeList}>
-                    {activeYearGroup.fees.map((fee) => {
-                      const totalCollected = fee.payments.reduce(
-                        (sum, payment) => sum + payment.amountPaid,
-                        0,
-                      )
-                      const expectedTotal =
-                        fee.amount * activeYearGroup.students.length
-                      const paidStudents = fee.payments.filter(
-                        (payment) =>
-                          payment.isFullyPaid ||
-                          payment.amountPaid >= fee.amount,
-                      ).length
-
-                      return (
-                        <article key={fee.id} className={styles.feeCard}>
-                          <div className={styles.feeCardTop}>
-                            <div>
-                              <h4>{fee.title}</h4>
-                              <p>
-                                {fee.description ||
-                                  'Applies to every student in this year group.'}
-                              </p>
-                            </div>
-                            <button
-                              type="button"
-                              className={styles.deleteBtn}
-                              onClick={() => deleteFee.mutate(fee.id)}
-                              disabled={deleteFee.isPending}
-                            >
-                              <Trash2 size={16} strokeWidth={2} />
-                            </button>
-                          </div>
-
-                          <div className={styles.feeMetrics}>
-                            <div>
-                              <span>Per student</span>
-                              <strong>{formatCurrency(fee.amount)}</strong>
-                            </div>
-                            <div>
-                              <span>Collected</span>
-                              <strong>{formatCurrency(totalCollected)}</strong>
-                            </div>
-                            <div>
-                              <span>Expected total</span>
-                              <strong>{formatCurrency(expectedTotal)}</strong>
-                            </div>
-                            <div>
-                              <span>Fully paid students</span>
-                              <strong>
-                                {paidStudents}/{activeYearGroup.students.length}
-                              </strong>
-                            </div>
-                          </div>
-
-                          <div className={styles.feeActions}>
-                            <button
-                              type="button"
-                              className="btn btn-primary"
-                              onClick={() => setPaymentFeeId(fee.id)}
-                            >
-                              Record payments
-                            </button>
-                          </div>
-                        </article>
-                      )
-                    })}
-                  </div>
-                )}
-              </section>
-            </>
-          ) : (
-            <div className={styles.emptyState}>
-              No year groups available yet.
-            </div>
-          )}
+              )}
+            </section>
+          </>
         </div>
       </div>
 
-      {activeYearGroup && activeFee ? (
+      {activeFee ? (
         <FeePaymentModal
           fee={activeFee}
           yearGroup={activeYearGroup}

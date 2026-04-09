@@ -6,6 +6,7 @@ import {
 } from '@tanstack/react-router'
 import useUserStore from '#/components/store/UserStore'
 import DashboardHeader from '#/components/dashboard/DashboardHeader/DashboardHeader'
+import { useDashboardLanguage } from '#/components/dashboard/i18n'
 import Sidebar from '#/components/dashboard/Sidebar/Sidebar'
 import styles from './dashboard/Dashboard.module.scss'
 import { getSectionLabel } from '#/components/constants/navigation'
@@ -25,6 +26,7 @@ export const Route = createFileRoute('/dashboard')({
 function DashboardLayout() {
   const { user } = useUserStore()
   const location = useLocation()
+  const language = useDashboardLanguage()
 
   // Derive the current section from the URL path
   // Example: /dashboard/admin/announcements -> 'announcements'
@@ -41,7 +43,7 @@ function DashboardLayout() {
         <DashboardHeader
           role={user.role}
           user={user}
-          sectionLabel={getSectionLabel(user.role, currentSection)}
+          sectionLabel={getSectionLabel(user.role, currentSection, language)}
         />
 
         <section className={styles.content}>

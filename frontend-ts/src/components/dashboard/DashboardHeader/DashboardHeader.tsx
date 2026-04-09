@@ -1,6 +1,8 @@
 'use client'
 
-import { ROLE_LABELS } from '#/components/constants/navigation'
+import { getRoleLabel } from '#/components/constants/navigation'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
+import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 import { useLogout } from '#/components/query/AuthQuery'
 import { Avatar, Badge, Switch } from '#/components/ui'
 import { useTheme } from '#/components/theme/ThemeProvider'
@@ -27,6 +29,8 @@ export default function DashboardHeader({
   user,
 }: DashboardHeaderProps) {
   const { theme, setTheme } = useTheme()
+  const { school } = useSchoolData()
+  const { t, language } = useDashboardTranslation()
   const isDark = theme === 'dark'
 
   const { mutateAsync: logoutMutation } = useLogout()
@@ -43,8 +47,13 @@ export default function DashboardHeader({
     <header className={styles.header}>
       <div className={styles.titleBlock}>
         <div className={styles.badgeContainer}>
-          <Badge variant={ROLE_BADGE_VARIANT[role]}>{ROLE_LABELS[role]}</Badge>
-          <span className={styles.sectionEyebrow}>Workspace</span>
+          <Badge variant={ROLE_BADGE_VARIANT[role]}>
+            {getRoleLabel(role, language)}
+          </Badge>
+          <span className={styles.schoolPill}>
+            {school.name} · {school.term} {school.year}
+          </span>
+          <span className={styles.sectionEyebrow}>{t('common.workspace')}</span>
         </div>
         <h1 className={styles.heading}>{sectionLabel}</h1>
       </div>
@@ -60,7 +69,7 @@ export default function DashboardHeader({
             onChange={(checked: boolean) =>
               setTheme(checked ? 'dark' : 'light')
             }
-            ariaLabel="Toggle theme"
+            ariaLabel={t('common.toggleTheme')}
           />
           <MoonStar
             size={16}
@@ -73,7 +82,7 @@ export default function DashboardHeader({
             <button
               type="button"
               className={styles.profileTrigger}
-              aria-label="Open account menu"
+              aria-label={t('common.openAccountMenu')}
             >
               <Avatar size={40} fontSize={14} color="var(--accent)" />
               <div className={styles.profileText}>
@@ -98,7 +107,7 @@ export default function DashboardHeader({
                 onClick={logoutUser}
               >
                 <LogOut size={16} />
-                <span>Sign out</span>
+                <span>{t('common.signOut')}</span>
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Portal>

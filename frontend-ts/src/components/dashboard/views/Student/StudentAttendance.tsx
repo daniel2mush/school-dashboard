@@ -3,6 +3,7 @@ import styles from './StudentAttendance.module.scss'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 import { useState, useMemo } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
 // Formatter for nicer dates
 const formatDate = (date: Date) => {
@@ -33,23 +34,24 @@ const getStatusColor = (status: string) => {
   }
 }
 
-const getStatusLabel = (status: string) => {
+const getStatusLabel = (status: string, t: (key: string) => string) => {
   switch (status) {
     case 'P':
-      return 'Present'
+      return t('student.attendance.present')
     case 'A':
-      return 'Absent'
+      return t('student.attendance.absent')
     case 'T':
-      return 'Late'
+      return t('student.attendance.late')
     case 'H':
-      return 'Holiday'
+      return t('student.attendance.holiday')
     default:
-      return 'Unknown'
+      return t('student.attendance.unknown')
   }
 }
 
 export function StudentAttendance() {
   const currentData = useCurrentStudent()
+  const { t } = useDashboardTranslation()
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
 
@@ -140,29 +142,33 @@ export function StudentAttendance() {
   return (
     <section className={styles.view}>
       <div className={styles.panel}>
-        <div className={styles.eyebrow}>Attendance</div>
-        <h2 className={styles.title}>Presence, punctuality, and habits</h2>
-        <p className={styles.copy}>
-          Follow your attendance pattern and stay informed about school targets.
-        </p>
+        <div className={styles.eyebrow}>{t('student.attendance.eyebrow')}</div>
+        <h2 className={styles.title}>{t('student.attendance.title')}</h2>
+        <p className={styles.copy}>{t('student.attendance.copy')}</p>
       </div>
 
       <div className={styles.statsRow}>
         <div className={styles.statCard}>
           <div className={styles.statValue}>{student.att}%</div>
-          <div className={styles.statLabel}>Overall Attendance</div>
+          <div className={styles.statLabel}>
+            {t('student.attendance.overallAttendance')}
+          </div>
         </div>
         <div className={styles.statCard}>
           <div className={`${styles.statValue} ${styles.red}`}>
             {absentCount}
           </div>
-          <div className={styles.statLabel}>Absences</div>
+          <div className={styles.statLabel}>
+            {t('student.attendance.absences')}
+          </div>
         </div>
         <div className={styles.statCard}>
           <div className={`${styles.statValue} ${styles.amber}`}>
             {tardyCount}
           </div>
-          <div className={styles.statLabel}>Late Arrivals</div>
+          <div className={styles.statLabel}>
+            {t('student.attendance.lateArrivals')}
+          </div>
         </div>
       </div>
 
@@ -206,7 +212,15 @@ export function StudentAttendance() {
         </div>
 
         <div className={styles.calendarGrid}>
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+          {[
+            t('student.attendance.sun'),
+            t('student.attendance.mon'),
+            t('student.attendance.tue'),
+            t('student.attendance.wed'),
+            t('student.attendance.thu'),
+            t('student.attendance.fri'),
+            t('student.attendance.sat'),
+          ].map((day) => (
             <div key={day} className={styles.dayHeader}>
               {day}
             </div>
@@ -225,7 +239,7 @@ export function StudentAttendance() {
                   <div
                     className={styles.statusDot}
                     style={{ backgroundColor: getStatusColor(record.status) }}
-                    title={getStatusLabel(record.status)}
+                    title={getStatusLabel(record.status, t)}
                   />
                 )}
               </div>
@@ -239,28 +253,28 @@ export function StudentAttendance() {
               className={styles.dot}
               style={{ backgroundColor: 'var(--green)' }}
             />
-            <span>Present</span>
+            <span>{t('student.attendance.present')}</span>
           </div>
           <div className={styles.legendItem}>
             <div
               className={styles.dot}
               style={{ backgroundColor: 'var(--red)' }}
             />
-            <span>Absent</span>
+            <span>{t('student.attendance.absent')}</span>
           </div>
           <div className={styles.legendItem}>
             <div
               className={styles.dot}
               style={{ backgroundColor: 'var(--amber)' }}
             />
-            <span>Late</span>
+            <span>{t('student.attendance.late')}</span>
           </div>
           <div className={styles.legendItem}>
             <div
               className={styles.dot}
               style={{ backgroundColor: 'var(--blue)' }}
             />
-            <span>Holiday</span>
+            <span>{t('student.attendance.holiday')}</span>
           </div>
         </div>
       </div>

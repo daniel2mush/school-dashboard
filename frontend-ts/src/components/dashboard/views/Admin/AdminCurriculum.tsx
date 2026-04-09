@@ -2,6 +2,7 @@ import { useGetSubjects } from '#/components/query/AdminQuery'
 import { BookText, Users, Plus, Edit, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import styles from './AdminCurriculum.module.scss'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import {
   CreateSubjectModal,
   EditSubjectModal,
@@ -10,6 +11,7 @@ import {
 } from './AdminCurriculumModals'
 
 export function AdminCurriculum() {
+  const { t } = useDashboardTranslation()
   const { data: subjects = [], isLoading } = useGetSubjects()
   const [createOpen, setCreateOpen] = useState(false)
   const [editSubjectId, setEditSubjectId] = useState<number | null>(null)
@@ -17,7 +19,7 @@ export function AdminCurriculum() {
   const [assignSubjectId, setAssignSubjectId] = useState<number | null>(null)
 
   if (isLoading) {
-    return <div className={styles.view}>Loading curriculum…</div>
+    return <div className={styles.view}>{t('admin.curriculum.loading')}</div>
   }
 
   const editingSubject = subjects.find((s) => s.id === editSubjectId)
@@ -29,30 +31,30 @@ export function AdminCurriculum() {
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <div className={styles.eyebrow}>Curriculum</div>
-            <h1 className={styles.title}>Subjects & Curriculum</h1>
-            <p className={styles.copy}>
-              Manage all school subjects, refine their details, and link them to
-              year groups so each cohort has the right academic structure.
-            </p>
+            <div className={styles.eyebrow}>
+              {t('admin.curriculum.eyebrow')}
+            </div>
+            <h1 className={styles.title}>{t('admin.curriculum.title')}</h1>
+            <p className={styles.copy}>{t('admin.curriculum.copy')}</p>
             <div className={styles.heroStats}>
               <span className={styles.heroStat}>
                 <BookText size={14} strokeWidth={2} aria-hidden />
-                {subjects.length} subject{subjects.length === 1 ? '' : 's'}
+                {t('admin.curriculum.subjectsCount').replace(
+                  '{count}',
+                  String(subjects.length),
+                )}
               </span>
               <span className={styles.heroStat}>
                 <Users size={14} strokeWidth={2} aria-hidden />
-                {subjects.reduce(
-                  (sum, subject) => sum + subject._count.yearGroups,
-                  0,
-                )}{' '}
-                year-group link
-                {subjects.reduce(
-                  (sum, subject) => sum + subject._count.yearGroups,
-                  0,
-                ) === 1
-                  ? ''
-                  : 's'}
+                {t('admin.curriculum.yearGroupLinksCount').replace(
+                  '{count}',
+                  String(
+                    subjects.reduce(
+                      (sum, subject) => sum + subject._count.yearGroups,
+                      0,
+                    ),
+                  ),
+                )}
               </span>
             </div>
           </div>
@@ -63,7 +65,7 @@ export function AdminCurriculum() {
               onClick={() => setCreateOpen(true)}
             >
               <Plus size={16} strokeWidth={2} />
-              Create Subject
+              {t('admin.curriculum.createSubject')}
             </button>
           </div>
         </div>
@@ -73,10 +75,12 @@ export function AdminCurriculum() {
         <table className={styles.adminTable}>
           <thead>
             <tr>
-              <th>Subject Name</th>
-              <th>Assigned Year Groups</th>
-              <th>Usage</th>
-              <th className={styles.actionsColumn}>Actions</th>
+              <th>{t('admin.curriculum.subjectName')}</th>
+              <th>{t('admin.curriculum.assignedYearGroups')}</th>
+              <th>{t('admin.curriculum.usage')}</th>
+              <th className={styles.actionsColumn}>
+                {t('admin.curriculum.actions')}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -84,7 +88,7 @@ export function AdminCurriculum() {
               <tr>
                 <td colSpan={4} className={styles.emptyState}>
                   <BookText size={24} className={styles.mutedIcon} />
-                  <p>No subjects found. Create one to get started.</p>
+                  <p>{t('admin.curriculum.noSubjects')}</p>
                 </td>
               </tr>
             ) : (
@@ -93,7 +97,8 @@ export function AdminCurriculum() {
                   <td>
                     <div className={styles.subjectName}>{subject.name}</div>
                     <div className={styles.subjectDesc}>
-                      {subject.description || 'No description provided.'}
+                      {subject.description ||
+                        t('admin.curriculum.noDescription')}
                     </div>
                   </td>
 
@@ -107,38 +112,41 @@ export function AdminCurriculum() {
                         ))}
                       </div>
                     ) : (
-                      <span className={styles.mutedText}>Not assigned</span>
+                      <span className={styles.mutedText}>
+                        {t('admin.curriculum.notAssigned')}
+                      </span>
                     )}
                   </td>
 
                   <td>
                     <div className={styles.subjectDesc}>
-                      {subject._count.yearGroups} year group
-                      {subject._count.yearGroups === 1 ? '' : 's'}
-                      {' · '}
-                      {subject._count.timetable} timetable slot
-                      {subject._count.timetable === 1 ? '' : 's'}
+                      {t('admin.curriculum.usageSummary')
+                        .replace(
+                          '{yearGroups}',
+                          String(subject._count.yearGroups),
+                        )
+                        .replace('{slots}', String(subject._count.timetable))}
                     </div>
                   </td>
 
                   <td className={styles.actionsCell}>
                     <div className={styles.actionButtons}>
                       <button
-                        title="Assign to Year Group"
+                        title={t('admin.curriculum.assignToYearGroup')}
                         className={styles.iconBtn}
                         onClick={() => setAssignSubjectId(subject.id)}
                       >
                         <Users size={18} />
                       </button>
                       <button
-                        title="Edit Subject"
+                        title={t('admin.curriculum.editSubject')}
                         className={styles.iconBtn}
                         onClick={() => setEditSubjectId(subject.id)}
                       >
                         <Edit size={18} />
                       </button>
                       <button
-                        title="Delete Subject"
+                        title={t('admin.curriculum.deleteSubject')}
                         className={`${styles.iconBtn} ${styles.dangerText}`}
                         onClick={() => setDeleteSubjectId(subject.id)}
                       >

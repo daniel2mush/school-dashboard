@@ -23,12 +23,14 @@ import {
   X,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { useCurrency, type CurrencyCode } from '#/context/CurrencyContext'
+import { useCurrency } from '#/context/CurrencyContext'
+import type { CurrencyCode } from '#/context/CurrencyContext'
 import { Input } from '@/components/ui'
 import {
   useGetAdminAnalytics,
   useUpsertFeePayment,
 } from '#/components/query/AdminQuery'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
 function StudentEditModal({
   student,
@@ -37,6 +39,7 @@ function StudentEditModal({
   student: any
   onClose: () => void
 }) {
+  const { t } = useDashboardTranslation()
   const { formatCurrency } = useCurrency()
   const upsertPayment = useUpsertFeePayment()
   const [drafts, setDrafts] = useState<
@@ -66,7 +69,9 @@ function StudentEditModal({
       <div className={styles.modalDialog} onClick={(e) => e.stopPropagation()}>
         <header className={styles.modalHead}>
           <div>
-            <div className={styles.eyebrow}>Edit Student Records</div>
+            <div className={styles.eyebrow}>
+              {t('admin.analytics.editStudentRecords')}
+            </div>
             <h3 className={styles.modalTitle}>{student.name}</h3>
             <p className={styles.modalSubtitle}>
               {student.yearGroupName} · {student.email}
@@ -85,7 +90,7 @@ function StudentEditModal({
               color: 'var(--text-tertiary)',
             }}
           >
-            Fee Payments
+            {t('admin.analytics.feePayments')}
           </h4>
           {student.fees.map((f: any) => (
             <div key={f.feeId} className={styles.feeItemRow}>
@@ -99,7 +104,7 @@ function StudentEditModal({
               </div>
               <div className={styles.feeItemInputGrid}>
                 <Input
-                  label="Paid"
+                  label={t('admin.analytics.paid')}
                   value={drafts[f.feeId].amountPaid}
                   onChange={(e) =>
                     setDrafts((prev) => ({
@@ -132,7 +137,9 @@ function StudentEditModal({
                       }))
                     }
                   />
-                  <span style={{ fontSize: '0.85rem' }}>Fully Paid</span>
+                  <span style={{ fontSize: '0.85rem' }}>
+                    {t('admin.analytics.fullyPaid')}
+                  </span>
                 </div>
               </div>
               <div className={styles.feeItemActions}>
@@ -141,7 +148,7 @@ function StudentEditModal({
                   onClick={() => savePayment(f.feeId)}
                   disabled={upsertPayment.isPending}
                 >
-                  Save
+                  {t('admin.analytics.save')}
                 </button>
               </div>
             </div>
@@ -153,6 +160,7 @@ function StudentEditModal({
 }
 
 export function AdminAnalytics() {
+  const { t } = useDashboardTranslation()
   const { currency, setCurrency, formatCurrency } = useCurrency()
   const [isMounted, setIsMounted] = useState(false)
   useEffect(() => {
@@ -171,8 +179,8 @@ export function AdminAnalytics() {
     return (
       <div className={styles.view}>
         <div className={styles.hero}>
-          <div className={styles.eyebrow}>Analytics</div>
-          <h2 className={styles.title}>Loading school-wide data...</h2>
+          <div className={styles.eyebrow}>{t('admin.analytics.eyebrow')}</div>
+          <h2 className={styles.title}>{t('admin.analytics.loading')}</h2>
         </div>
       </div>
     )
@@ -213,9 +221,13 @@ export function AdminAnalytics() {
   const attendanceRate = stats.attendancePresentPct ?? 0
 
   const revenueData = [
-    { name: 'Collected', value: stats.totalCollectedRevenue, color: '#10b981' },
     {
-      name: 'Outstanding',
+      name: t('admin.analytics.collected'),
+      value: stats.totalCollectedRevenue,
+      color: '#10b981',
+    },
+    {
+      name: t('admin.analytics.outstanding'),
       value: Math.max(
         0,
         stats.totalExpectedRevenue - stats.totalCollectedRevenue,
@@ -226,16 +238,20 @@ export function AdminAnalytics() {
 
   const paymentDistributionData = [
     {
-      name: 'Fully Paid',
+      name: t('admin.analytics.fullyPaid'),
       value: stats.paymentStats.fullyPaid,
       color: '#10b981',
     },
     {
-      name: 'Partial',
+      name: t('admin.analytics.partial'),
       value: stats.paymentStats.partiallyPaid,
       color: '#f59e0b',
     },
-    { name: 'Unpaid', value: stats.paymentStats.notPaid, color: '#ef4444' },
+    {
+      name: t('admin.analytics.unpaid'),
+      value: stats.paymentStats.notPaid,
+      color: '#ef4444',
+    },
   ]
 
   // Aggregate attendance by Year Group
@@ -260,8 +276,8 @@ export function AdminAnalytics() {
   return (
     <section className={styles.view}>
       <header className={styles.hero}>
-        <div className={styles.eyebrow}>Institutional Overview</div>
-        <h2 className={styles.title}>School Performance Analytics</h2>
+        <div className={styles.eyebrow}>{t('admin.analytics.eyebrow')}</div>
+        <h2 className={styles.title}>{t('admin.analytics.title')}</h2>
         <div className={styles.currencyTabs}>
           {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
             (code) => (
@@ -283,8 +299,7 @@ export function AdminAnalytics() {
             maxWidth: 600,
           }}
         >
-          Real-time insights into student enrollment, financial health, and
-          operational efficiency across all cohorts.
+          {t('admin.analytics.copy')}
         </p>
       </header>
 
@@ -297,12 +312,17 @@ export function AdminAnalytics() {
               alignItems: 'center',
             }}
           >
-            <span className={styles.metricLabel}>Total Students</span>
+            <span className={styles.metricLabel}>
+              {t('admin.analytics.totalStudents')}
+            </span>
             <Users size={20} color="var(--accent)" />
           </div>
           <div className={styles.metricValue}>{stats.students}</div>
           <div className={styles.metricFooter}>
-            Across {stats.yearGroups} Year Groups
+            {t('admin.analytics.acrossYearGroups').replace(
+              '{count}',
+              String(stats.yearGroups),
+            )}
           </div>
         </div>
 
@@ -314,12 +334,17 @@ export function AdminAnalytics() {
               alignItems: 'center',
             }}
           >
-            <span className={styles.metricLabel}>Faculty Members</span>
+            <span className={styles.metricLabel}>
+              {t('admin.analytics.facultyMembers')}
+            </span>
             <GraduationCap size={20} color="#10b981" />
           </div>
           <div className={styles.metricValue}>{stats.teachers}</div>
           <div className={styles.metricFooter}>
-            {teacherStudentRatio}:1 Student/Teacher Ratio
+            {t('admin.analytics.studentTeacherRatio').replace(
+              '{ratio}',
+              String(teacherStudentRatio),
+            )}
           </div>
         </div>
 
@@ -331,14 +356,19 @@ export function AdminAnalytics() {
               alignItems: 'center',
             }}
           >
-            <span className={styles.metricLabel}>Total Revenue</span>
+            <span className={styles.metricLabel}>
+              {t('admin.analytics.totalRevenue')}
+            </span>
             <Wallet size={20} color="#f59e0b" />
           </div>
           <div className={styles.metricValue}>
             {formatCurrency(stats.totalCollectedRevenue)}
           </div>
           <div className={styles.metricFooter}>
-            {collectionRate.toFixed(1)}% Collection Rate
+            {t('admin.analytics.collectionRate').replace(
+              '{rate}',
+              collectionRate.toFixed(1),
+            )}
           </div>
         </div>
 
@@ -350,11 +380,15 @@ export function AdminAnalytics() {
               alignItems: 'center',
             }}
           >
-            <span className={styles.metricLabel}>Attendance</span>
+            <span className={styles.metricLabel}>
+              {t('admin.analytics.attendance')}
+            </span>
             <CheckCircle size={20} color="#4f46e5" />
           </div>
           <div className={styles.metricValue}>{attendanceRate.toFixed(1)}%</div>
-          <div className={styles.metricFooter}>Daily average presence</div>
+          <div className={styles.metricFooter}>
+            {t('admin.analytics.dailyAveragePresence')}
+          </div>
         </div>
       </div>
 
@@ -362,8 +396,12 @@ export function AdminAnalytics() {
       <div className={styles.chartsGrid}>
         <div className={styles.chartCard}>
           <div className={styles.chartHeader}>
-            <h3 className={styles.chartTitle}>School Fees Revenue</h3>
-            <p className={styles.chartSub}>Collected vs Outstanding Fees</p>
+            <h3 className={styles.chartTitle}>
+              {t('admin.analytics.schoolFeesRevenue')}
+            </h3>
+            <p className={styles.chartSub}>
+              {t('admin.analytics.collectedVsOutstandingFees')}
+            </p>
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
             {isMounted && (
@@ -396,7 +434,7 @@ export function AdminAnalytics() {
                     }}
                     formatter={(value) => [
                       formatCurrency(tooltipValueToNumber(value)),
-                      'Amount',
+                      t('admin.analytics.amount'),
                     ]}
                   />
                   <Bar dataKey="value" radius={[8, 8, 0, 0]} barSize={60}>
@@ -418,7 +456,10 @@ export function AdminAnalytics() {
               }}
             >
               <span style={{ color: 'var(--text-secondary)' }}>
-                Goal: {formatCurrency(stats.totalExpectedRevenue)}
+                {t('admin.analytics.goalAmount').replace(
+                  '{amount}',
+                  formatCurrency(stats.totalExpectedRevenue),
+                )}
               </span>
               <span style={{ fontWeight: 600 }}>
                 {collectionRate.toFixed(1)}%
@@ -438,8 +479,12 @@ export function AdminAnalytics() {
 
         <div className={styles.chartCard}>
           <div className={styles.chartHeader}>
-            <h3 className={styles.chartTitle}>Payment Status Distribution</h3>
-            <p className={styles.chartSub}>Breakdown of fee item settlements</p>
+            <h3 className={styles.chartTitle}>
+              {t('admin.analytics.paymentStatusDistribution')}
+            </h3>
+            <p className={styles.chartSub}>
+              {t('admin.analytics.breakdownOfSettlements')}
+            </p>
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
             {isMounted && (
@@ -481,8 +526,12 @@ export function AdminAnalytics() {
 
         <div className={styles.chartCard} style={{ gridColumn: 'span 2' }}>
           <div className={styles.chartHeader}>
-            <h3 className={styles.chartTitle}>Attendance by Cohort</h3>
-            <p className={styles.chartSub}>Presence rate per year group</p>
+            <h3 className={styles.chartTitle}>
+              {t('admin.analytics.attendanceByCohort')}
+            </h3>
+            <p className={styles.chartSub}>
+              {t('admin.analytics.presenceRatePerYearGroup')}
+            </p>
           </div>
           <div className={styles.chartContent} style={{ minWidth: 0 }}>
             {isMounted && (
@@ -521,7 +570,7 @@ export function AdminAnalytics() {
                     }}
                     formatter={(value) => [
                       `${tooltipValueToNumber(value)}%`,
-                      'Attendance Rate',
+                      t('admin.analytics.attendanceRate'),
                     ]}
                   />
                   <Bar
@@ -562,13 +611,15 @@ export function AdminAnalytics() {
           }}
         >
           <div>
-            <h3 className={styles.chartTitle}>Student Registry</h3>
+            <h3 className={styles.chartTitle}>
+              {t('admin.analytics.studentRegistry')}
+            </h3>
             <div className={styles.tabs}>
               <div
                 className={`${styles.tab} ${activeTab === 'fees' ? styles.tabActive : ''}`}
                 onClick={() => setActiveTab('fees')}
               >
-                Fee Management
+                {t('admin.analytics.feeManagement')}
               </div>
             </div>
           </div>
@@ -593,7 +644,7 @@ export function AdminAnalytics() {
               />
               <input
                 type="text"
-                placeholder="Search students..."
+                placeholder={t('admin.analytics.searchStudents')}
                 className="input"
                 style={{ paddingLeft: 40, width: '100%' }}
                 value={searchTerm}
@@ -607,7 +658,7 @@ export function AdminAnalytics() {
               value={selectedYearGroup}
               onChange={(e) => setSelectedYearGroup(e.target.value)}
             >
-              <option value="All">All Classes</option>
+              <option value="All">{t('admin.analytics.allClasses')}</option>
               {yearGroups.map((yg) => (
                 <option key={yg} value={yg}>
                   {yg}
@@ -623,9 +674,9 @@ export function AdminAnalytics() {
                 setSelectedStatus(e.target.value as 'All' | 'Unpaid' | 'Paid')
               }
             >
-              <option value="All">All Status</option>
-              <option value="Unpaid">Unpaid Only</option>
-              <option value="Paid">Fully Paid</option>
+              <option value="All">{t('admin.analytics.allStatus')}</option>
+              <option value="Unpaid">{t('admin.analytics.unpaidOnly')}</option>
+              <option value="Paid">{t('admin.analytics.fullyPaid')}</option>
             </select>
           </div>
         </div>
@@ -634,13 +685,13 @@ export function AdminAnalytics() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Student</th>
-                <th>Cohort</th>
-                <th>Fee Items</th>
-                <th>Total Billed</th>
-                <th>Total Paid</th>
-                <th>Balance</th>
-                <th>Action</th>
+                <th>{t('admin.analytics.student')}</th>
+                <th>{t('admin.analytics.cohort')}</th>
+                <th>{t('admin.analytics.feeItems')}</th>
+                <th>{t('admin.analytics.totalBilled')}</th>
+                <th>{t('admin.analytics.totalPaid')}</th>
+                <th>{t('admin.analytics.balance')}</th>
+                <th>{t('admin.analytics.action')}</th>
               </tr>
             </thead>
             <tbody>

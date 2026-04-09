@@ -2,16 +2,16 @@ import { BookOpen, CalendarRange, Clock3, Sparkles } from 'lucide-react'
 import styles from './StudentTimetable.module.scss'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 import { useMemo } from 'react'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
-
-const FALLBACK_PERIODS = [
-  { id: 1, label: 'Period 1', startTime: '7:30', endTime: '8:30' },
-  { id: 2, label: 'Period 2', startTime: '8:30', endTime: '9:30' },
-  { id: 3, label: 'Period 3', startTime: '9:30', endTime: '10:30' },
-  { id: 4, label: 'Period 4', startTime: '11:00', endTime: '12:00' },
-  { id: 5, label: 'Period 5', startTime: '12:00', endTime: '13:00' },
-]
+const DAY_KEYS = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+] as const
+const DAY_LOOKUP = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 const formatSubjectTone = (subject: string) => {
   const tones = [
@@ -31,6 +31,7 @@ const formatSubjectTone = (subject: string) => {
 
 export function StudentTimetable() {
   const currentData = useCurrentStudent()
+  const { t } = useDashboardTranslation()
 
   if (!currentData) return null
 
@@ -39,7 +40,7 @@ export function StudentTimetable() {
   const periods = useMemo(() => {
     const pMap = new Map()
     studentTimetableSlots.forEach((slot) => {
-      if (slot.period && !slot.period.isBreak) {
+      if (!slot.period.isBreak) {
         pMap.set(slot.periodId, slot.period)
       }
     })
@@ -54,7 +55,7 @@ export function StudentTimetable() {
   const slotsByDayAndPeriod = useMemo(() => {
     const map: Record<string, Record<number, any>> = {}
     studentTimetableSlots.forEach((slot) => {
-      if (!map[slot.day]) map[slot.day] = {}
+      if (!(slot.day in map)) map[slot.day] = {}
       map[slot.day][slot.periodId] = slot
     })
     return map
@@ -70,25 +71,29 @@ export function StudentTimetable() {
       .filter((subject): subject is string => Boolean(subject)),
   )
 
-  const firstClass = periods[0]
-    ? `${periods[0].startTime} - ${periods[0].endTime}`
-    : 'N/A'
+  const firstClass =
+    periods.length > 0
+      ? `${periods[0].startTime} - ${periods[0].endTime}`
+      : 'N/A'
+  const dayEntries = DAY_KEYS.map((day, index) => ({
+    label: t(`student.timetable.${day}`),
+    lookup: DAY_LOOKUP[index],
+  }))
 
   return (
     <section className={styles.view}>
       <header className={styles.hero}>
         <div className={styles.heroCopy}>
-          <div className={styles.eyebrow}>Timetable</div>
-          <h2 className={styles.title}>A calmer view of your school week</h2>
+          <div className={styles.eyebrow}>{t('student.timetable.eyebrow')}</div>
+          <h2 className={styles.title}>{t('student.timetable.title')}</h2>
           <p className={styles.copy}>
-            Track every lesson for {yearGroup.name} with a cleaner daily layout,
-            clearer time blocks, and space that is easier to scan.
+            {t('student.timetable.copy').replace('{yearGroup}', yearGroup.name)}
           </p>
         </div>
 
         <div className={styles.heroBadge}>
           <Sparkles size={18} />
-          <span>Weekly rhythm</span>
+          <span>{t('student.timetable.weeklyRhythm')}</span>
         </div>
       </header>
 
@@ -98,8 +103,10 @@ export function StudentTimetable() {
             <CalendarRange size={18} />
           </div>
           <div>
-            <div className={styles.summaryLabel}>Active days</div>
-            <div className={styles.summaryValue}>{DAYS.length}</div>
+            <div className={styles.summaryLabel}>
+              {t('student.timetable.activeDays')}
+            </div>
+            <div className={styles.summaryValue}>{dayEntries.length}</div>
           </div>
         </article>
 
@@ -108,7 +115,9 @@ export function StudentTimetable() {
             <BookOpen size={18} />
           </div>
           <div>
-            <div className={styles.summaryLabel}>Subjects this week</div>
+            <div className={styles.summaryLabel}>
+              {t('student.timetable.subjectsThisWeek')}
+            </div>
             <div className={styles.summaryValue}>{scheduledSubjects.size}</div>
           </div>
         </article>
@@ -118,7 +127,9 @@ export function StudentTimetable() {
             <Clock3 size={18} />
           </div>
           <div>
-            <div className={styles.summaryLabel}>Lessons scheduled</div>
+            <div className={styles.summaryLabel}>
+              {t('student.timetable.lessonsScheduled')}
+            </div>
             <div className={styles.summaryValue}>{lessonCount}</div>
           </div>
         </article>
@@ -127,11 +138,18 @@ export function StudentTimetable() {
       <section className={styles.board}>
         <div className={styles.boardHeader}>
           <div>
-            <p className={styles.boardEyebrow}>Week at a glance</p>
-            <h3 className={styles.boardTitle}>Calendar timetable</h3>
+            <p className={styles.boardEyebrow}>
+              {t('student.timetable.weekAtAGlance')}
+            </p>
+            <h3 className={styles.boardTitle}>
+              {t('student.timetable.calendarTimetable')}
+            </h3>
           </div>
           <div className={styles.boardMeta}>
-            First class starts {firstClass}
+            {t('student.timetable.firstClassStarts').replace(
+              '{time}',
+              firstClass,
+            )}
           </div>
         </div>
 
@@ -140,10 +158,10 @@ export function StudentTimetable() {
             <div className={styles.cornerCell}>
               <CalendarRange size={18} />
             </div>
-            {DAYS.map((day) => (
-              <div key={day} className={styles.dayColumnHeader}>
-                <span className={styles.dayLabel}>{day}</span>
-                <span className={styles.dayShort}>{day.slice(0, 3)}</span>
+            {dayEntries.map((day) => (
+              <div key={day.lookup} className={styles.dayColumnHeader}>
+                <span className={styles.dayLabel}>{day.label}</span>
+                <span className={styles.dayShort}>{day.label.slice(0, 3)}</span>
               </div>
             ))}
 
@@ -156,15 +174,18 @@ export function StudentTimetable() {
                   </div>
                 </div>
 
-                {DAYS.map((day) => {
-                  const slot = slotsByDayAndPeriod[day]?.[period.id]
+                {dayEntries.map((day) => {
+                  const daySlots = slotsByDayAndPeriod[day.lookup] as
+                    | Record<number, any>
+                    | undefined
+                  const slot = daySlots?.[period.id]
                   const subject = slot?.subject?.name
                   const teacher = slot?.teacher?.name
                   const isFree = !subject
 
                   return (
                     <div
-                      key={`${day}-${period.id}`}
+                      key={`${day.lookup}-${period.id}`}
                       className={`${styles.slot} ${
                         !isFree ? styles.populated : styles.empty
                       }`}
@@ -173,7 +194,7 @@ export function StudentTimetable() {
                         <>
                           <div className={styles.slotValue}>{subject}</div>
                           <div className={styles.slotMeta}>
-                            {teacher || 'No teacher'}
+                            {teacher || t('student.timetable.noTeacher')}
                           </div>
                         </>
                       ) : (
@@ -192,11 +213,11 @@ export function StudentTimetable() {
             <span
               className={`${styles.legendColor} ${styles.populated}`}
             ></span>
-            <span>Scheduled lessons</span>
+            <span>{t('student.timetable.scheduledLessons')}</span>
           </div>
           <div className={styles.legendItem}>
             <span className={`${styles.legendColor} ${styles.empty}`}></span>
-            <span>Free periods</span>
+            <span>{t('student.timetable.freePeriods')}</span>
           </div>
         </div>
       </section>

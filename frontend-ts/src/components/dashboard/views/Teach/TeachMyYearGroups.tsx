@@ -11,6 +11,7 @@ import {
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import { TeacherTimetableModal } from './TeacherTimetableModal'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
 const CARD_ACCENTS = [
   {
@@ -52,11 +53,12 @@ function formatLevel(level: string) {
 export function TeachMyYearGroups() {
   const { data: classes, isLoading, error } = useGetTeacherClasses()
   const [selectedYgId, setSelectedYgId] = useState<number | null>(null)
+  const { t } = useDashboardTranslation()
 
   if (isLoading) {
     return (
       <section className={styles.view}>
-        <div className={styles.panel}>Loading your classes...</div>
+        <div className={styles.panel}>{t('teacher.yearGroups.loading')}</div>
       </section>
     )
   }
@@ -64,9 +66,7 @@ export function TeachMyYearGroups() {
   if (error || !classes) {
     return (
       <section className={styles.view}>
-        <div className={styles.panel}>
-          An error occurred fetching your classes.
-        </div>
+        <div className={styles.panel}>{t('teacher.yearGroups.error')}</div>
       </section>
     )
   }
@@ -75,7 +75,7 @@ export function TeachMyYearGroups() {
     ? classes.find((c) => c.id === selectedYgId)
     : null
   const totalStudents = classes.reduce(
-    (count, group) => count + (group.students?.length || 0),
+    (count, group) => count + group.students.length,
     0,
   )
   const totalSubjects = new Set(
@@ -86,16 +86,30 @@ export function TeachMyYearGroups() {
     <section className={styles.view}>
       <div className={styles.panel}>
         <div className={styles.panelCopy}>
-          <div className={styles.eyebrow}>Class Management</div>
-          <h2 className={styles.title}>Your Assigned Year Groups</h2>
-          <p className={styles.copy}>
-            Professional overview of your cohorts. Review student counts, room
-            assignments, and access class timetables.
-          </p>
+          <div className={styles.eyebrow}>
+            {t('teacher.yearGroups.eyebrow')}
+          </div>
+          <h2 className={styles.title}>{t('teacher.yearGroups.title')}</h2>
+          <p className={styles.copy}>{t('teacher.yearGroups.copy')}</p>
           <div className={styles.panelMeta}>
-            <span>{classes.length} year groups</span>
-            <span>{totalStudents} students</span>
-            <span>{totalSubjects} subjects</span>
+            <span>
+              {t('teacher.yearGroups.yearGroupsCount').replace(
+                '{count}',
+                String(classes.length),
+              )}
+            </span>
+            <span>
+              {t('teacher.yearGroups.studentsCount').replace(
+                '{count}',
+                String(totalStudents),
+              )}
+            </span>
+            <span>
+              {t('teacher.yearGroups.subjectsCount').replace(
+                '{count}',
+                String(totalSubjects),
+              )}
+            </span>
           </div>
         </div>
       </div>
@@ -126,11 +140,10 @@ export function TeachMyYearGroups() {
             <LayoutGrid size={32} />
           </div>
           <h3 style={{ color: 'var(--text-primary)', marginBottom: 8 }}>
-            No classes assigned
+            {t('teacher.yearGroups.noClasses')}
           </h3>
           <p style={{ color: 'var(--text-secondary)' }}>
-            You have not been assigned to any year groups yet. Please contact
-            the administration.
+            {t('teacher.yearGroups.noClassesCopy')}
           </p>
         </div>
       ) : (
@@ -162,12 +175,14 @@ export function TeachMyYearGroups() {
                         <span className={styles.levelLabel}>
                           {formatLevel(yg.level)}
                         </span>
-                        <Badge variant="purple">Active</Badge>
+                        <Badge variant="purple">
+                          {t('teacher.yearGroups.active')}
+                        </Badge>
                       </div>
                       {yg.roomNumber && (
                         <div className={styles.room}>
                           <DoorOpen size={12} strokeWidth={2} aria-hidden />
-                          Room: {yg.roomNumber}
+                          {t('teacher.yearGroups.room')}: {yg.roomNumber}
                         </div>
                       )}
                     </div>
@@ -183,9 +198,11 @@ export function TeachMyYearGroups() {
                     />
                     <div>
                       <div className={styles.statValue}>
-                        {yg.students?.length || 0}
+                        {yg.students.length}
                       </div>
-                      <div className={styles.statLabel}>Students</div>
+                      <div className={styles.statLabel}>
+                        {t('teacher.yearGroups.students')}
+                      </div>
                     </div>
                   </div>
                   <div className={styles.statBlock}>
@@ -196,16 +213,20 @@ export function TeachMyYearGroups() {
                     />
                     <div>
                       <div className={styles.statValue}>
-                        {yg.subjects?.length || 0}
+                        {yg.subjects.length}
                       </div>
-                      <div className={styles.statLabel}>Subjects</div>
+                      <div className={styles.statLabel}>
+                        {t('teacher.yearGroups.subjects')}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div className={styles.subjectsBlock}>
-                  <div className={styles.blockLabel}>Curriculum</div>
-                  {yg.subjects && yg.subjects.length > 0 ? (
+                  <div className={styles.blockLabel}>
+                    {t('teacher.yearGroups.curriculum')}
+                  </div>
+                  {yg.subjects.length > 0 ? (
                     <div className={styles.subjectsList}>
                       {yg.subjects.slice(0, 3).map((sub) => (
                         <span key={sub.id} className={styles.subjectPill}>
@@ -214,20 +235,27 @@ export function TeachMyYearGroups() {
                       ))}
                       {yg.subjects.length > 3 && (
                         <span className={styles.subjectPill}>
-                          +{yg.subjects.length - 3} more
+                          {t('teacher.yearGroups.more').replace(
+                            '{count}',
+                            String(yg.subjects.length - 3),
+                          )}
                         </span>
                       )}
                     </div>
                   ) : (
-                    <p className={styles.muted}>No subjects linked.</p>
+                    <p className={styles.muted}>
+                      {t('teacher.yearGroups.noSubjects')}
+                    </p>
                   )}
                 </div>
 
                 <div className={styles.cardFooter}>
                   <span className={styles.cardHint}>
-                    Tap to open timetable details
+                    {t('teacher.yearGroups.tapToOpen')}
                   </span>
-                  <span className={styles.cardAction}>View schedule</span>
+                  <span className={styles.cardAction}>
+                    {t('teacher.yearGroups.viewSchedule')}
+                  </span>
                 </div>
               </article>
             )

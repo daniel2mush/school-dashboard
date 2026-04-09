@@ -10,6 +10,7 @@ import {
 import AppError from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendJson } from "../utils/sendJson.js";
+import { ensureSchoolSettingsTable } from "../utils/ensureSchoolSettings.js";
 import {
   AdminCreateStudentSchema,
   AdminCreateTeacherSchema,
@@ -361,6 +362,69 @@ export const GetSchoolStructure = asyncHandler(async (req, res) => {
   }
 
   return sendJson(res, 200, true, "Structure fetched", yearGroups);
+});
+
+export const GetSchoolSettings = asyncHandler(async (_req, res) => {
+  await ensureSchoolSettingsTable();
+
+  const settings = await prisma.schoolSetting.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      name: "Sunridge International School",
+      term: "Term 2",
+      year: "2026",
+      language: "en",
+      logo: "/logo.svg",
+    },
+  });
+
+  return sendJson(res, 200, true, "School settings fetched", settings);
+});
+
+export const UpdateSchoolSettings = asyncHandler(async (req, res) => {
+  checkAdmin(req.user.role);
+  await ensureSchoolSettingsTable();
+
+  const { name, term, year, language, logo } = req.body;
+
+  if (!name || typeof name !== "string" || !name.trim()) {
+    throw new AppError("School name is required", 400);
+  }
+
+  if (!term || typeof term !== "string" || !term.trim()) {
+    throw new AppError("School term is required", 400);
+  }
+
+  if (!year || typeof year !== "string" || !year.trim()) {
+    throw new AppError("School year is required", 400);
+  }
+
+  if (language !== "en" && language !== "fr") {
+    throw new AppError("Language must be either 'en' or 'fr'", 400);
+  }
+
+  const settings = await prisma.schoolSetting.upsert({
+    where: { id: 1 },
+    update: {
+      name: name.trim(),
+      term: term.trim(),
+      year: year.trim(),
+      language,
+      logo: typeof logo === "string" && logo.trim() ? logo.trim() : "/logo.svg",
+    },
+    create: {
+      id: 1,
+      name: name.trim(),
+      term: term.trim(),
+      year: year.trim(),
+      language,
+      logo: typeof logo === "string" && logo.trim() ? logo.trim() : "/logo.svg",
+    },
+  });
+
+  return sendJson(res, 200, true, "School settings updated", settings);
 });
 
 // Create a new announcement

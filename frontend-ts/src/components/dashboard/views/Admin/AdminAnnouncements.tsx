@@ -18,10 +18,12 @@ import {
   useCreateAnnouncement,
 } from '#/components/query/AdminQuery'
 import { useGetAnnouncements } from '#/components/query/AuthQuery'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
 type TabType = 'ALL' | 'TEACHERS' | 'STUDENTS'
 
 export function AdminAnnouncements() {
+  const { t, language } = useDashboardTranslation()
   const { data: announcements, isLoading } = useGetAnnouncements()
   const { data: structure } = useGetSchoolStructure()
   const { mutate: createAnnouncement, isPending } = useCreateAnnouncement()
@@ -41,11 +43,9 @@ export function AdminAnnouncements() {
     if (activeTab === 'ALL') return announcements
     if (activeTab === 'TEACHERS')
       return announcements.filter((a) => a.targetType === 'TEACHERS_ONLY')
-    if (activeTab === 'STUDENTS')
-      return announcements.filter(
-        (a) => a.targetType === 'ALL' || a.targetType === 'YEAR_GROUP',
-      )
-    return announcements
+    return announcements.filter(
+      (a) => a.targetType === 'ALL' || a.targetType === 'YEAR_GROUP',
+    )
   }, [announcements, activeTab])
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -88,7 +88,7 @@ export function AdminAnnouncements() {
     return (
       <div className={styles.loadingState}>
         <div className={styles.spinner}></div>
-        <p>Syncing broadcast systems...</p>
+        <p>{t('admin.announcements.loading')}</p>
       </div>
     )
   }
@@ -99,24 +99,21 @@ export function AdminAnnouncements() {
         <div className={styles.heroContent}>
           <div className={styles.eyebrow}>
             <Megaphone size={14} />
-            Institutional Communication
+            {t('admin.announcements.eyebrow')}
           </div>
-          <h1 className={styles.title}>School Announcements</h1>
-          <p className={styles.subtitle}>
-            Manage global broadcasts, teacher-specific directives, and
-            year-group updates from a centralized hub.
-          </p>
+          <h1 className={styles.title}>{t('admin.announcements.title')}</h1>
+          <p className={styles.subtitle}>{t('admin.announcements.copy')}</p>
         </div>
         <button
           className={styles.createTrigger}
           onClick={() => setShowCreateForm(!showCreateForm)}
         >
           {showCreateForm ? (
-            'Discard Message'
+            t('admin.announcements.discardMessage')
           ) : (
             <>
               <Plus size={18} />
-              Create Announcement
+              {t('admin.announcements.createAnnouncement')}
             </>
           )}
         </button>
@@ -126,18 +123,16 @@ export function AdminAnnouncements() {
         <div className={styles.formOverlay}>
           <form className={styles.formCard} onSubmit={handleSubmit}>
             <div className={styles.formHeader}>
-              <h3>Broadcast New Message</h3>
-              <p>
-                Your message will be instantly visible to the selected audience.
-              </p>
+              <h3>{t('admin.announcements.broadcastNewMessage')}</h3>
+              <p>{t('admin.announcements.broadcastCopy')}</p>
             </div>
 
             <div className={styles.formGrid}>
               <div className={styles.inputGroup}>
-                <label>Announcement Title</label>
+                <label>{t('admin.announcements.announcementTitle')}</label>
                 <div className={styles.inputWrapper}>
                   <input
-                    placeholder="e.g. Annual Sports Day 2024"
+                    placeholder={t('admin.announcements.titlePlaceholder')}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     required
@@ -147,19 +142,25 @@ export function AdminAnnouncements() {
 
               <div className={styles.row}>
                 <div className={styles.inputGroup}>
-                  <label>Priority Level</label>
+                  <label>{t('admin.announcements.priorityLevel')}</label>
                   <select
                     value={priority}
                     onChange={(e) => setPriority(e.target.value)}
                   >
-                    <option value="Normal">Normal</option>
-                    <option value="Important">Important</option>
-                    <option value="Urgent">Urgent</option>
+                    <option value="Normal">
+                      {t('admin.announcements.normal')}
+                    </option>
+                    <option value="Important">
+                      {t('admin.announcements.important')}
+                    </option>
+                    <option value="Urgent">
+                      {t('admin.announcements.urgent')}
+                    </option>
                   </select>
                 </div>
 
                 <div className={styles.inputGroup}>
-                  <label>Target Audience</label>
+                  <label>{t('admin.announcements.targetAudience')}</label>
                   <select
                     value={targetType}
                     onChange={(e) => {
@@ -168,21 +169,29 @@ export function AdminAnnouncements() {
                         setTargetYearGroupId('')
                     }}
                   >
-                    <option value="ALL">Everyone (Public)</option>
-                    <option value="TEACHERS_ONLY">Teachers Only</option>
-                    <option value="YEAR_GROUP">Specific Year Group</option>
+                    <option value="ALL">
+                      {t('admin.announcements.everyonePublic')}
+                    </option>
+                    <option value="TEACHERS_ONLY">
+                      {t('admin.announcements.teachersOnly')}
+                    </option>
+                    <option value="YEAR_GROUP">
+                      {t('admin.announcements.specificYearGroup')}
+                    </option>
                   </select>
                 </div>
 
                 {targetType === 'YEAR_GROUP' && (
                   <div className={styles.inputGroup}>
-                    <label>Select Year Group</label>
+                    <label>{t('admin.announcements.selectYearGroup')}</label>
                     <select
                       value={targetYearGroupId}
                       onChange={(e) => setTargetYearGroupId(e.target.value)}
                       required
                     >
-                      <option value="">Choose cohort...</option>
+                      <option value="">
+                        {t('admin.announcements.chooseCohort')}
+                      </option>
                       {structure?.map((yg) => (
                         <option key={yg.id} value={yg.id}>
                           {yg.name}
@@ -194,10 +203,10 @@ export function AdminAnnouncements() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label>Message Content</label>
+                <label>{t('admin.announcements.messageContent')}</label>
                 <textarea
                   rows={4}
-                  placeholder="Draft your detailed announcement here..."
+                  placeholder={t('admin.announcements.messagePlaceholder')}
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   required
@@ -211,7 +220,7 @@ export function AdminAnnouncements() {
                 className={styles.cancelBtn}
                 onClick={() => setShowCreateForm(false)}
               >
-                Cancel
+                {t('admin.announcements.cancel')}
               </button>
               <button
                 type="submit"
@@ -219,11 +228,11 @@ export function AdminAnnouncements() {
                 disabled={isPending || !title || !content}
               >
                 {isPending ? (
-                  'Broadcasting...'
+                  t('admin.announcements.broadcasting')
                 ) : (
                   <>
                     <Send size={16} />
-                    Send Broadcast
+                    {t('admin.announcements.sendBroadcast')}
                   </>
                 )}
               </button>
@@ -239,25 +248,28 @@ export function AdminAnnouncements() {
             onClick={() => setActiveTab('ALL')}
           >
             <Users size={16} />
-            All Broadcasts
+            {t('admin.announcements.allBroadcasts')}
           </button>
           <button
             className={`${styles.tabTrigger} ${activeTab === 'TEACHERS' ? styles.active : ''}`}
             onClick={() => setActiveTab('TEACHERS')}
           >
             <UserRound size={16} />
-            Teachers Only
+            {t('admin.announcements.teachersOnly')}
           </button>
           <button
             className={`${styles.tabTrigger} ${activeTab === 'STUDENTS' ? styles.active : ''}`}
             onClick={() => setActiveTab('STUDENTS')}
           >
             <Filter size={16} />
-            Student Updates
+            {t('admin.announcements.studentUpdates')}
           </button>
         </div>
         <div className={styles.statsCount}>
-          {filteredAnnouncements.length} messages found
+          {t('admin.announcements.messagesFound').replace(
+            '{count}',
+            String(filteredAnnouncements.length),
+          )}
         </div>
       </nav>
 
@@ -265,11 +277,8 @@ export function AdminAnnouncements() {
         {filteredAnnouncements.length === 0 ? (
           <div className={styles.emptyState}>
             <Bell size={48} />
-            <h3>No announcements in this category</h3>
-            <p>
-              Important updates and news for this group will appear here once
-              published.
-            </p>
+            <h3>{t('admin.announcements.noAnnouncements')}</h3>
+            <p>{t('admin.announcements.noAnnouncementsCopy')}</p>
           </div>
         ) : (
           filteredAnnouncements.map((ann) => (
@@ -281,7 +290,11 @@ export function AdminAnnouncements() {
                 <div className={styles.noticeTitleGroup}>
                   <div className={styles.priorityBadge}>
                     {getPriorityIcon(ann.priority)}
-                    {ann.priority}
+                    {ann.priority === 'Urgent'
+                      ? t('admin.announcements.urgent')
+                      : ann.priority === 'Important'
+                        ? t('admin.announcements.important')
+                        : t('admin.announcements.normal')}
                   </div>
                   <h3 className={styles.noticeTitle}>{ann.title}</h3>
                 </div>
@@ -296,8 +309,10 @@ export function AdminAnnouncements() {
                   className={styles.targetBadge}
                 >
                   {ann.targetType === 'YEAR_GROUP'
-                    ? 'Cohorts'
-                    : ann.targetType.replace('_', ' ')}
+                    ? t('admin.announcements.cohorts')
+                    : ann.targetType === 'TEACHERS_ONLY'
+                      ? t('admin.announcements.teachersOnly')
+                      : t('admin.announcements.everyone')}
                 </Badge>
               </div>
 
@@ -308,7 +323,7 @@ export function AdminAnnouncements() {
               <footer className={styles.noticeFooter}>
                 <div className={styles.authorInfo}>
                   <div className={styles.avatar}>
-                    {ann.author?.name?.charAt(0) || 'A'}
+                    {ann.author?.name.charAt(0) || 'A'}
                   </div>
                   <div className={styles.metaText}>
                     <span className={styles.authorName}>
@@ -321,13 +336,16 @@ export function AdminAnnouncements() {
                 </div>
                 <div className={styles.timestamp}>
                   <Clock size={12} />
-                  {new Date(ann.createdAt).toLocaleDateString(undefined, {
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {new Date(ann.createdAt).toLocaleDateString(
+                    language === 'fr' ? 'fr-FR' : undefined,
+                    {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    },
+                  )}
                 </div>
               </footer>
             </article>

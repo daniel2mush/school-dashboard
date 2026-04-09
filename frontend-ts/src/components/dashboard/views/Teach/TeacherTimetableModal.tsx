@@ -1,10 +1,18 @@
 import type { TaughtYearGroupData } from '#/components/query/TeacherQuery'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useUserStore from '#/components/store/UserStore'
 import styles from './TeacherTimetableModal.module.scss'
 import { X, CalendarDays, MapPin, Clock } from 'lucide-react'
 import { useMemo } from 'react'
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
+const DAY_KEYS = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+] as const
+const DAY_LOOKUP = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 interface TeacherTimetableModalProps {
   yearGroup: TaughtYearGroupData
@@ -16,14 +24,13 @@ export function TeacherTimetableModal({
   onClose,
 }: TeacherTimetableModalProps) {
   const user = useUserStore((state) => state.user)
+  const { t } = useDashboardTranslation()
 
   // Extract unique periods from the timetable slots
   const periods = useMemo(() => {
     const pMap = new Map()
     yearGroup.timetables.forEach((slot) => {
-      if (slot.period) {
-        pMap.set(slot.periodId, slot.period)
-      }
+      pMap.set(slot.periodId, slot.period)
     })
     return Array.from(pMap.values()).sort((a, b) => {
       const [hA, mA] = a.startTime.split(':').map(Number)
@@ -36,25 +43,42 @@ export function TeacherTimetableModal({
   const slotsByDayAndPeriod = useMemo(() => {
     const map: Record<string, Record<number, any>> = {}
     yearGroup.timetables.forEach((slot) => {
-      if (!map[slot.day]) map[slot.day] = {}
+      if (!(slot.day in map)) map[slot.day] = {}
       map[slot.day][slot.periodId] = slot
     })
     return map
   }, [yearGroup.timetables])
+  const dayEntries = DAY_KEYS.map((day, index) => ({
+    label: t(`teacher.timetableModal.${day}`),
+    lookup: DAY_LOOKUP[index],
+  }))
 
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
           <div>
-            <div className={styles.modalEyebrow}>Timetable View</div>
-            <h2 className={styles.modalTitle}>{yearGroup.name} Schedule</h2>
+            <div className={styles.modalEyebrow}>
+              {t('teacher.timetableModal.view')}
+            </div>
+            <h2 className={styles.modalTitle}>
+              {t('teacher.timetableModal.schedule').replace(
+                '{name}',
+                yearGroup.name,
+              )}
+            </h2>
             <div className={styles.modalMeta}>
               <span className={styles.metaItem}>
-                <MapPin size={14} /> Room {yearGroup.roomNumber || 'N/A'}
+                <MapPin size={14} />{' '}
+                {yearGroup.roomNumber
+                  ? t('teacher.timetableModal.room').replace(
+                      '{room}',
+                      yearGroup.roomNumber,
+                    )
+                  : t('teacher.timetableModal.roomFallback')}
               </span>
               <span className={styles.metaItem}>
-                <Clock size={14} /> Weekly View
+                <Clock size={14} /> {t('teacher.timetableModal.weeklyView')}
               </span>
             </div>
           </div>
@@ -68,10 +92,10 @@ export function TeacherTimetableModal({
             <div className={styles.cornerCell}>
               <CalendarDays size={18} />
             </div>
-            {DAYS.map((day) => (
-              <div key={day} className={styles.dayColumnHeader}>
-                <span className={styles.dayLabel}>{day}</span>
-                <span className={styles.dayShort}>{day.slice(0, 3)}</span>
+            {dayEntries.map((day) => (
+              <div key={day.lookup} className={styles.dayColumnHeader}>
+                <span className={styles.dayLabel}>{day.label}</span>
+                <span className={styles.dayShort}>{day.label.slice(0, 3)}</span>
               </div>
             ))}
 
@@ -84,14 +108,18 @@ export function TeacherTimetableModal({
                   </div>
                 </div>
 
-                {DAYS.map((day) => {
-                  const slot = slotsByDayAndPeriod[day]?.[period.id]
+                {dayEntries.map((day) => {
+                  const daySlots = slotsByDayAndPeriod[day.lookup] as
+                    | Record<number, any>
+                    | undefined
+                  const slot = daySlots?.[period.id]
                   const isAssignedToCurrentTeacher =
-                    slot?.teacherId === user?.id || slot?.teacher?.id === user?.id
+                    slot?.teacherId === user?.id ||
+                    slot?.teacher?.id === user?.id
 
                   return (
                     <div
-                      key={`${day}-${period.id}`}
+                      key={`${day.lookup}-${period.id}`}
                       className={`${styles.slot} ${slot ? styles.populated : styles.empty} ${
                         isAssignedToCurrentTeacher ? styles.highlighted : ''
                       }`}
@@ -99,10 +127,12 @@ export function TeacherTimetableModal({
                       {slot ? (
                         <>
                           <div className={styles.slotValue}>
-                            {slot.subject?.name || 'Free Period'}
+                            {slot.subject?.name ||
+                              t('teacher.timetableModal.freePeriod')}
                           </div>
                           <div className={styles.slotMeta}>
-                            {slot.teacher?.name || 'No teacher'}
+                            {slot.teacher?.name ||
+                              t('teacher.timetableModal.noTeacher')}
                           </div>
                         </>
                       ) : (
@@ -121,13 +151,13 @@ export function TeacherTimetableModal({
             <span
               className={`${styles.legendColor} ${styles.highlighted}`}
             ></span>
-            <span>Your lessons</span>
+            <span>{t('teacher.timetableModal.yourLessons')}</span>
           </div>
           <div className={styles.legendItem}>
             <span
               className={`${styles.legendColor} ${styles.populated}`}
             ></span>
-            <span>Other assigned lessons</span>
+            <span>{t('teacher.timetableModal.otherLessons')}</span>
           </div>
         </div>
       </div>

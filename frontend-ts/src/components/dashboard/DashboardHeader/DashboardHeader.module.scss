@@ -6,7 +6,11 @@
   padding: 24px 28px 20px;
   margin-bottom: 10px;
   background:
-    radial-gradient(circle at top left, rgba(79, 70, 229, 0.12), transparent 34%),
+    radial-gradient(
+      circle at top left,
+      rgba(79, 70, 229, 0.12),
+      transparent 34%
+    ),
     linear-gradient(180deg, rgba(79, 70, 229, 0.05), transparent 74%),
     var(--bg-primary);
   border: 1px solid var(--border-light);
@@ -39,6 +43,12 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.sectionEyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
 }
 
 .heading {
@@ -83,7 +93,9 @@
 .inactiveIcon {
   color: var(--text-tertiary);
   opacity: 0.5;
-  transition: color 0.2s ease, opacity 0.2s ease;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
 }
 
 .profileTrigger {

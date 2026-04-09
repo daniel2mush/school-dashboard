@@ -1,4 +1,5 @@
 import styles from './StudentReportCard.module.scss'
+import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import {
   getPerformanceLabel,
   getPerformanceText,
@@ -6,26 +7,37 @@ import {
 } from './StudentReportCard.utils'
 import type { GradeRecord } from './StudentReportCard.utils'
 
+const performanceLabelKeyMap: Record<string, string> = {
+  'Excellent progress': 'student.report.excellentProgress',
+  'Solid performance': 'student.report.solidPerformance',
+  'Needs support': 'student.report.needsSupport',
+}
+
 type ReportHeaderProps = {
   schoolName: string
   termLabel: string
 }
 
 export function ReportHeader({ schoolName, termLabel }: ReportHeaderProps) {
+  const { t } = useDashboardTranslation()
   return (
     <header className={styles.reportHeader}>
       <div className={styles.schoolIdentity}>
-        <p className={styles.kicker}>Official Student Report</p>
+        <p className={styles.kicker}>
+          {t('student.report.officialStudentReport')}
+        </p>
         <h1 className={styles.schoolName}>{schoolName}</h1>
-        <p className={styles.schoolMeta}>Issued on {reportDate}</p>
+        <p className={styles.schoolMeta}>
+          {t('student.report.issuedOn').replace('{date}', reportDate)}
+        </p>
       </div>
 
       <div className={styles.reportTitle}>
-        <strong>Report Card</strong>
+        <strong>{t('student.dashboard.reportCard')}</strong>
         <span>{termLabel}</span>
         <div className={styles.metaChips}>
-          <span>Verified Academic Record</span>
-          <span>Student Copy</span>
+          <span>{t('student.report.verifiedAcademicRecord')}</span>
+          <span>{t('student.report.studentCopy')}</span>
         </div>
       </div>
     </header>
@@ -45,37 +57,38 @@ export function StudentDetailsCard({
   studentId,
   termLabel,
 }: StudentDetailsProps) {
+  const { t } = useDashboardTranslation()
   return (
     <section className={styles.panel}>
       <div className={styles.sectionHeading}>
-        <h2>Student Details</h2>
-        <p>Core student and session information for this report.</p>
+        <h2>{t('student.report.studentDetails')}</h2>
+        <p>{t('student.report.studentDetailsCopy')}</p>
       </div>
 
       <div className={styles.studentDetails}>
         <div className={styles.detailItem}>
-          <label>Student Name</label>
+          <label>{t('student.report.studentName')}</label>
           <span>{studentName}</span>
         </div>
         <div className={styles.detailItem}>
-          <label>Year Group</label>
+          <label>{t('student.report.yearGroup')}</label>
           <span>{yearGroup}</span>
         </div>
         <div className={styles.detailItem}>
-          <label>Term</label>
+          <label>{t('student.report.term')}</label>
           <span>{termLabel}</span>
         </div>
         <div className={styles.detailItem}>
-          <label>Student ID</label>
+          <label>{t('student.report.studentId')}</label>
           <span>{studentId}</span>
         </div>
         <div className={styles.detailItem}>
-          <label>Date Issued</label>
+          <label>{t('student.report.dateIssued')}</label>
           <span>{reportDate}</span>
         </div>
         <div className={styles.detailItem}>
-          <label>Status</label>
-          <span>Verified</span>
+          <label>{t('student.report.status')}</label>
+          <span>{t('student.report.verified')}</span>
         </div>
       </div>
     </section>
@@ -93,24 +106,32 @@ export function ReportMetricsCard({
   averageGrade,
   subjectsCount,
 }: ReportMetricsProps) {
+  const { t } = useDashboardTranslation()
+  const performanceLabel = getPerformanceLabel(averageScore)
   return (
     <section className={styles.metricsPanel}>
       <div className={styles.metricCard}>
-        <span className={styles.metricLabel}>Overall Average</span>
+        <span className={styles.metricLabel}>
+          {t('student.report.overallAverage')}
+        </span>
         <strong>{averageScore}%</strong>
-        <p>{getPerformanceLabel(averageScore)}</p>
+        <p>{t(performanceLabelKeyMap[performanceLabel])}</p>
       </div>
 
       <div className={styles.metricCard}>
-        <span className={styles.metricLabel}>Final Grade</span>
+        <span className={styles.metricLabel}>
+          {t('student.report.finalGrade')}
+        </span>
         <strong>{averageGrade}</strong>
-        <p>Computed from submitted subject scores</p>
+        <p>{t('student.report.computedFromScores')}</p>
       </div>
 
       <div className={styles.metricCard}>
-        <span className={styles.metricLabel}>Subjects Graded</span>
+        <span className={styles.metricLabel}>
+          {t('student.report.subjectsGraded')}
+        </span>
         <strong>{subjectsCount}</strong>
-        <p>Subjects included in this term report</p>
+        <p>{t('student.report.subjectsIncluded')}</p>
       </div>
     </section>
   )
@@ -138,24 +159,23 @@ function GradeRow({ grade }: { grade: GradeRecord }) {
 }
 
 export function GradeTable({ grades }: { grades: GradeRecord[] }) {
+  const { t } = useDashboardTranslation()
   return (
     <section className={styles.tablePanel}>
       <div className={styles.sectionHeading}>
-        <h2>Academic Performance</h2>
-        <p>
-          A subject-by-subject summary of scores, grades, and teacher input.
-        </p>
+        <h2>{t('student.report.academicPerformance')}</h2>
+        <p>{t('student.report.academicPerformanceCopy')}</p>
       </div>
 
       <div className={styles.tableShell}>
         <table className={styles.reportTable}>
           <thead>
             <tr>
-              <th>Subject</th>
-              <th>Score</th>
-              <th>Grade</th>
-              <th>Teacher</th>
-              <th>Performance</th>
+              <th>{t('student.report.subject')}</th>
+              <th>{t('student.report.score')}</th>
+              <th>{t('student.report.grade')}</th>
+              <th>{t('student.report.teacher')}</th>
+              <th>{t('student.report.performance')}</th>
             </tr>
           </thead>
           <tbody>
@@ -166,7 +186,7 @@ export function GradeTable({ grades }: { grades: GradeRecord[] }) {
             ) : (
               <tr>
                 <td colSpan={5} className={styles.emptyRow}>
-                  No grades available for this period.
+                  {t('student.report.noGrades')}
                 </td>
               </tr>
             )}
@@ -188,21 +208,19 @@ export function TeacherRemarks({
   averageScore,
   teacherReport,
 }: TeacherRemarksProps) {
+  const { t } = useDashboardTranslation()
   const defaultRemark =
     averageScore >= 80
-      ? `${studentName} has demonstrated exceptional academic performance this term. Keep up the excellent work!`
+      ? t('student.report.remarkExcellent').replace('{name}', studentName)
       : averageScore >= 60
-        ? `${studentName} has shown good progress. Continued focus on core subjects will yield even better results.`
-        : `${studentName} needs to put in more effort in the coming term to improve their overall standing.`
+        ? t('student.report.remarkGood').replace('{name}', studentName)
+        : t('student.report.remarkNeedsWork').replace('{name}', studentName)
 
   return (
     <section className={styles.panel}>
       <div className={styles.sectionHeading}>
-        <h2>Teacher's Remarks</h2>
-        <p>
-          Professional comment provided for the student's overall term
-          performance.
-        </p>
+        <h2>{t('student.report.teacherRemarks')}</h2>
+        <p>{t('student.report.teacherRemarksCopy')}</p>
       </div>
 
       <div className={styles.remarksBody}>
@@ -213,14 +231,19 @@ export function TeacherRemarks({
 }
 
 export function ReportFooter() {
+  const { t } = useDashboardTranslation()
   return (
     <footer className={styles.reportFooter}>
       <div className={styles.footerNote}>
-        <span>Report approved by school administration</span>
+        <span>{t('student.report.approvedBySchool')}</span>
       </div>
 
       <div className={styles.signatures}>
-        {['Class Teacher', 'Principal', 'Parent/Guardian'].map((label) => (
+        {[
+          t('student.report.classTeacher'),
+          t('student.report.principal'),
+          t('student.report.parentGuardian'),
+        ].map((label) => (
           <div key={label} className={styles.signature}>
             <div className={styles.line} />
             <span>{label}</span>

@@ -2,6 +2,16 @@
 export type UserRole = 'STUDENT' | 'TEACHER' | 'ADMIN'
 export type UserStatus = 'Active' | 'Inactive' | 'Suspended'
 export type Gender = 'Male' | 'Female' | 'Other'
+export type DashboardLanguage = 'en' | 'fr'
+
+export interface SchoolSettings {
+  id?: number
+  name: string
+  term: string
+  year: string
+  language: DashboardLanguage
+  logo?: string | null
+}
 
 export interface User {
   id: number
@@ -93,7 +103,7 @@ export interface UserResponse {
   data: User
 }
 
-//LoginResponse
+// LoginResponse
 
 // {
 //   "success": true,

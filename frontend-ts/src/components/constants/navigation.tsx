@@ -13,8 +13,11 @@ import {
   Wallet,
   PieChart,
   BookText,
+  Settings,
 } from 'lucide-react'
 import type { UserRole } from '@/types/Types'
+import type { DashboardLanguage } from '#/components/dashboard/i18n'
+import { translate } from '#/components/dashboard/i18n'
 
 export type NavGroupLabel = {
   section: string
@@ -28,26 +31,20 @@ export type NavPageItem = {
 
 export type NavItem = NavGroupLabel | NavPageItem
 
-export const ROLE_LABELS: Record<UserRole, string> = {
-  ADMIN: 'Admin',
-  TEACHER: 'Teacher',
-  STUDENT: 'Student',
-}
-
 export const ROLE_DEFAULT_PAGE: Record<UserRole, string> = {
   ADMIN: 'overview',
   TEACHER: 'tmy',
   STUDENT: 'sdash',
 }
 
-export const NAV_CONFIG: Record<UserRole, NavItem[]> = {
+const NAV_CONFIG: Record<UserRole, NavItem[]> = {
   ADMIN: [
-    { section: 'Platform' },
+    { section: 'platform' },
     { id: 'overview', label: 'Overview', icon: <PieChart size={20} /> },
     { id: 'yeargroups', label: 'Year Groups', icon: <Layers size={20} /> },
     { id: 'users', label: 'Staff & Students', icon: <Users size={20} /> },
     { id: 'fees', label: 'Fee Management', icon: <Banknote size={20} /> },
-    { section: 'School' },
+    { section: 'school' },
     { id: 'timetable', label: 'Timetable', icon: <CalendarDays size={20} /> },
     {
       id: 'announcements',
@@ -57,9 +54,10 @@ export const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     { id: 'analytics', label: 'Analytics', icon: <BarChart3 size={20} /> },
     { id: 'attendance', label: 'Attendance', icon: <UserCheck size={20} /> },
     { id: 'curriculum', label: 'Curriculum', icon: <BookText size={20} /> },
+    { id: 'settings', label: 'Settings', icon: <Settings size={20} /> },
   ],
   TEACHER: [
-    { section: 'My Classes' },
+    { section: 'myClasses' },
     { id: 'tmy', label: 'My Year Groups', icon: <Layers size={20} /> },
     {
       id: 'tsubjects',
@@ -69,11 +67,11 @@ export const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     { id: 'tgrades', label: 'Grading', icon: <ClipboardCheck size={20} /> },
     { id: 'tattend', label: 'Attendance', icon: <UserCheck size={20} /> },
     { id: 'ttimetable', label: 'Timetable', icon: <CalendarDays size={20} /> },
-    { section: 'Communication' },
+    { section: 'communication' },
     { id: 'tann', label: 'Announcements', icon: <Megaphone size={20} /> },
   ],
   STUDENT: [
-    { section: 'My School' },
+    { section: 'mySchool' },
     { id: 'sdash', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
     { id: 'ssubjects', label: 'My Subjects', icon: <BookOpen size={20} /> },
     { id: 'sreport', label: 'Report Card', icon: <FileText size={20} /> },
@@ -95,14 +93,32 @@ export function getRolePages(role: UserRole): NavPageItem[] {
   return NAV_CONFIG[role].filter(isNavPageItem)
 }
 
+export function getRoleLabel(role: UserRole, language: DashboardLanguage) {
+  return translate(language, `role.${role}`)
+}
+
+export function getNavigationConfig(
+  role: UserRole,
+  language: DashboardLanguage,
+) {
+  return NAV_CONFIG[role].map((item) =>
+    'section' in item
+      ? { section: translate(language, `nav.${item.section}`) }
+      : { ...item, label: translate(language, `nav.${item.id}`) },
+  )
+}
+
 export function isValidSection(role: UserRole, section: string) {
   return getRolePages(role).some((item) => item.id === section)
 }
 
-export function getSectionLabel(role: UserRole, section: string) {
-  return (
-    getRolePages(role).find((item) => item.id === section)?.label ?? 'Dashboard'
-  )
+export function getSectionLabel(
+  role: UserRole,
+  section: string,
+  language: DashboardLanguage,
+) {
+  const match = getRolePages(role).find((item) => item.id === section)
+  return match ? translate(language, `nav.${match.id}`) : 'Dashboard'
 }
 
 export function getDashboardHref(

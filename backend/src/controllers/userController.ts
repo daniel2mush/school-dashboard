@@ -3,6 +3,7 @@ import { TargetType } from "../../generated/prisma/index.js";
 import AppError from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { sendJson } from "../utils/sendJson.js";
+import { ensureSchoolSettingsTable } from "../utils/ensureSchoolSettings.js";
 
 export const GetUserProfile = asyncHandler(async (req, res) => {
   const { email, userId } = req.user;
@@ -161,4 +162,23 @@ export const GetAnnouncements = asyncHandler(async (req, res) => {
   });
 
   return sendJson(res, 200, true, "Announcements fetched", announcements);
+});
+
+export const GetSchoolSettings = asyncHandler(async (_req, res) => {
+  await ensureSchoolSettingsTable();
+
+  const settings = await prisma.schoolSetting.upsert({
+    where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      name: "Sunridge International School",
+      term: "Term 2",
+      year: "2026",
+      language: "en",
+      logo: "/logo.svg",
+    },
+  });
+
+  return sendJson(res, 200, true, "School settings fetched", settings);
 });
