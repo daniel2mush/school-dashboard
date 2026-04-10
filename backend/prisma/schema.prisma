@@ -30,6 +30,8 @@ model User {
   feePayments          FeePayment[]
   grades               Grade[]        @relation("StudentGrades")
   givenGrades          Grade[]        @relation("TeacherGrades")
+  reportSummaries      StudentReportSummary[] @relation("StudentReportSummaries")
+  issuedReportSummaries StudentReportSummary[] @relation("TeacherReportSummaries")
   materials            Material[]     @relation("TeacherMaterials")
   refreshTokens        RefreshToken[]
   taughtTimetableSlots Timetable[]    @relation("TeacherTimetableSlots")
@@ -61,9 +63,29 @@ model YearGroup {
   fees          Fee[]
   materials     Material[]
   timetables    Timetable[]
+  reportSummaries StudentReportSummary[]
   students      User[]         @relation("StudentYearGroup")
   subjects      Subject[]      @relation("SubjectYearGroups")
   teachers      User[]         @relation("TeacherYearGroups")
+}
+
+model StudentReportSummary {
+  id           Int       @id @default(autoincrement())
+  studentId    Int
+  teacherId    Int
+  yearGroupId  Int?
+  term         String?
+  academicYear String?
+  overallGrade String?
+  performance  String?
+  teacherComment String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  student      User      @relation("StudentReportSummaries", fields: [studentId], references: [id], onDelete: Cascade)
+  teacher      User      @relation("TeacherReportSummaries", fields: [teacherId], references: [id], onDelete: Restrict)
+  yearGroup    YearGroup? @relation(fields: [yearGroupId], references: [id], onDelete: SetNull)
+
+  @@unique([studentId])
 }
 
 model Grade {

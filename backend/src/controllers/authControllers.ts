@@ -148,6 +148,16 @@ const studentInclude = {
     },
     orderBy: { date: "desc" as const },
   },
+  reportSummaries: {
+    take: 1,
+    orderBy: { updatedAt: "desc" as const },
+    include: {
+      teacher: {
+        select: { id: true, name: true, email: true },
+      },
+      yearGroup: true,
+    },
+  },
   attendance: {
     take: 30,
     orderBy: { date: "desc" as const },

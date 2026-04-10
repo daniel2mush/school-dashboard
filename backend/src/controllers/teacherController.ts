@@ -27,10 +27,10 @@ export const GetTeacherClasses = asyncHandler(async (req, res) => {
                 select: {
                   id: true,
                   name: true,
-                  initials: true
-                }
-              }
-            }
+                  initials: true,
+                },
+              },
+            },
           },
           students: {
             select: {
@@ -38,12 +38,25 @@ export const GetTeacherClasses = asyncHandler(async (req, res) => {
               name: true,
               email: true,
               attendance: { take: 10, orderBy: { date: "desc" } },
-              grades: { include: { subject: true } }
-            }
-          }
-        }
-      }
-    }
+              grades: { include: { subject: true } },
+              reportSummaries: {
+                take: 1,
+                orderBy: { updatedAt: "desc" },
+                include: {
+                  teacher: {
+                    select: {
+                      id: true,
+                      name: true,
+                      email: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!teacher) {
@@ -55,7 +68,7 @@ export const GetTeacherClasses = asyncHandler(async (req, res) => {
     200,
     true,
     "Teacher classes fetched successfully",
-    teacher.taughtYearGroups
+    teacher.taughtYearGroups,
   );
 });
 
@@ -63,14 +76,41 @@ export const GetTeacherClasses = asyncHandler(async (req, res) => {
 export const SubmitGrades = asyncHandler(async (req, res) => {
   const { userId, role } = req.user;
 
-  const { studentId, subjectId, score, grade, midterm, assignmentAvg, projectFinal, performance, teacherReport } = req.body;
+  const {
+    studentId,
+    subjectId,
+    score,
+    grade,
+    midterm,
+    assignmentAvg,
+    projectFinal,
+    performance,
+    teacherReport,
+    overallGrade,
+  } = req.body;
 
   if (role !== "TEACHER") {
     throw new AppError("Unauthorized access. Teachers only.", 403);
   }
 
-  if (studentId === undefined || studentId === null || subjectId === undefined || subjectId === null) {
+  if (
+    studentId === undefined ||
+    studentId === null ||
+    subjectId === undefined ||
+    subjectId === null
+  ) {
     throw new AppError("Missing required fields: studentId, subjectId", 400);
+  }
+
+  const student = await prisma.user.findUnique({
+    where: { id: Number(studentId) },
+    select: {
+      enrolledYearGroupId: true,
+    },
+  });
+
+  if (!student) {
+    throw new AppError("Student not found", 404);
   }
 
   // Check if a grade already exists for this student and subject
@@ -89,16 +129,23 @@ export const SubmitGrades = asyncHandler(async (req, res) => {
         score: score !== undefined ? Number(score) : undefined,
         grade: grade ? String(grade) : undefined,
         midterm: midterm !== undefined ? Number(midterm) : undefined,
-        assignmentAvg: assignmentAvg !== undefined ? Number(assignmentAvg) : undefined,
-        projectFinal: projectFinal !== undefined ? Number(projectFinal) : undefined,
-        performance: performance ? String(performance) : undefined,
-        teacherReport: teacherReport ? String(teacherReport) : undefined,
+        assignmentAvg:
+          assignmentAvg !== undefined ? Number(assignmentAvg) : undefined,
+        projectFinal:
+          projectFinal !== undefined ? Number(projectFinal) : undefined,
+        performance:
+          performance !== undefined ? String(performance) : undefined,
+        teacherReport:
+          teacherReport !== undefined ? String(teacherReport) : undefined,
         teacherId: userId, // Update who last graded it
       },
     });
   } else {
     if (score === undefined || grade === undefined) {
-      throw new AppError("Missing required fields for a new grade: score, grade", 400);
+      throw new AppError(
+        "Missing required fields for a new grade: score, grade",
+        400,
+      );
     }
 
     savedGrade = await prisma.grade.create({
@@ -106,16 +153,56 @@ export const SubmitGrades = asyncHandler(async (req, res) => {
         score: Number(score),
         grade: String(grade),
         midterm: midterm !== undefined ? Number(midterm) : null,
-        assignmentAvg: assignmentAvg !== undefined ? Number(assignmentAvg) : null,
+        assignmentAvg:
+          assignmentAvg !== undefined ? Number(assignmentAvg) : null,
         projectFinal: projectFinal !== undefined ? Number(projectFinal) : null,
-        performance: performance ? String(performance) : null,
-        teacherReport: teacherReport ? String(teacherReport) : null,
+        performance: performance !== undefined ? String(performance) : null,
+        teacherReport:
+          teacherReport !== undefined ? String(teacherReport) : null,
         test: false,
         test2: false,
         studentId: Number(studentId),
         subjectId: Number(subjectId),
-        teacherId: userId
-      }
+        teacherId: userId,
+      },
+    });
+  }
+
+  if (
+    overallGrade !== undefined ||
+    performance !== undefined ||
+    teacherReport !== undefined
+  ) {
+    const schoolSettings = await prisma.schoolSetting.findFirst({
+      orderBy: { updatedAt: "desc" },
+      select: { term: true, year: true },
+    });
+
+    await (prisma as any).studentReportSummary.upsert({
+      where: {
+        studentId: Number(studentId),
+      },
+      update: {
+        overallGrade:
+          overallGrade !== undefined ? String(overallGrade) : undefined,
+        performance:
+          performance !== undefined ? String(performance) : undefined,
+        teacherComment:
+          teacherReport !== undefined ? String(teacherReport) : undefined,
+        teacherId: userId,
+        yearGroupId: student.enrolledYearGroupId ?? undefined,
+      },
+      create: {
+        studentId: Number(studentId),
+        teacherId: userId,
+        yearGroupId: student.enrolledYearGroupId ?? null,
+        term: schoolSettings?.term ?? null,
+        academicYear: schoolSettings?.year ?? null,
+        overallGrade: overallGrade !== undefined ? String(overallGrade) : null,
+        performance: performance !== undefined ? String(performance) : null,
+        teacherComment:
+          teacherReport !== undefined ? String(teacherReport) : null,
+      },
     });
   }
 
@@ -136,7 +223,7 @@ export const SubmitAttendance = asyncHandler(async (req, res) => {
   }
 
   const attendanceDate = date ? new Date(date) : new Date();
-  
+
   // Find if an attendance record already exists for this student on this day
   const existingAttendance = await prisma.attendance.findFirst({
     where: {
@@ -193,14 +280,25 @@ export const GetTeacherMaterials = asyncHandler(async (req, res) => {
 // Upload material
 export const UploadMaterial = asyncHandler(async (req, res) => {
   const { userId, role } = req.user;
-  const { title, description, fileUrl, subjectId, yearGroupId, fileType, isPublished } = req.body;
+  const {
+    title,
+    description,
+    fileUrl,
+    subjectId,
+    yearGroupId,
+    fileType,
+    isPublished,
+  } = req.body;
 
   if (role !== "TEACHER") {
     throw new AppError("Unauthorized access. Teachers only.", 403);
   }
 
   if (!title || !fileUrl || !subjectId) {
-    throw new AppError("Missing required fields: title, fileUrl, subjectId", 400);
+    throw new AppError(
+      "Missing required fields: title, fileUrl, subjectId",
+      400,
+    );
   }
 
   const material = await prisma.material.create({
@@ -234,7 +332,7 @@ export const ToggleMaterialStatus = asyncHandler(async (req, res) => {
   }
 
   const material = await prisma.material.findUnique({
-    where: { id: Number(id) }
+    where: { id: Number(id) },
   });
 
   if (!material) {
@@ -267,11 +365,17 @@ export const CreateTeacherAnnouncement = asyncHandler(async (req, res) => {
   }
 
   if (!title || !content || !targetYearGroupId) {
-    throw new AppError("Missing required fields: title, content, targetYearGroupId", 400);
+    throw new AppError(
+      "Missing required fields: title, content, targetYearGroupId",
+      400,
+    );
   }
 
   if (targetType && targetType !== "YEAR_GROUP") {
-    throw new AppError("Teachers can only send announcements to their classes.", 403);
+    throw new AppError(
+      "Teachers can only send announcements to their classes.",
+      403,
+    );
   }
 
   // Verify the teacher is assigned to the target year group
@@ -279,13 +383,16 @@ export const CreateTeacherAnnouncement = asyncHandler(async (req, res) => {
     where: {
       id: userId,
       taughtYearGroups: {
-        some: { id: Number(targetYearGroupId) }
-      }
-    }
+        some: { id: Number(targetYearGroupId) },
+      },
+    },
   });
 
   if (!teacher) {
-    throw new AppError("You are not authorized to send announcements to this year group.", 403);
+    throw new AppError(
+      "You are not authorized to send announcements to this year group.",
+      403,
+    );
   }
 
   const announcement = await prisma.announcement.create({
@@ -303,11 +410,17 @@ export const CreateTeacherAnnouncement = asyncHandler(async (req, res) => {
           id: true,
           name: true,
           role: true,
-        }
+        },
       },
       targetYearGroup: true,
-    }
+    },
   });
 
-  return sendJson(res, 201, true, "Announcement broadcasted successfully", announcement);
+  return sendJson(
+    res,
+    201,
+    true,
+    "Announcement broadcasted successfully",
+    announcement,
+  );
 });

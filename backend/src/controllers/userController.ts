@@ -60,6 +60,16 @@ export const GetUserProfile = asyncHandler(async (req, res) => {
         take: 10,
         orderBy: { date: "desc" },
       },
+      reportSummaries: {
+        take: 1,
+        orderBy: { updatedAt: "desc" },
+        include: {
+          teacher: {
+            select: { id: true, name: true, email: true },
+          },
+          yearGroup: true,
+        },
+      },
       attendance: {
         take: 30,
         orderBy: { date: "desc" },
