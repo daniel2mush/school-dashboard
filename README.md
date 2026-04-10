@@ -167,4 +167,6 @@ NODE_ENV=production PORT=3001 node dist/server.js
 
 ## License
 
-This repository does not specify a license. Add one if you plan to publish or share this project publicly.
+This project is licensed under the MIT License.
+
+See [LICENSE](./LICENSE) for details.
