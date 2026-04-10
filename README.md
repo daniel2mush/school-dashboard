@@ -2,6 +2,19 @@
 
 A full-stack school dashboard application with an Express + Prisma backend and a React + TanStack frontend.
 
+## Why this project exists
+
+Many schools still rely on scattered paper records, unorganized spreadsheets, and file systems that grow more fragile over time. I built this dashboard to help both new and established schools keep their data organized without stress.
+
+This platform is designed to:
+
+- keep school data safe and structured
+- help teachers see the programs and assignments they are responsible for
+- help students understand which subject areas to focus on
+- support both French and English users with an advanced bilingual experience
+
+If you want to contribute financially or support the project, feel free to reach out: +223 71907048
+
 ## Project structure
 
 - `backend/` - Express server, Prisma ORM, authentication, admin/teacher/user APIs.
@@ -14,6 +27,25 @@ A full-stack school dashboard application with an Express + Prisma backend and a
 - Prisma-backed PostgreSQL database with migrations
 - School settings, reports, announcements, attendance, and grade management
 - Frontend dashboard with state management, forms, charts, and internationalization
+
+## Who this helps
+
+- Admins can manage users, school settings, and overall system data
+- Teachers can view assigned programs, submit grades, track attendance, and upload materials
+- Students can see which subjects to study, review announcements, and follow their learning progress
+- Schools can keep records organized, searchable, and available over time
+
+## Contributing
+
+If you want to help improve the project:
+
+1. Fork the repository
+2. Clone your fork locally
+3. Install dependencies in both `backend/` and `frontend/`
+4. Run the app and verify your changes
+5. Open a pull request with a clear description of your improvement
+
+Contributions are welcome for bug fixes, feature enhancements, translations, and documentation.
 
 ## Tech stack
 
@@ -164,6 +196,14 @@ NODE_ENV=production PORT=3001 node dist/server.js
 3. Configure environment variables and CORS for your production domains.
 
 4. Optionally use a reverse proxy or separate domains to route `frontend` and `backend` traffic.
+
+## Support and feedback
+
+If you want to contribute financially, report bugs, or suggest features, please contact:
+
+- Phone: +223 71907048
+
+You can also open issues or pull requests directly in the repository.
 
 ## License
 
