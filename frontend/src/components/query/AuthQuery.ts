@@ -3,7 +3,12 @@ import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import type { LoginFormData } from '../validation/authValidation'
 import { getDashboardHref } from '../constants/navigation'
-import type { LoginResponse, UserResponse, Announcement } from '#/types/Types'
+import type {
+  LoginResponse,
+  UserResponse,
+  Announcement,
+  Material,
+} from '#/types/Types'
 import useUserStore from '../store/UserStore'
 
 export const useLoginUser = () => {
@@ -65,6 +70,24 @@ export const useGetAnnouncements = () => {
         throw new Error(responseData.message || 'Failed to fetch announcements')
       }
       return responseData.data as Announcement[]
+    },
+  })
+}
+
+export const useGetStudentMaterials = () => {
+  return useQuery({
+    queryKey: ['student', 'materials'],
+    queryFn: async () => {
+      const res = await fetch('/api/user/materials')
+      const responseData = await res.json()
+      if (!res.ok) {
+        throw new Error(
+          responseData.message ||
+            responseData.error ||
+            'Failed to fetch class content',
+        )
+      }
+      return responseData.data as Material[]
     },
   })
 }

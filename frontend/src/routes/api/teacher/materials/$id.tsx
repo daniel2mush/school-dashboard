@@ -1,13 +1,15 @@
+import axiosClient from '#/components/client/AxiosClient'
 import { createFileRoute } from '@tanstack/react-router'
-import axiosClient from '#/components/client/AxiosClient.ts'
 import { isAxiosError } from 'axios'
 
-export const Route = createFileRoute('/api/teacher/classes')({
+export const Route = createFileRoute('/api/teacher/materials/$id')({
   server: {
     handlers: {
-      GET: async () => {
+      DELETE: async ({ request, params }) => {
         try {
-          const res = await axiosClient.get('/teacher/classes')
+          const res = await axiosClient.delete(
+            `/teacher/materials/${params.id}`,
+          )
           return Response.json(res.data)
         } catch (error) {
           if (isAxiosError(error)) {

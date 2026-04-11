@@ -1,4 +1,5 @@
 import { prisma } from "../clients/prismaClient.js";
+import { supabase } from "../clients/superbaseClient.js";
 import { TargetType } from "../../generated/prisma/index.js";
 import AppError from "../utils/AppError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -172,6 +173,125 @@ export const GetAnnouncements = asyncHandler(async (req, res) => {
   });
 
   return sendJson(res, 200, true, "Announcements fetched", announcements);
+});
+
+export const GetStudentMaterials = asyncHandler(async (req, res) => {
+  const { role, userId } = req.user;
+
+  if (role !== "STUDENT") {
+    throw new AppError("Unauthorized access. Students only.", 403);
+  }
+
+  const student = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      enrolledYearGroupId: true,
+    },
+  });
+
+  if (!student) {
+    throw new AppError("Student profile not found", 404);
+  }
+
+  if (!student.enrolledYearGroupId) {
+    return sendJson(
+      res,
+      200,
+      true,
+      "No class content available for this student yet",
+      [],
+    );
+  }
+
+  const materials = await prisma.material.findMany({
+    where: {
+      isPublished: true,
+      yearGroupId: student.enrolledYearGroupId,
+    },
+    include: {
+      subject: true,
+      yearGroup: true,
+      teacher: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          initials: true,
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return sendJson(
+    res,
+    200,
+    true,
+    "Student materials fetched successfully",
+    materials,
+  );
+});
+
+export const DownloadStudentMaterial = asyncHandler(async (req, res) => {
+  const { role, userId } = req.user;
+  const { id } = req.params;
+
+  if (role !== "STUDENT") {
+    throw new AppError("Unauthorized access. Students only.", 403);
+  }
+
+  const student = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { enrolledYearGroupId: true },
+  });
+
+  if (!student?.enrolledYearGroupId) {
+    throw new AppError("Student is not assigned to a class", 400);
+  }
+
+  const material = await prisma.material.findFirst({
+    where: {
+      id: Number(id),
+      isPublished: true,
+      yearGroupId: student.enrolledYearGroupId,
+    },
+  });
+
+  if (!material) {
+    throw new AppError("Material not found", 404);
+  }
+
+  const fileName = material.fileUrl.split("/").pop();
+
+  if (!fileName) {
+    throw new AppError("Unable to resolve the requested file", 400);
+  }
+
+  const { data, error } = await supabase.storage
+    .from("School Dashboard")
+    .download(fileName);
+
+  if (error || !data) {
+    throw new AppError("Failed to download material", 500);
+  }
+
+  const fileBuffer = Buffer.from(await data.arrayBuffer());
+  const extension = fileName.includes(".") ? fileName.split(".").pop() : "";
+  const downloadName = extension
+    ? `${material.title}.${extension}`
+    : material.title;
+
+  res.setHeader(
+    "Content-Type",
+    data.type || "application/octet-stream",
+  );
+  res.setHeader(
+    "Content-Disposition",
+    `attachment; filename="${downloadName.replace(/"/g, "")}"`,
+  );
+  res.setHeader("Content-Length", fileBuffer.length.toString());
+
+  return res.status(200).send(fileBuffer);
 });
 
 export const GetSchoolSettings = asyncHandler(async (_req, res) => {

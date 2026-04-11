@@ -27,6 +27,7 @@ import { Route as DashboardStudentSsubjectsRouteImport } from './routes/dashboar
 import { Route as DashboardStudentSreportRouteImport } from './routes/dashboard/student/sreport'
 import { Route as DashboardStudentSfeesRouteImport } from './routes/dashboard/student/sfees'
 import { Route as DashboardStudentSdashRouteImport } from './routes/dashboard/student/sdash'
+import { Route as DashboardStudentScontentRouteImport } from './routes/dashboard/student/scontent'
 import { Route as DashboardStudentSattRouteImport } from './routes/dashboard/student/satt'
 import { Route as DashboardAdminYeargroupsRouteImport } from './routes/dashboard/admin/yeargroups'
 import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard/admin/users'
@@ -39,8 +40,10 @@ import { Route as DashboardAdminAttendanceRouteImport } from './routes/dashboard
 import { Route as DashboardAdminAnnouncementsRouteImport } from './routes/dashboard/admin/announcements'
 import { Route as DashboardAdminAnalyticsRouteImport } from './routes/dashboard/admin/analytics'
 import { Route as ApiUserSchoolSettingsRouteImport } from './routes/api/user/school-settings'
+import { Route as ApiUserMaterialsRouteImport } from './routes/api/user/materials'
 import { Route as ApiUserAnnouncementsRouteImport } from './routes/api/user/announcements'
 import { Route as ApiUserIdRouteImport } from './routes/api/user/$id'
+import { Route as ApiTeacherMaterialsRouteImport } from './routes/api/teacher/materials'
 import { Route as ApiTeacherGradesRouteImport } from './routes/api/teacher/grades'
 import { Route as ApiTeacherClassesRouteImport } from './routes/api/teacher/classes'
 import { Route as ApiTeacherAttendanceRouteImport } from './routes/api/teacher/attendance'
@@ -56,6 +59,7 @@ import { Route as ApiAdminPeriodsRouteImport } from './routes/api/admin/periods'
 import { Route as ApiAdminFeesRouteImport } from './routes/api/admin/fees'
 import { Route as ApiAdminAnnouncementsRouteImport } from './routes/api/admin/announcements'
 import { Route as ApiAdminAnalyticsRouteImport } from './routes/api/admin/analytics'
+import { Route as ApiTeacherMaterialsIdRouteImport } from './routes/api/teacher/materials/$id'
 import { Route as ApiAdminYearGroupsUnassignTeacherRouteImport } from './routes/api/admin/year-groups/unassign-teacher'
 import { Route as ApiAdminYearGroupsMoveStudentRouteImport } from './routes/api/admin/year-groups/move-student'
 import { Route as ApiAdminYearGroupsAssignTeacherRouteImport } from './routes/api/admin/year-groups/assign-teacher'
@@ -66,6 +70,8 @@ import { Route as ApiAdminSubjectsIdRouteImport } from './routes/api/admin/subje
 import { Route as ApiAdminPeriodsAssignYearGroupRouteImport } from './routes/api/admin/periods/assign-year-group'
 import { Route as ApiAdminPeriodsIdRouteImport } from './routes/api/admin/periods/$id'
 import { Route as ApiAdminFeesIdRouteImport } from './routes/api/admin/fees/$id'
+import { Route as ApiUserMaterialsIdDownloadRouteImport } from './routes/api/user/materials/$id/download'
+import { Route as ApiTeacherMaterialsIdDownloadRouteImport } from './routes/api/teacher/materials/$id/download'
 import { Route as ApiAdminUsersIdUsersRouteImport } from './routes/api/admin/users/$id/users'
 import { Route as ApiAdminUsersIdStatusRouteImport } from './routes/api/admin/users/$id/status'
 import { Route as ApiAdminUsersIdResetPasswordRouteImport } from './routes/api/admin/users/$id/reset-password'
@@ -165,6 +171,12 @@ const DashboardStudentSdashRoute = DashboardStudentSdashRouteImport.update({
   path: '/student/sdash',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardStudentScontentRoute =
+  DashboardStudentScontentRouteImport.update({
+    id: '/student/scontent',
+    path: '/student/scontent',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardStudentSattRoute = DashboardStudentSattRouteImport.update({
   id: '/student/satt',
   path: '/student/satt',
@@ -229,6 +241,11 @@ const ApiUserSchoolSettingsRoute = ApiUserSchoolSettingsRouteImport.update({
   path: '/api/user/school-settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiUserMaterialsRoute = ApiUserMaterialsRouteImport.update({
+  id: '/api/user/materials',
+  path: '/api/user/materials',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUserAnnouncementsRoute = ApiUserAnnouncementsRouteImport.update({
   id: '/api/user/announcements',
   path: '/api/user/announcements',
@@ -237,6 +254,11 @@ const ApiUserAnnouncementsRoute = ApiUserAnnouncementsRouteImport.update({
 const ApiUserIdRoute = ApiUserIdRouteImport.update({
   id: '/api/user/$id',
   path: '/api/user/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTeacherMaterialsRoute = ApiTeacherMaterialsRouteImport.update({
+  id: '/api/teacher/materials',
+  path: '/api/teacher/materials',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiTeacherGradesRoute = ApiTeacherGradesRouteImport.update({
@@ -314,6 +336,11 @@ const ApiAdminAnalyticsRoute = ApiAdminAnalyticsRouteImport.update({
   path: '/api/admin/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTeacherMaterialsIdRoute = ApiTeacherMaterialsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiTeacherMaterialsRoute,
+} as any)
 const ApiAdminYearGroupsUnassignTeacherRoute =
   ApiAdminYearGroupsUnassignTeacherRouteImport.update({
     id: '/unassign-teacher',
@@ -370,6 +397,18 @@ const ApiAdminFeesIdRoute = ApiAdminFeesIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => ApiAdminFeesRoute,
 } as any)
+const ApiUserMaterialsIdDownloadRoute =
+  ApiUserMaterialsIdDownloadRouteImport.update({
+    id: '/$id/download',
+    path: '/$id/download',
+    getParentRoute: () => ApiUserMaterialsRoute,
+  } as any)
+const ApiTeacherMaterialsIdDownloadRoute =
+  ApiTeacherMaterialsIdDownloadRouteImport.update({
+    id: '/download',
+    path: '/download',
+    getParentRoute: () => ApiTeacherMaterialsIdRoute,
+  } as any)
 const ApiAdminUsersIdUsersRoute = ApiAdminUsersIdUsersRouteImport.update({
   id: '/$id/users',
   path: '/$id/users',
@@ -414,8 +453,10 @@ export interface FileRoutesByFullPath {
   '/api/teacher/attendance': typeof ApiTeacherAttendanceRoute
   '/api/teacher/classes': typeof ApiTeacherClassesRoute
   '/api/teacher/grades': typeof ApiTeacherGradesRoute
+  '/api/teacher/materials': typeof ApiTeacherMaterialsRouteWithChildren
   '/api/user/$id': typeof ApiUserIdRoute
   '/api/user/announcements': typeof ApiUserAnnouncementsRoute
+  '/api/user/materials': typeof ApiUserMaterialsRouteWithChildren
   '/api/user/school-settings': typeof ApiUserSchoolSettingsRoute
   '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
   '/dashboard/admin/announcements': typeof DashboardAdminAnnouncementsRoute
@@ -428,6 +469,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
   '/dashboard/student/satt': typeof DashboardStudentSattRoute
+  '/dashboard/student/scontent': typeof DashboardStudentScontentRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
   '/dashboard/student/sfees': typeof DashboardStudentSfeesRoute
   '/dashboard/student/sreport': typeof DashboardStudentSreportRoute
@@ -451,9 +493,12 @@ export interface FileRoutesByFullPath {
   '/api/admin/year-groups/assign-teacher': typeof ApiAdminYearGroupsAssignTeacherRoute
   '/api/admin/year-groups/move-student': typeof ApiAdminYearGroupsMoveStudentRoute
   '/api/admin/year-groups/unassign-teacher': typeof ApiAdminYearGroupsUnassignTeacherRoute
+  '/api/teacher/materials/$id': typeof ApiTeacherMaterialsIdRouteWithChildren
   '/api/admin/users/$id/reset-password': typeof ApiAdminUsersIdResetPasswordRoute
   '/api/admin/users/$id/status': typeof ApiAdminUsersIdStatusRoute
   '/api/admin/users/$id/users': typeof ApiAdminUsersIdUsersRoute
+  '/api/teacher/materials/$id/download': typeof ApiTeacherMaterialsIdDownloadRoute
+  '/api/user/materials/$id/download': typeof ApiUserMaterialsIdDownloadRoute
   '/api/admin/fees/$id/payments/$studentId': typeof ApiAdminFeesIdPaymentsStudentIdRoute
 }
 export interface FileRoutesByTo {
@@ -476,8 +521,10 @@ export interface FileRoutesByTo {
   '/api/teacher/attendance': typeof ApiTeacherAttendanceRoute
   '/api/teacher/classes': typeof ApiTeacherClassesRoute
   '/api/teacher/grades': typeof ApiTeacherGradesRoute
+  '/api/teacher/materials': typeof ApiTeacherMaterialsRouteWithChildren
   '/api/user/$id': typeof ApiUserIdRoute
   '/api/user/announcements': typeof ApiUserAnnouncementsRoute
+  '/api/user/materials': typeof ApiUserMaterialsRouteWithChildren
   '/api/user/school-settings': typeof ApiUserSchoolSettingsRoute
   '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
   '/dashboard/admin/announcements': typeof DashboardAdminAnnouncementsRoute
@@ -490,6 +537,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
   '/dashboard/student/satt': typeof DashboardStudentSattRoute
+  '/dashboard/student/scontent': typeof DashboardStudentScontentRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
   '/dashboard/student/sfees': typeof DashboardStudentSfeesRoute
   '/dashboard/student/sreport': typeof DashboardStudentSreportRoute
@@ -513,9 +561,12 @@ export interface FileRoutesByTo {
   '/api/admin/year-groups/assign-teacher': typeof ApiAdminYearGroupsAssignTeacherRoute
   '/api/admin/year-groups/move-student': typeof ApiAdminYearGroupsMoveStudentRoute
   '/api/admin/year-groups/unassign-teacher': typeof ApiAdminYearGroupsUnassignTeacherRoute
+  '/api/teacher/materials/$id': typeof ApiTeacherMaterialsIdRouteWithChildren
   '/api/admin/users/$id/reset-password': typeof ApiAdminUsersIdResetPasswordRoute
   '/api/admin/users/$id/status': typeof ApiAdminUsersIdStatusRoute
   '/api/admin/users/$id/users': typeof ApiAdminUsersIdUsersRoute
+  '/api/teacher/materials/$id/download': typeof ApiTeacherMaterialsIdDownloadRoute
+  '/api/user/materials/$id/download': typeof ApiUserMaterialsIdDownloadRoute
   '/api/admin/fees/$id/payments/$studentId': typeof ApiAdminFeesIdPaymentsStudentIdRoute
 }
 export interface FileRoutesById {
@@ -540,8 +591,10 @@ export interface FileRoutesById {
   '/api/teacher/attendance': typeof ApiTeacherAttendanceRoute
   '/api/teacher/classes': typeof ApiTeacherClassesRoute
   '/api/teacher/grades': typeof ApiTeacherGradesRoute
+  '/api/teacher/materials': typeof ApiTeacherMaterialsRouteWithChildren
   '/api/user/$id': typeof ApiUserIdRoute
   '/api/user/announcements': typeof ApiUserAnnouncementsRoute
+  '/api/user/materials': typeof ApiUserMaterialsRouteWithChildren
   '/api/user/school-settings': typeof ApiUserSchoolSettingsRoute
   '/dashboard/admin/analytics': typeof DashboardAdminAnalyticsRoute
   '/dashboard/admin/announcements': typeof DashboardAdminAnnouncementsRoute
@@ -554,6 +607,7 @@ export interface FileRoutesById {
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
   '/dashboard/student/satt': typeof DashboardStudentSattRoute
+  '/dashboard/student/scontent': typeof DashboardStudentScontentRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
   '/dashboard/student/sfees': typeof DashboardStudentSfeesRoute
   '/dashboard/student/sreport': typeof DashboardStudentSreportRoute
@@ -577,9 +631,12 @@ export interface FileRoutesById {
   '/api/admin/year-groups/assign-teacher': typeof ApiAdminYearGroupsAssignTeacherRoute
   '/api/admin/year-groups/move-student': typeof ApiAdminYearGroupsMoveStudentRoute
   '/api/admin/year-groups/unassign-teacher': typeof ApiAdminYearGroupsUnassignTeacherRoute
+  '/api/teacher/materials/$id': typeof ApiTeacherMaterialsIdRouteWithChildren
   '/api/admin/users/$id/reset-password': typeof ApiAdminUsersIdResetPasswordRoute
   '/api/admin/users/$id/status': typeof ApiAdminUsersIdStatusRoute
   '/api/admin/users/$id/users': typeof ApiAdminUsersIdUsersRoute
+  '/api/teacher/materials/$id/download': typeof ApiTeacherMaterialsIdDownloadRoute
+  '/api/user/materials/$id/download': typeof ApiUserMaterialsIdDownloadRoute
   '/api/admin/fees/$id/payments/$studentId': typeof ApiAdminFeesIdPaymentsStudentIdRoute
 }
 export interface FileRouteTypes {
@@ -605,8 +662,10 @@ export interface FileRouteTypes {
     | '/api/teacher/attendance'
     | '/api/teacher/classes'
     | '/api/teacher/grades'
+    | '/api/teacher/materials'
     | '/api/user/$id'
     | '/api/user/announcements'
+    | '/api/user/materials'
     | '/api/user/school-settings'
     | '/dashboard/admin/analytics'
     | '/dashboard/admin/announcements'
@@ -619,6 +678,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
     | '/dashboard/student/satt'
+    | '/dashboard/student/scontent'
     | '/dashboard/student/sdash'
     | '/dashboard/student/sfees'
     | '/dashboard/student/sreport'
@@ -642,9 +702,12 @@ export interface FileRouteTypes {
     | '/api/admin/year-groups/assign-teacher'
     | '/api/admin/year-groups/move-student'
     | '/api/admin/year-groups/unassign-teacher'
+    | '/api/teacher/materials/$id'
     | '/api/admin/users/$id/reset-password'
     | '/api/admin/users/$id/status'
     | '/api/admin/users/$id/users'
+    | '/api/teacher/materials/$id/download'
+    | '/api/user/materials/$id/download'
     | '/api/admin/fees/$id/payments/$studentId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -667,8 +730,10 @@ export interface FileRouteTypes {
     | '/api/teacher/attendance'
     | '/api/teacher/classes'
     | '/api/teacher/grades'
+    | '/api/teacher/materials'
     | '/api/user/$id'
     | '/api/user/announcements'
+    | '/api/user/materials'
     | '/api/user/school-settings'
     | '/dashboard/admin/analytics'
     | '/dashboard/admin/announcements'
@@ -681,6 +746,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
     | '/dashboard/student/satt'
+    | '/dashboard/student/scontent'
     | '/dashboard/student/sdash'
     | '/dashboard/student/sfees'
     | '/dashboard/student/sreport'
@@ -704,9 +770,12 @@ export interface FileRouteTypes {
     | '/api/admin/year-groups/assign-teacher'
     | '/api/admin/year-groups/move-student'
     | '/api/admin/year-groups/unassign-teacher'
+    | '/api/teacher/materials/$id'
     | '/api/admin/users/$id/reset-password'
     | '/api/admin/users/$id/status'
     | '/api/admin/users/$id/users'
+    | '/api/teacher/materials/$id/download'
+    | '/api/user/materials/$id/download'
     | '/api/admin/fees/$id/payments/$studentId'
   id:
     | '__root__'
@@ -730,8 +799,10 @@ export interface FileRouteTypes {
     | '/api/teacher/attendance'
     | '/api/teacher/classes'
     | '/api/teacher/grades'
+    | '/api/teacher/materials'
     | '/api/user/$id'
     | '/api/user/announcements'
+    | '/api/user/materials'
     | '/api/user/school-settings'
     | '/dashboard/admin/analytics'
     | '/dashboard/admin/announcements'
@@ -744,6 +815,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
     | '/dashboard/student/satt'
+    | '/dashboard/student/scontent'
     | '/dashboard/student/sdash'
     | '/dashboard/student/sfees'
     | '/dashboard/student/sreport'
@@ -767,9 +839,12 @@ export interface FileRouteTypes {
     | '/api/admin/year-groups/assign-teacher'
     | '/api/admin/year-groups/move-student'
     | '/api/admin/year-groups/unassign-teacher'
+    | '/api/teacher/materials/$id'
     | '/api/admin/users/$id/reset-password'
     | '/api/admin/users/$id/status'
     | '/api/admin/users/$id/users'
+    | '/api/teacher/materials/$id/download'
+    | '/api/user/materials/$id/download'
     | '/api/admin/fees/$id/payments/$studentId'
   fileRoutesById: FileRoutesById
 }
@@ -793,8 +868,10 @@ export interface RootRouteChildren {
   ApiTeacherAttendanceRoute: typeof ApiTeacherAttendanceRoute
   ApiTeacherClassesRoute: typeof ApiTeacherClassesRoute
   ApiTeacherGradesRoute: typeof ApiTeacherGradesRoute
+  ApiTeacherMaterialsRoute: typeof ApiTeacherMaterialsRouteWithChildren
   ApiUserIdRoute: typeof ApiUserIdRoute
   ApiUserAnnouncementsRoute: typeof ApiUserAnnouncementsRoute
+  ApiUserMaterialsRoute: typeof ApiUserMaterialsRouteWithChildren
   ApiUserSchoolSettingsRoute: typeof ApiUserSchoolSettingsRoute
 }
 
@@ -926,6 +1003,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardStudentSdashRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/student/scontent': {
+      id: '/dashboard/student/scontent'
+      path: '/student/scontent'
+      fullPath: '/dashboard/student/scontent'
+      preLoaderRoute: typeof DashboardStudentScontentRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/student/satt': {
       id: '/dashboard/student/satt'
       path: '/student/satt'
@@ -1010,6 +1094,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUserSchoolSettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/user/materials': {
+      id: '/api/user/materials'
+      path: '/api/user/materials'
+      fullPath: '/api/user/materials'
+      preLoaderRoute: typeof ApiUserMaterialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/user/announcements': {
       id: '/api/user/announcements'
       path: '/api/user/announcements'
@@ -1022,6 +1113,13 @@ declare module '@tanstack/react-router' {
       path: '/api/user/$id'
       fullPath: '/api/user/$id'
       preLoaderRoute: typeof ApiUserIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/teacher/materials': {
+      id: '/api/teacher/materials'
+      path: '/api/teacher/materials'
+      fullPath: '/api/teacher/materials'
+      preLoaderRoute: typeof ApiTeacherMaterialsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/teacher/grades': {
@@ -1129,6 +1227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/teacher/materials/$id': {
+      id: '/api/teacher/materials/$id'
+      path: '/$id'
+      fullPath: '/api/teacher/materials/$id'
+      preLoaderRoute: typeof ApiTeacherMaterialsIdRouteImport
+      parentRoute: typeof ApiTeacherMaterialsRoute
+    }
     '/api/admin/year-groups/unassign-teacher': {
       id: '/api/admin/year-groups/unassign-teacher'
       path: '/unassign-teacher'
@@ -1199,6 +1304,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminFeesIdRouteImport
       parentRoute: typeof ApiAdminFeesRoute
     }
+    '/api/user/materials/$id/download': {
+      id: '/api/user/materials/$id/download'
+      path: '/$id/download'
+      fullPath: '/api/user/materials/$id/download'
+      preLoaderRoute: typeof ApiUserMaterialsIdDownloadRouteImport
+      parentRoute: typeof ApiUserMaterialsRoute
+    }
+    '/api/teacher/materials/$id/download': {
+      id: '/api/teacher/materials/$id/download'
+      path: '/download'
+      fullPath: '/api/teacher/materials/$id/download'
+      preLoaderRoute: typeof ApiTeacherMaterialsIdDownloadRouteImport
+      parentRoute: typeof ApiTeacherMaterialsIdRoute
+    }
     '/api/admin/users/$id/users': {
       id: '/api/admin/users/$id/users'
       path: '/$id/users'
@@ -1243,6 +1362,7 @@ interface DashboardRouteChildren {
   DashboardAdminUsersRoute: typeof DashboardAdminUsersRoute
   DashboardAdminYeargroupsRoute: typeof DashboardAdminYeargroupsRoute
   DashboardStudentSattRoute: typeof DashboardStudentSattRoute
+  DashboardStudentScontentRoute: typeof DashboardStudentScontentRoute
   DashboardStudentSdashRoute: typeof DashboardStudentSdashRoute
   DashboardStudentSfeesRoute: typeof DashboardStudentSfeesRoute
   DashboardStudentSreportRoute: typeof DashboardStudentSreportRoute
@@ -1271,6 +1391,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdminUsersRoute: DashboardAdminUsersRoute,
   DashboardAdminYeargroupsRoute: DashboardAdminYeargroupsRoute,
   DashboardStudentSattRoute: DashboardStudentSattRoute,
+  DashboardStudentScontentRoute: DashboardStudentScontentRoute,
   DashboardStudentSdashRoute: DashboardStudentSdashRoute,
   DashboardStudentSfeesRoute: DashboardStudentSfeesRoute,
   DashboardStudentSreportRoute: DashboardStudentSreportRoute,
@@ -1378,6 +1499,41 @@ const ApiAdminYearGroupsRouteChildren: ApiAdminYearGroupsRouteChildren = {
 const ApiAdminYearGroupsRouteWithChildren =
   ApiAdminYearGroupsRoute._addFileChildren(ApiAdminYearGroupsRouteChildren)
 
+interface ApiTeacherMaterialsIdRouteChildren {
+  ApiTeacherMaterialsIdDownloadRoute: typeof ApiTeacherMaterialsIdDownloadRoute
+}
+
+const ApiTeacherMaterialsIdRouteChildren: ApiTeacherMaterialsIdRouteChildren = {
+  ApiTeacherMaterialsIdDownloadRoute: ApiTeacherMaterialsIdDownloadRoute,
+}
+
+const ApiTeacherMaterialsIdRouteWithChildren =
+  ApiTeacherMaterialsIdRoute._addFileChildren(
+    ApiTeacherMaterialsIdRouteChildren,
+  )
+
+interface ApiTeacherMaterialsRouteChildren {
+  ApiTeacherMaterialsIdRoute: typeof ApiTeacherMaterialsIdRouteWithChildren
+}
+
+const ApiTeacherMaterialsRouteChildren: ApiTeacherMaterialsRouteChildren = {
+  ApiTeacherMaterialsIdRoute: ApiTeacherMaterialsIdRouteWithChildren,
+}
+
+const ApiTeacherMaterialsRouteWithChildren =
+  ApiTeacherMaterialsRoute._addFileChildren(ApiTeacherMaterialsRouteChildren)
+
+interface ApiUserMaterialsRouteChildren {
+  ApiUserMaterialsIdDownloadRoute: typeof ApiUserMaterialsIdDownloadRoute
+}
+
+const ApiUserMaterialsRouteChildren: ApiUserMaterialsRouteChildren = {
+  ApiUserMaterialsIdDownloadRoute: ApiUserMaterialsIdDownloadRoute,
+}
+
+const ApiUserMaterialsRouteWithChildren =
+  ApiUserMaterialsRoute._addFileChildren(ApiUserMaterialsRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRouteWithChildren,
@@ -1398,8 +1554,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiTeacherAttendanceRoute: ApiTeacherAttendanceRoute,
   ApiTeacherClassesRoute: ApiTeacherClassesRoute,
   ApiTeacherGradesRoute: ApiTeacherGradesRoute,
+  ApiTeacherMaterialsRoute: ApiTeacherMaterialsRouteWithChildren,
   ApiUserIdRoute: ApiUserIdRoute,
   ApiUserAnnouncementsRoute: ApiUserAnnouncementsRoute,
+  ApiUserMaterialsRoute: ApiUserMaterialsRouteWithChildren,
   ApiUserSchoolSettingsRoute: ApiUserSchoolSettingsRoute,
 }
 export const routeTree = rootRouteImport

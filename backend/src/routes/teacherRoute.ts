@@ -1,6 +1,17 @@
 import express from "express";
-import { GetTeacherClasses, SubmitGrades, SubmitAttendance, GetTeacherMaterials, UploadMaterial, ToggleMaterialStatus, CreateTeacherAnnouncement } from "../controllers/teacherController.js";
+import {
+  GetTeacherClasses,
+  SubmitGrades,
+  SubmitAttendance,
+  GetTeacherMaterials,
+  DownloadTeacherMaterial,
+  UploadMaterial,
+  ToggleMaterialStatus,
+  DeleteMaterial,
+  CreateTeacherAnnouncement,
+} from "../controllers/teacherController.js";
 import { AuthenticateRequest } from "../middleware/authenticate.js";
+import { uploadMiddlware } from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
 
@@ -9,8 +20,19 @@ router.get("/classes", AuthenticateRequest, GetTeacherClasses);
 
 // Materials management
 router.get("/materials", AuthenticateRequest, GetTeacherMaterials);
-router.post("/materials", AuthenticateRequest, UploadMaterial);
-router.patch("/materials/:id/status", AuthenticateRequest, ToggleMaterialStatus);
+router.get("/materials/:id/download", AuthenticateRequest, DownloadTeacherMaterial);
+router.post(
+  "/materials",
+  AuthenticateRequest,
+  uploadMiddlware.single("document"),
+  UploadMaterial,
+);
+router.patch(
+  "/materials/:id/status",
+  AuthenticateRequest,
+  ToggleMaterialStatus,
+);
+router.delete("/materials/:id", AuthenticateRequest, DeleteMaterial);
 
 // Mutating endpoints for Teachers
 router.post("/grades", AuthenticateRequest, SubmitGrades);

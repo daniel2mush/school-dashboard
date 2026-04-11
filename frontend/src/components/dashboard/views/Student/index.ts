@@ -1,5 +1,6 @@
 export { StudentDashboard } from './StudentDashboard'
 export { StudentSubjects } from './StudentSubjects'
+export { StudentClassContent } from './StudentClassContent'
 export { StudentReportCard } from './StudentReportCard'
 export { StudentAttendance } from './StudentAttendance'
 export { StudentTimetable } from './StudentTimetable'

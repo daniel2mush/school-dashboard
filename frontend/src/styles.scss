@@ -15,7 +15,9 @@
   margin-bottom: 24px;
   padding: 24px;
   position: relative;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 
   &:hover {
     transform: translateY(-2px);
@@ -313,7 +315,10 @@
   animation: btn-spin 0.8s linear infinite;
 }
 
-.btn-secondary, .btn-outline, .secondary, .outline {
+.btn-secondary,
+.btn-outline,
+.secondary,
+.outline {
   .btn-spinner {
     border-color: rgba(79, 70, 229, 0.2);
     border-top-color: var(--accent);
@@ -321,7 +326,9 @@
 }
 
 @keyframes btn-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ============================================================
@@ -431,8 +438,7 @@
   box-shadow: var(--shadow-sm);
   appearance: none;
   font-family: inherit;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='currentColor'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")
     no-repeat right 12px center/16px;
 
   &:focus {
@@ -524,6 +530,9 @@
   --red-text: #991b1b;
   --red-rgb: 220, 38, 38;
 
+  /* Error color alias */
+  --error: var(--red);
+
   --purple: #7c3aed;
   --purple-bg: #f5f3ff;
   --purple-text: #5b21b6;
@@ -556,7 +565,9 @@
   border-radius: 999px;
   border: 1px solid var(--border-mid);
   cursor: pointer;
-  transition: background-color 0.2s, border-color 0.2s;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s;
   padding: 0;
   outline: none;
 
@@ -582,7 +593,9 @@
     height: 18px;
     background-color: var(--text-tertiary);
     border-radius: 50%;
-    transition: transform 0.2s, background-color 0.2s;
+    transition:
+      transform 0.2s,
+      background-color 0.2s;
     display: flex;
     align-items: center;
     justify-content: center;

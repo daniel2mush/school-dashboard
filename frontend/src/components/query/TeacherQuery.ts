@@ -154,18 +154,10 @@ export const useUploadMaterial = () => {
 
   return useMutation({
     mutationKey: ['teacher', 'uploadMaterial'],
-    mutationFn: async (data: {
-      title: string
-      description?: string
-      fileUrl: string
-      subjectId: number
-      yearGroupId?: number
-      fileType?: string
-    }) => {
+    mutationFn: async (formData: FormData) => {
       const res = await fetch('/api/teacher/materials', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: formData,
       })
 
       const responseData = await res.json()
@@ -212,6 +204,36 @@ export const useToggleMaterialStatus = () => {
     },
     onSuccess: () => {
       toast.success('Material status updated')
+      queryClient.invalidateQueries({ queryKey: ['teacher', 'materials'] })
+    },
+    onError: (error: Error) => {
+      toast.error(error.message)
+    },
+  })
+}
+
+export const useDeleteMaterial = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationKey: ['teacher', 'deleteMaterial'],
+    mutationFn: async (id: number) => {
+      const res = await fetch(`/api/teacher/materials/${id}`, {
+        method: 'DELETE',
+      })
+
+      const responseData = await res.json()
+      if (!res.ok) {
+        throw new Error(
+          responseData.message ||
+            responseData.error ||
+            'Failed to delete material',
+        )
+      }
+      return responseData
+    },
+    onSuccess: () => {
+      toast.success('Material deleted successfully')
       queryClient.invalidateQueries({ queryKey: ['teacher', 'materials'] })
     },
     onError: (error: Error) => {

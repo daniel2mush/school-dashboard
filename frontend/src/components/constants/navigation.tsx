@@ -14,6 +14,7 @@ import {
   PieChart,
   BookText,
   Settings,
+  FolderOpen,
 } from 'lucide-react'
 import type { UserRole } from '@/types/Types'
 import type { DashboardLanguage } from '#/components/dashboard/i18n'
@@ -74,6 +75,7 @@ const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     { section: 'mySchool' },
     { id: 'sdash', label: 'Dashboard', icon: <LayoutDashboard size={20} /> },
     { id: 'ssubjects', label: 'My Subjects', icon: <BookOpen size={20} /> },
+    { id: 'scontent', label: 'Class Content', icon: <FolderOpen size={20} /> },
     { id: 'sreport', label: 'Report Card', icon: <FileText size={20} /> },
     { id: 'satt', label: 'Attendance', icon: <UserCheck size={20} /> },
     { id: 'stimetable', label: 'Timetable', icon: <CalendarDays size={20} /> },

@@ -185,3 +185,20 @@ export interface Announcement {
   author?: { name: string; role: string }
   targetYearGroup?: { id: number; name: string } | null
 }
+
+export interface Material {
+  id: number
+  title: string
+  description?: string | null
+  fileUrl: string
+  fileType?: string | null
+  subjectId: number
+  yearGroupId?: number | null
+  teacherId: number
+  isPublished: boolean
+  createdAt: string
+  updatedAt: string
+  subject: Subject
+  yearGroup?: Pick<YearGroup, 'id' | 'name' | 'level'> | null
+  teacher?: Pick<User, 'id' | 'name' | 'email' | 'initials'> | null
+}

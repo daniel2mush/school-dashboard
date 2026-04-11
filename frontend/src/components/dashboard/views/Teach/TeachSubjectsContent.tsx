@@ -5,6 +5,7 @@ import {
   useGetTeacherMaterials,
   useUploadMaterial,
   useToggleMaterialStatus,
+  useDeleteMaterial,
 } from '#/components/query/TeacherQuery.ts'
 import {
   Upload,
@@ -13,18 +14,13 @@ import {
   X,
   FilePlus,
   Info,
-  MoreVertical,
-  Eye,
-  EyeOff,
   Search,
   Filter,
   Video,
   Music,
   File as FileIcon,
-  CheckCircle2,
-  Clock,
+  Trash2,
 } from 'lucide-react'
-import { format } from 'date-fns'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 
 export function TeachSubjectsContent() {
@@ -34,15 +30,19 @@ export function TeachSubjectsContent() {
     useGetTeacherMaterials()
   const uploadMutation = useUploadMaterial()
   const toggleStatusMutation = useToggleMaterialStatus()
+  const deleteMutation = useDeleteMaterial()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [materialToDelete, setMaterialToDelete] = useState<number | null>(null)
+  const [downloadingId, setDownloadingId] = useState<number | null>(null)
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     subjectId: '',
     yearGroupId: '',
-    fileUrl: 'https://example.com/mock-file.pdf',
     isPublished: true,
   })
 
@@ -62,26 +62,27 @@ export function TeachSubjectsContent() {
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!formData.title || !formData.subjectId) return
+    if (!formData.title || !formData.subjectId || !selectedFile) return
 
-    await uploadMutation.mutateAsync({
-      title: formData.title,
-      description: formData.description,
-      subjectId: Number(formData.subjectId),
-      yearGroupId: formData.yearGroupId
-        ? Number(formData.yearGroupId)
-        : undefined,
-      fileUrl: formData.fileUrl,
-      fileType: formData.fileUrl.split('.').pop() || 'pdf',
-    })
+    const formDataToSend = new FormData()
+    formDataToSend.append('title', formData.title)
+    formDataToSend.append('description', formData.description)
+    formDataToSend.append('subjectId', formData.subjectId)
+    if (formData.yearGroupId) {
+      formDataToSend.append('yearGroupId', formData.yearGroupId)
+    }
+    formDataToSend.append('isPublished', formData.isPublished.toString())
+    formDataToSend.append('document', selectedFile)
+
+    await uploadMutation.mutateAsync(formDataToSend)
 
     setIsModalOpen(false)
+    setSelectedFile(null)
     setFormData({
       title: '',
       description: '',
       subjectId: '',
       yearGroupId: '',
-      fileUrl: 'https://example.com/mock-file.pdf',
       isPublished: true,
     })
   }
@@ -91,6 +92,46 @@ export function TeachSubjectsContent() {
       id,
       isPublished: !currentStatus,
     })
+  }
+
+  const handleDeleteMaterial = async (id: number) => {
+    setMaterialToDelete(id)
+    setDeleteModalOpen(true)
+  }
+
+  const confirmDelete = async () => {
+    if (materialToDelete) {
+      await deleteMutation.mutateAsync(materialToDelete)
+      setDeleteModalOpen(false)
+      setMaterialToDelete(null)
+    }
+  }
+
+  const handleDownload = async (materialId: number) => {
+    try {
+      setDownloadingId(materialId)
+
+      const response = await fetch(`/api/teacher/materials/${materialId}/download`)
+      if (!response.ok) {
+        throw new Error('Failed to download file')
+      }
+
+      const blob = await response.blob()
+      const disposition = response.headers.get('content-disposition') || ''
+      const fileNameMatch = disposition.match(/filename="?(.*?)"?$/i)
+      const fileName = fileNameMatch?.[1] || `material-${materialId}`
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+
+      link.href = url
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } finally {
+      setDownloadingId(null)
+    }
   }
 
   const getFileIcon = (type?: string) => {
@@ -113,12 +154,10 @@ export function TeachSubjectsContent() {
   return (
     <section className={styles.view}>
       <header className={styles.panel}>
-          <div className={styles.heroContent}>
-            <div className={styles.eyebrow}>{t('teacher.content.eyebrow')}</div>
+        <div className={styles.heroContent}>
+          <div className={styles.eyebrow}>{t('teacher.content.eyebrow')}</div>
           <h2 className={styles.title}>{t('teacher.content.title')}</h2>
-          <p className={styles.copy}>
-            {t('teacher.content.copy')}
-          </p>
+          <p className={styles.copy}>{t('teacher.content.copy')}</p>
         </div>
         <div className={styles.heroActions}>
           <button
@@ -179,7 +218,9 @@ export function TeachSubjectsContent() {
                         {getFileIcon(material.fileType || undefined)}
                       </div>
                       <div className={styles.fileInfo}>
-                        <span className={styles.fileName}>{material.title}</span>
+                        <span className={styles.fileName}>
+                          {material.title}
+                        </span>
                         <span className={styles.fileDesc}>
                           {material.description ||
                             t('teacher.content.noDescription')}
@@ -194,7 +235,8 @@ export function TeachSubjectsContent() {
                   </td>
                   <td>
                     <span className={styles.classText}>
-                      {material.yearGroup?.name || t('teacher.content.allClasses')}
+                      {material.yearGroup?.name ||
+                        t('teacher.content.allClasses')}
                     </span>
                   </td>
                   <td>
@@ -216,7 +258,10 @@ export function TeachSubjectsContent() {
                           type="checkbox"
                           checked={material.isPublished}
                           onChange={() =>
-                            handleToggleStatus(material.id, material.isPublished)
+                            handleToggleStatus(
+                              material.id,
+                              material.isPublished,
+                            )
                           }
                         />
                         <span
@@ -238,20 +283,21 @@ export function TeachSubjectsContent() {
                   </td>
                   <td className={styles.actionsCell}>
                     <div className={styles.actionButtons}>
-                      <a
-                        href={material.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        type="button"
                         className={styles.iconBtn}
                         title={t('teacher.content.download')}
+                        onClick={() => handleDownload(material.id)}
+                        disabled={downloadingId === material.id}
                       >
                         <Download size={18} />
-                      </a>
+                      </button>
                       <button
-                        className={styles.iconBtn}
-                        title={t('teacher.content.moreOptions')}
+                        className={`${styles.iconBtn} ${styles.deleteBtn}`}
+                        onClick={() => handleDeleteMaterial(material.id)}
+                        title="Delete material"
                       >
-                        <MoreVertical size={18} />
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </td>
@@ -284,7 +330,9 @@ export function TeachSubjectsContent() {
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
-              <h3 className={styles.modalTitle}>{t('teacher.content.upload')}</h3>
+              <h3 className={styles.modalTitle}>
+                {t('teacher.content.upload')}
+              </h3>
               <button
                 className={styles.closeBtn}
                 onClick={() => setIsModalOpen(false)}
@@ -371,7 +419,7 @@ export function TeachSubjectsContent() {
                   </div>
 
                   <div className={styles.formGroup}>
-                      <label className={styles.label}>
+                    <label className={styles.label}>
                       {t('teacher.content.description')}
                     </label>
                     <textarea
@@ -387,11 +435,44 @@ export function TeachSubjectsContent() {
                     />
                   </div>
 
-                  <div className={styles.uploadArea}>
-                    <div className={styles.uploadPlaceholder}>
-                      <Upload size={24} />
-                      <p>{t('teacher.content.uploadPlaceholder')}</p>
-                      <span>{t('teacher.content.uploadSupport')}</span>
+                  <div className={styles.formGroup}>
+                    <label className={styles.label}>
+                      {t('teacher.content.selectFile')}
+                    </label>
+                    <input
+                      type="file"
+                      id="file-upload"
+                      className={styles.fileInput}
+                      accept=".pdf,.doc,.docx,.ppt,.pptx"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          setSelectedFile(file)
+                        }
+                      }}
+                    />
+                    <div
+                      className={styles.uploadArea}
+                      onClick={() =>
+                        document.getElementById('file-upload')?.click()
+                      }
+                    >
+                      <div className={styles.uploadPlaceholder}>
+                        <Upload size={24} />
+                        {selectedFile ? (
+                          <div className={styles.fileSelected}>
+                            <p>{selectedFile.name}</p>
+                            <span>
+                              {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                            </span>
+                          </div>
+                        ) : (
+                          <>
+                            <p>{t('teacher.content.uploadPlaceholder')}</p>
+                            <span>{t('teacher.content.uploadSupport')}</span>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -416,6 +497,40 @@ export function TeachSubjectsContent() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {deleteModalOpen && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.deleteModal}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>
+                {t('teacher.content.deleteConfirmTitle')}
+              </h3>
+            </div>
+            <div className={styles.modalBody}>
+              <p>{t('teacher.content.deleteConfirmMessage')}</p>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.cancelBtn}
+                onClick={() => setDeleteModalOpen(false)}
+              >
+                {t('teacher.content.cancel')}
+              </button>
+              <button
+                type="button"
+                className={styles.deleteConfirmBtn}
+                onClick={confirmDelete}
+                disabled={deleteMutation.isPending}
+              >
+                {deleteMutation.isPending
+                  ? t('teacher.content.processing')
+                  : t('teacher.content.delete')}
+              </button>
+            </div>
           </div>
         </div>
       )}
