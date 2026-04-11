@@ -29,7 +29,7 @@ const setCookieServer = (
  * Server Axios Client – TanStack Start API Routes
  */
 export const axiosClient = axios.create({
-  baseURL: 'http://localhost:3001/api',
+  baseURL: process.env.API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
