@@ -18,6 +18,10 @@ const fr = {
     enterYourEmail: 'Saisissez votre e-mail',
     enterYourPassword: 'Saisissez votre mot de passe',
     signIn: 'Se connecter',
+    mobileRestrictedEyebrow: 'Ordinateur requis',
+    mobileRestrictedTitle: 'Connectez-vous avec un ordinateur',
+    mobileRestrictedMessage:
+      "Ce tableau de bord n'est pas disponible sur les ecrans de telephone apres la connexion. Deconnectez-vous maintenant puis continuez sur un ordinateur de bureau ou portable pour acceder a l'espace complet.",
   },
   role: {
     ADMIN: 'Administration',

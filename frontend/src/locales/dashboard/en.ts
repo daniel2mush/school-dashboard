@@ -18,6 +18,10 @@ const en = {
     enterYourEmail: 'Enter your email',
     enterYourPassword: 'Enter your password',
     signIn: 'Sign in',
+    mobileRestrictedEyebrow: 'Desktop required',
+    mobileRestrictedTitle: 'Sign in with a desktop computer',
+    mobileRestrictedMessage:
+      'This dashboard is not available on phone screens after login. Please sign out now and continue on a desktop or laptop for the full workspace.',
   },
   role: {
     ADMIN: 'Admin',
