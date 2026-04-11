@@ -15,6 +15,16 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   overflow: hidden;
+  &.mobile {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+}
+
+.authImage {
+  &.mobile {
+    display: none;
+  }
 }
 .loginContent {
   width: 100%;
@@ -59,3 +69,5 @@
 .submitBtn {
   margin-top: 8px;
 }
+
+

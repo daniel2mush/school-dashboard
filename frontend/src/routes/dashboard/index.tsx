@@ -6,15 +6,13 @@ import Loading from '#/components/Loading/Loading'
 export const Route = createFileRoute('/dashboard/')({
   // Keep the beforeLoad for internal transitions
   beforeLoad: () => {
-    if (typeof window !== 'undefined') {
-      const user = useUserStore.getState().user
-      if (user?.role === 'ADMIN')
-        throw redirect({ to: '/dashboard/admin/overview' })
-      if (user?.role === 'TEACHER')
-        throw redirect({ to: '/dashboard/teacher/tmy' })
-      if (user?.role === 'STUDENT')
-        throw redirect({ to: '/dashboard/student/sdash' })
-    }
+    const user = useUserStore.getState().user
+    if (user?.role === 'ADMIN')
+      throw redirect({ to: '/dashboard/admin/overview' })
+    if (user?.role === 'TEACHER')
+      throw redirect({ to: '/dashboard/teacher/tmy' })
+    if (user?.role === 'STUDENT')
+      throw redirect({ to: '/dashboard/student/sdash' })
   },
   component: DashboardIndexComponent,
 })

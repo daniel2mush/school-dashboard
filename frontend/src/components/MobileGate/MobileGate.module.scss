@@ -1,0 +1,67 @@
+.mobileGate {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle at top left, rgba(79, 70, 229, 0.08), transparent 40%),
+              linear-gradient(180deg, var(--bg-tertiary), var(--bg-secondary));
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobileGateCard {
+  width: 100%;
+  max-width: 440px;
+  padding: 40px 32px;
+  text-align: center;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(8px);
+}
+
+.mobileGateIcon {
+  display: inline-flex;
+  padding: 20px;
+  margin-bottom: 24px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border-radius: 24px;
+}
+
+.mobileGateEyebrow {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+
+.mobileGateTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.mobileGateCopy {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

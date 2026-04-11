@@ -11,19 +11,18 @@ import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 import { useLoginUser } from '#/components/query/AuthQuery'
 import { Mail, Lock } from 'lucide-react'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
+import { useMediaQuery } from 'react-responsive'
+import { MobileGate } from '#/components/MobileGate/MobileGate'
 
 export const Route = createFileRoute('/login/')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
+  const isTabletOrMobile = useMediaQuery({ maxWidth: 1024 })
   const { t } = useDashboardTranslation()
   const { school } = useSchoolData()
   const { mutateAsync: loginUser, isPending: loading } = useLoginUser()
-
-  const handleLoginSubmit = (data: LoginFormData) => {
-    loginUser(data)
-  }
 
   const {
     register,
@@ -36,10 +35,19 @@ function RouteComponent() {
       password: '',
     },
   })
+
+  if (isTabletOrMobile) {
+    return <MobileGate />
+  }
+
+  const handleLoginSubmit = (data: LoginFormData) => {
+    loginUser(data)
+  }
+
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <div>
+        <div className={styles.authImage}>
           <AuthImage />
         </div>
         <div className={styles.loginContent}>
