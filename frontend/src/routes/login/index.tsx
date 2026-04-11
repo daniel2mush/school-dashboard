@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Input } from '#/components/ui/Input/Input'
 import { Button } from '#/components/ui/Button/Button'
 import AuthImage from '#/components/AuthImage/AuthImage'
+import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 import { useLoginUser } from '#/components/query/AuthQuery'
 import { Mail, Lock } from 'lucide-react'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
@@ -17,6 +18,7 @@ export const Route = createFileRoute('/login/')({
 
 function RouteComponent() {
   const { t } = useDashboardTranslation()
+  const { school } = useSchoolData()
   const { mutateAsync: loginUser, isPending: loading } = useLoginUser()
 
   const handleLoginSubmit = (data: LoginFormData) => {
@@ -44,7 +46,7 @@ function RouteComponent() {
           <div className={styles.header}>
             <div className={styles.logo}>SA</div>
             <div className={styles.title}>
-              <h1>{t('auth.schoolName')}</h1>
+              <h1>{school.name}</h1>
               <p>{t('auth.schoolDashboard')}</p>
             </div>
           </div>

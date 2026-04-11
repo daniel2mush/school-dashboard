@@ -24,6 +24,7 @@ import { useGetAnnouncements } from '#/components/query/AuthQuery.ts'
 import { useCurrency } from '#/context/CurrencyContext.tsx'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import { useSchoolData } from '#/components/providers/SchoolDataProvider'
+import { formatLocalizedFullDate } from '#/components/lib/formatLocalizedDate'
 
 const PERIODS = [
   { label: 'Period 1', time: '7:30 – 8:30' },
@@ -42,7 +43,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
   const currentData = useCurrentStudent()
   const { data: announcements } = useGetAnnouncements()
   const { formatCurrency } = useCurrency()
-  const { t } = useDashboardTranslation()
+  const { t, language } = useDashboardTranslation()
   const { school } = useSchoolData()
 
   if (!currentData) return null
@@ -52,12 +53,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
 
   const feePct = Math.round((student.fees.paid / student.fees.total) * 100)
   const todayLessons = Object.values(studentTimetable)[0]
-  const today = new Date().toLocaleDateString('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
+  const today = formatLocalizedFullDate(new Date(), language)
 
   return (
     <section className={styles.view}>

@@ -42,6 +42,7 @@ import {
 import type { TooltipValueType } from 'recharts'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import { useSchoolData } from '#/components/providers/SchoolDataProvider'
+import { formatLocalizedFullDate } from '#/components/lib/formatLocalizedDate'
 import styles from './AdminOverview.module.scss'
 
 const YG_ACCENTS = [
@@ -132,7 +133,7 @@ function StatTile({
 
 export function AdminOverview() {
   const { currency, setCurrency, formatCurrency } = useCurrency()
-  const { t } = useDashboardTranslation()
+  const { t, language } = useDashboardTranslation()
   const { school } = useSchoolData()
   const [isMounted, setIsMounted] = useState(false)
   useEffect(() => {
@@ -205,12 +206,7 @@ export function AdminOverview() {
   const totalSubjectLinks =
     structure?.reduce((sum, yg) => sum + yg.subjects.length, 0) ?? 0
 
-  const today = new Date().toLocaleDateString('en-GB', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
+  const today = formatLocalizedFullDate(new Date(), language)
 
   const latestAnnouncement = announcements.length > 0 ? announcements[0] : null
 
@@ -240,7 +236,6 @@ export function AdminOverview() {
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <div className={styles.eyebrow}>Sunridge Academy · Admin</div>
             <div className={styles.eyebrow}>
               {school.name} · {t('admin.overview.eyebrow')}
             </div>
