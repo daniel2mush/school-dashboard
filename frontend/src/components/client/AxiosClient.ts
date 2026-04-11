@@ -3,7 +3,6 @@ import { getCookie, setCookie } from '@tanstack/react-start/server'
 import { getRequestHeaders } from '@tanstack/react-start/server'
 
 const getCookieValue = (name: string) => {
-  // Server-side cookie reading
   return getCookie(name)
 }
 
@@ -17,7 +16,6 @@ const setCookieServer = (
     sameSite?: string
   } = {},
 ) => {
-  // Server-side cookie setting (adds Set-Cookie to response)
   setCookie(name, value, {
     ...options,
     path: options.path ?? '/',
@@ -25,32 +23,27 @@ const setCookieServer = (
   })
 }
 
-/**
- * Server Axios Client – TanStack Start API Routes
- */
+// ✅ Use import.meta.env for Vite/TanStack Start
+const BASE_URL = import.meta.env.VITE_API_URL
+
 export const axiosClient = axios.create({
-  baseURL: process.env.API_URL,
+  baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 })
 
-// Request interceptor – automatically forwards cookies from the incoming request
 axiosClient.interceptors.request.use(async (config) => {
   const headers = getRequestHeaders()
   config.headers = { ...config.headers, ...headers }
   return config
 })
 
-/**
- * Response Interceptor: Token Rotation (exactly as you wanted)
- */
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
 
-    // 1. Guard against non-401 errors and infinite loops
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
 
@@ -63,28 +56,29 @@ axiosClient.interceptors.response.use(
           return Promise.reject(error)
         }
 
-        // 2. Refresh token request (exactly your code)
+        // ✅ FIXED: Changed process.env.API_URL to BASE_URL
         const response = await axios.post(
-          `${process.env.API_URL}/auth/refresh-token`,
+          `${BASE_URL}/auth/refresh-token`,
           {},
           {
             headers: {
-              Cookie: `refreshToken=${refreshToken}`, // ← as you specified
+              Cookie: `refreshToken=${refreshToken}`,
             },
           },
         )
 
         const { accessToken } = response.data.data
 
-        // 3. Update Access Token
+        // ✅ FIXED: Using import.meta.env for production check
+        const isProd = import.meta.env.PROD
+
         setCookieServer('accessToken', accessToken, {
-          secure: process.env.NODE_ENV === 'production',
+          secure: isProd,
           sameSite: 'Strict',
           path: '/',
           maxAge: 60 * 60 * 24 * 7,
         })
 
-        // 4. Update Refresh Token from backend Set-Cookie header
         const setCookieHeaders = response.headers['set-cookie']
 
         if (setCookieHeaders) {
@@ -96,7 +90,7 @@ axiosClient.interceptors.response.use(
             const tokenValue = refreshTokenCookie.split(';')[0].split('=')[1]
 
             setCookieServer('refreshToken', tokenValue, {
-              secure: process.env.NODE_ENV === 'production',
+              secure: isProd,
               sameSite: 'Strict',
               path: '/',
               maxAge: 60 * 60 * 24 * 7,
@@ -104,9 +98,7 @@ axiosClient.interceptors.response.use(
           }
         }
 
-        // 5. Retry original request with new token
         originalRequest.headers['Authorization'] = `Bearer ${accessToken}`
-
         console.info('New Token Successfully set')
 
         return axiosClient(originalRequest)

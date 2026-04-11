@@ -3,6 +3,7 @@ import type { LoginFormData } from '#/components/validation/authValidation'
 import type { LoginResponse } from '#/types/Types'
 import { setCookie } from '@tanstack/react-start/server'
 import { createFileRoute } from '@tanstack/react-router'
+import axiosClient from '#/components/client/AxiosClient'
 
 export const Route = createFileRoute('/api/auth/login')({
   server: {
@@ -18,10 +19,7 @@ export const Route = createFileRoute('/api/auth/login')({
             })
           }
           // 2. Send the data to your backend
-          const res = await axios.post(
-            `${process.env.API_URL}/auth/login`,
-            data,
-          )
+          const res = await axiosClient.post('/auth/login', data)
           const newdata = res.data as LoginResponse
           // 3. Set the access token (which comes from the response body)
           setCookie('accessToken', newdata.data.accessToken, {

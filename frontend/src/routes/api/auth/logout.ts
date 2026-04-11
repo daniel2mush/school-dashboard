@@ -1,6 +1,7 @@
 import axios, { isAxiosError } from 'axios'
 import { deleteCookie } from '@tanstack/react-start/server'
 import { createFileRoute } from '@tanstack/react-router'
+import axiosClient from '#/components/client/AxiosClient'
 
 export const Route = createFileRoute('/api/auth/logout')({
   server: {
@@ -8,8 +9,8 @@ export const Route = createFileRoute('/api/auth/logout')({
       POST: async () => {
         try {
           // Send the logout request to the backend
-          const res = await axios.post(
-            `${process.env.API_URL}/auth/logout`,
+          const res = await axiosClient.post(
+            '/auth/logout',
             {},
             {
               withCredentials: true, // This ensures cookies are sent
