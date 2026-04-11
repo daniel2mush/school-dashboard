@@ -65,7 +65,7 @@ axiosClient.interceptors.response.use(
 
         // 2. Refresh token request (exactly your code)
         const response = await axios.post(
-          'http://localhost:3001/api/auth/refresh-token',
+          `${process.env.API_URL}/auth/refresh-token`,
           {},
           {
             headers: {

@@ -9,7 +9,7 @@ export const Route = createFileRoute('/api/auth/logout')({
         try {
           // Send the logout request to the backend
           const res = await axios.post(
-            'http://localhost:3001/api/auth/logout',
+            `${process.env.API_URL}/auth/logout`,
             {},
             {
               withCredentials: true, // This ensures cookies are sent

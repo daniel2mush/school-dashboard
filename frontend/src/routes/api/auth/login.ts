@@ -19,7 +19,7 @@ export const Route = createFileRoute('/api/auth/login')({
           }
           // 2. Send the data to your backend
           const res = await axios.post(
-            'http://localhost:3001/api/auth/login',
+            `${process.env.API_URL}/auth/login`,
             data,
           )
           const newdata = res.data as LoginResponse
