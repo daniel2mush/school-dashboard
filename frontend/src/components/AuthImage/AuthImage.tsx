@@ -12,7 +12,7 @@ export default function AuthImage() {
         <img src={'/authImage.svg'} alt="Auth Image" loading="eager" />
         <div className={styles.texts}>
           <h1>{school.name}</h1>
-          <p>Where Eductation meets performance</p>
+          <p>{school.description}</p>
         </div>
       </div>
     </div>

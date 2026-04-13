@@ -288,6 +288,7 @@ type SchoolStoreValue = SchoolState & {
     name: string
     term: string
     year: string
+    description: string
     language: DashboardLanguage
   }) => void
   resetDemoData: () => void
@@ -337,6 +338,7 @@ export const useSchoolStore = create<SchoolStoreValue>((set, get) => {
               ...current.school,
               ...settings,
               logo: settings.logo ?? current.school.logo,
+              description: settings.description ?? current.school.description,
             },
           }))
         }
@@ -685,6 +687,7 @@ export function SchoolDataProvider({ children }: { children: ReactNode }) {
         name: schoolSettings.name,
         term: schoolSettings.term,
         year: schoolSettings.year,
+        description: schoolSettings.description,
         language: schoolSettings.language as DashboardLanguage,
       })
     }

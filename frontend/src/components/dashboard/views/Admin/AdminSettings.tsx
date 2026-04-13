@@ -45,6 +45,8 @@ export function AdminSettings() {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
+    console.log(form)
+
     await updateSchoolSettingsAsync(form)
     updateSchoolSettings(form)
   }

@@ -51,7 +51,7 @@ router.post(
   AdminResetUserPassword,
 );
 router.get("/structure", AuthenticateRequest, GetSchoolStructure);
-router.get("/school-settings", AuthenticateRequest, GetSchoolSettings);
+router.get("/school-settings", GetSchoolSettings);
 router.patch("/school-settings", AuthenticateRequest, UpdateSchoolSettings);
 
 // Global actions
@@ -66,7 +66,11 @@ router.post("/timetable", AuthenticateRequest, UpsertTimetableSlot);
 router.post("/periods", AuthenticateRequest, CreatePeriod);
 router.patch("/periods/:id", AuthenticateRequest, UpdatePeriod);
 router.delete("/periods/:id", AuthenticateRequest, DeletePeriod);
-router.post("/periods/assign-year-group", AuthenticateRequest, AssignPeriodToYearGroup);
+router.post(
+  "/periods/assign-year-group",
+  AuthenticateRequest,
+  AssignPeriodToYearGroup,
+);
 
 router.post(
   "/year-groups/assign-teacher",
@@ -101,7 +105,11 @@ router.post(
 
 router.get("/fees", AuthenticateRequest, GetFeeManagementOverview);
 router.post("/fees", AuthenticateRequest, CreateFee);
-router.get("/fees/year-group/:yearGroupId", AuthenticateRequest, GetFeesByYearGroup);
+router.get(
+  "/fees/year-group/:yearGroupId",
+  AuthenticateRequest,
+  GetFeesByYearGroup,
+);
 router.patch("/fees/:id", AuthenticateRequest, UpdateFee);
 router.delete("/fees/:id", AuthenticateRequest, DeleteFee);
 router.patch(

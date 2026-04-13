@@ -369,8 +369,6 @@ export const GetSchoolStructure = asyncHandler(async (req, res) => {
 });
 
 export const GetSchoolSettings = asyncHandler(async (_req, res) => {
-  // await ensureSchoolSettingsTable();
-
   const settings = await prisma.schoolSetting.upsert({
     where: { id: 1 },
     update: {},
@@ -393,6 +391,8 @@ export const UpdateSchoolSettings = asyncHandler(async (req, res) => {
   // await ensureSchoolSettingsTable();
 
   const { name, term, year, language, logo, description } = req.body;
+
+  console.log(req.body, "BAckend");
 
   if (!name || typeof name !== "string" || !name.trim()) {
     throw new AppError("School name is required", 400);
