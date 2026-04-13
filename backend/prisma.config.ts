@@ -10,6 +10,6 @@ export default defineConfig({
   },
   datasource: {
     url: process.env["DATABASE_URL"], // This should be the pooler URL
-    shadowDatabaseUrl: process.env["DIRECT_URL"], // Use this instead of hardcoding
+    // shadowDatabaseUrl: process.env["DIRECT_URL"], // Use this instead of hardcoding
   },
 });

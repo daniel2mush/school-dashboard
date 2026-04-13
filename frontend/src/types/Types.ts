@@ -7,6 +7,7 @@ export type DashboardLanguage = 'en' | 'fr'
 export interface SchoolSettings {
   id?: number
   name: string
+  description: string
   term: string
   year: string
   language: DashboardLanguage

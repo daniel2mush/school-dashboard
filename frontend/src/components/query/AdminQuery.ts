@@ -6,6 +6,7 @@ import type {
   Timetable,
   FeePayment,
   Announcement,
+  SchoolSettings,
 } from '#/types/Types'
 import {
   useMutation,
@@ -1010,6 +1011,58 @@ export const useUnassignSubjectFromYearGroup = () => {
       qc.invalidateQueries({ queryKey: ['admin', 'subjects'] })
       qc.invalidateQueries({ queryKey: ['admin', 'structure'] })
       toast.success('Year group unlinked')
+    },
+    onError: (e: Error) => toast.error(e.message),
+  })
+}
+
+export const useGetSchoolSettings = () => {
+  return useQuery({
+    queryKey: ['admin', 'school-settings'],
+    queryFn: async () => {
+      const res = await fetch('/api/admin/school-settings')
+      const responseData = await res.json()
+      if (!res.ok) {
+        throw new Error(
+          responseData.message ||
+            responseData.error ||
+            'Could not fetch school settings',
+        )
+      }
+      return responseData.data as SchoolSettings
+    },
+    refetchInterval: 1000 * 60 * 5,
+    refetchOnWindowFocus: true,
+  })
+}
+
+export const useSaveSchoolSettings = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await fetch('/api/admin/school-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      })
+      const responseData = await res.json()
+
+      if (!res.ok) {
+        toast.error(responseData.message || 'Failed to save settings')
+        return
+      }
+      return responseData.data
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'school-settings'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'analytics'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'attendance'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'fees'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'timetable'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'users'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'year-groups'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'structure'] })
+      toast.success('School settings saved')
     },
     onError: (e: Error) => toast.error(e.message),
   })

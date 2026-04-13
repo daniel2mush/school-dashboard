@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from 'axios'
+import { isAxiosError } from 'axios'
 import type { LoginFormData } from '#/components/validation/authValidation'
 import type { LoginResponse } from '#/types/Types'
 import { setCookie } from '@tanstack/react-start/server'

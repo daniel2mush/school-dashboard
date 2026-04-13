@@ -2,7 +2,6 @@
 
 import { getRoleLabel } from '#/components/constants/navigation'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
-import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 import { useLogout } from '#/components/query/AuthQuery'
 import { Avatar, Badge, Switch } from '#/components/ui'
 import { useTheme } from '#/components/theme/ThemeProvider'
@@ -10,6 +9,7 @@ import type { User } from '#/types/Types'
 import { SunMedium, MoonStar, LogOut } from 'lucide-react'
 import styles from './DashboardHeader.module.scss'
 import { DropdownMenu } from 'radix-ui'
+import { useSchoolData } from '#/components/store/SchoolDatatStore'
 
 type DashboardHeaderProps = {
   role: User['role']

@@ -2,7 +2,7 @@ import { Download } from 'lucide-react'
 import { useMemo, useRef } from 'react'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
-import { useSchoolData } from '#/components/providers/SchoolDataProvider'
+import { useSchoolData } from '#/components/store/SchoolDatatStore'
 import styles from './StudentReportCard.module.scss'
 import {
   GradeTable,
@@ -15,7 +15,11 @@ import {
 import { getGradeLetter } from './StudentReportCard.utils'
 import type { GradeRecord } from './StudentReportCard.utils'
 
-export function StudentReportCard({ printMode = false }: { printMode?: boolean }) {
+export function StudentReportCard({
+  printMode = false,
+}: {
+  printMode?: boolean
+}) {
   const currentData = useCurrentStudent()
   const { t } = useDashboardTranslation()
   const { school } = useSchoolData()

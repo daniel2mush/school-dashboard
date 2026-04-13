@@ -13,7 +13,7 @@ import '../styles.scss'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { Providers } from '#/components/client/QueryClient'
-import { SchoolDataProvider } from '#/components/providers/SchoolDataProvider'
+import { SchoolDataProvider } from '#/components/store/SchoolDatatStore'
 import { ThemeProvider } from '#/components/theme/ThemeProvider'
 import { CurrencyProvider } from '../context/CurrencyContext'
 

@@ -23,7 +23,7 @@ import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 import { useGetAnnouncements } from '#/components/query/AuthQuery.ts'
 import { useCurrency } from '#/context/CurrencyContext.tsx'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
-import { useSchoolData } from '#/components/providers/SchoolDataProvider'
+import { useSchoolData } from '#/components/store/SchoolDatatStore'
 import { formatLocalizedFullDate } from '#/components/lib/formatLocalizedDate'
 
 const PERIODS = [

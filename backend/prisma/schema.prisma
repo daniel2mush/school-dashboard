@@ -8,35 +8,35 @@ datasource db {
 }
 
 model User {
-  id                   Int            @id @default(autoincrement())
-  email                String         @unique
-  password             String
-  name                 String
-  initials             String?
-  role                 Role           @default(STUDENT)
-  status               String         @default("Active")
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
-  enrolledYearGroupId  Int?
-  address              String?
-  avatarUrl            String?
-  dateOfBirth          DateTime?
-  enrollmentDate       DateTime       @default(now())
-  gender               Gender?
-  phoneNumber          String?
-  specialization       String?
-  announcements        Announcement[] @relation("Author")
-  attendance           Attendance[]
-  feePayments          FeePayment[]
-  grades               Grade[]        @relation("StudentGrades")
-  givenGrades          Grade[]        @relation("TeacherGrades")
-  reportSummaries      StudentReportSummary[] @relation("StudentReportSummaries")
+  id                    Int                    @id @default(autoincrement())
+  email                 String                 @unique
+  password              String
+  name                  String
+  initials              String?
+  role                  Role                   @default(STUDENT)
+  status                String                 @default("Active")
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  enrolledYearGroupId   Int?
+  address               String?
+  avatarUrl             String?
+  dateOfBirth           DateTime?
+  enrollmentDate        DateTime               @default(now())
+  gender                Gender?
+  phoneNumber           String?
+  specialization        String?
+  announcements         Announcement[]         @relation("Author")
+  attendance            Attendance[]
+  feePayments           FeePayment[]
+  grades                Grade[]                @relation("StudentGrades")
+  givenGrades           Grade[]                @relation("TeacherGrades")
+  reportSummaries       StudentReportSummary[] @relation("StudentReportSummaries")
   issuedReportSummaries StudentReportSummary[] @relation("TeacherReportSummaries")
-  materials            Material[]     @relation("TeacherMaterials")
-  refreshTokens        RefreshToken[]
-  taughtTimetableSlots Timetable[]    @relation("TeacherTimetableSlots")
-  enrolledYearGroup    YearGroup?     @relation("StudentYearGroup", fields: [enrolledYearGroupId], references: [id])
-  taughtYearGroups     YearGroup[]    @relation("TeacherYearGroups")
+  materials             Material[]             @relation("TeacherMaterials")
+  refreshTokens         RefreshToken[]
+  taughtTimetableSlots  Timetable[]            @relation("TeacherTimetableSlots")
+  enrolledYearGroup     YearGroup?             @relation("StudentYearGroup", fields: [enrolledYearGroupId], references: [id])
+  taughtYearGroups      YearGroup[]            @relation("TeacherYearGroups")
 }
 
 model Subject {
@@ -52,38 +52,38 @@ model Subject {
 }
 
 model YearGroup {
-  id            Int            @id @default(autoincrement())
-  name          String
-  level         Level          @default(Primary)
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-  roomNumber    String?
-  capacity      Int?
-  announcements Announcement[] @relation("TargetYearGroup")
-  fees          Fee[]
-  materials     Material[]
-  timetables    Timetable[]
+  id              Int                    @id @default(autoincrement())
+  name            String
+  level           Level                  @default(Primary)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  roomNumber      String?
+  capacity        Int?
+  announcements   Announcement[]         @relation("TargetYearGroup")
+  fees            Fee[]
+  materials       Material[]
+  timetables      Timetable[]
   reportSummaries StudentReportSummary[]
-  students      User[]         @relation("StudentYearGroup")
-  subjects      Subject[]      @relation("SubjectYearGroups")
-  teachers      User[]         @relation("TeacherYearGroups")
+  students        User[]                 @relation("StudentYearGroup")
+  subjects        Subject[]              @relation("SubjectYearGroups")
+  teachers        User[]                 @relation("TeacherYearGroups")
 }
 
 model StudentReportSummary {
-  id           Int       @id @default(autoincrement())
-  studentId    Int
-  teacherId    Int
-  yearGroupId  Int?
-  term         String?
-  academicYear String?
-  overallGrade String?
-  performance  String?
+  id             Int        @id @default(autoincrement())
+  studentId      Int
+  teacherId      Int
+  yearGroupId    Int?
+  term           String?
+  academicYear   String?
+  overallGrade   String?
+  performance    String?
   teacherComment String?
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  student      User      @relation("StudentReportSummaries", fields: [studentId], references: [id], onDelete: Cascade)
-  teacher      User      @relation("TeacherReportSummaries", fields: [teacherId], references: [id], onDelete: Restrict)
-  yearGroup    YearGroup? @relation(fields: [yearGroupId], references: [id], onDelete: SetNull)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  student        User       @relation("StudentReportSummaries", fields: [studentId], references: [id], onDelete: Cascade)
+  teacher        User       @relation("TeacherReportSummaries", fields: [teacherId], references: [id], onDelete: Restrict)
+  yearGroup      YearGroup? @relation(fields: [yearGroupId], references: [id], onDelete: SetNull)
 
   @@unique([studentId])
 }
@@ -216,14 +216,15 @@ model Material {
 }
 
 model SchoolSetting {
-  id        Int      @id @default(1)
-  name      String
-  term      String
-  year      String
-  language  String   @default("en")
-  logo      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          Int      @id @default(1)
+  name        String
+  description String
+  term        String
+  year        String
+  language    String   @default("en")
+  logo        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 enum Role {

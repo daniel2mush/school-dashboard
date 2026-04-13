@@ -1,19 +1,22 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Globe, GraduationCap, Languages, School } from 'lucide-react'
-import { toast } from 'sonner'
-import { useSchoolData } from '#/components/providers/SchoolDataProvider'
+import { Languages, School } from 'lucide-react'
+import { useSchoolData } from '#/components/store/SchoolDatatStore'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import type { DashboardLanguage } from '#/types/Types'
 import styles from './AdminSettings.module.scss'
+import { Button, Input } from '#/components/ui'
+import { useSaveSchoolSettings } from '#/components/query/AdminQuery'
 
 export function AdminSettings() {
   const { school, updateSchoolSettings } = useSchoolData()
+  const { mutateAsync: updateSchoolSettingsAsync } = useSaveSchoolSettings()
   const { t } = useDashboardTranslation()
   const [form, setForm] = useState({
     name: school.name,
     term: school.term,
+    description: school.description,
     year: school.year,
     language: school.language,
   })
@@ -23,11 +26,15 @@ export function AdminSettings() {
       name: school.name,
       term: school.term,
       year: school.year,
+      description: school.description,
       language: school.language,
     })
   }, [school])
 
-  const handleChange = (field: 'name' | 'term' | 'year', value: string) => {
+  const handleChange = (
+    field: 'name' | 'term' | 'year' | 'description',
+    value: string,
+  ) => {
     setForm((current) => ({ ...current, [field]: value }))
   }
 
@@ -35,24 +42,11 @@ export function AdminSettings() {
     setForm((current) => ({ ...current, language: value }))
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    void (async () => {
-      const res = await fetch('/api/admin/school-settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const responseData = await res.json()
 
-      if (!res.ok) {
-        toast.error(responseData.message || 'Failed to save settings')
-        return
-      }
-
-      updateSchoolSettings(form)
-      toast.success(t('settings.saved'))
-    })()
+    await updateSchoolSettingsAsync(form)
+    updateSchoolSettings(form)
   }
 
   return (
@@ -70,60 +64,62 @@ export function AdminSettings() {
             <p>{t('settings.schoolProfileText')}</p>
           </div>
 
-          <label className={styles.field}>
-            <span className={styles.label}>
-              <School size={16} />
-              {t('settings.schoolName')}
-            </span>
-            <input
-              value={form.name}
-              onChange={(event) => handleChange('name', event.target.value)}
-            />
-          </label>
+          <Input
+            label={t('settings.schoolName')}
+            value={form.name}
+            onChange={(event) => handleChange('name', event.target.value)}
+            leftIcon={<School />}
+          />
+
+          <Input
+            label={t('settings.schoolDescription')}
+            value={form.description}
+            onChange={(event) =>
+              handleChange('description', event.target.value)
+            }
+            leftIcon={<School />}
+          />
 
           <div className={styles.fieldGrid}>
-            <label className={styles.field}>
-              <span className={styles.label}>
-                <GraduationCap size={16} />
-                {t('settings.schoolTerm')}
-              </span>
-              <input
-                value={form.term}
-                onChange={(event) => handleChange('term', event.target.value)}
-              />
-            </label>
+            <Input
+              label={t('settings.schoolTerm')}
+              value={form.term}
+              onChange={(event) => handleChange('term', event.target.value)}
+              leftIcon={<School />}
+            />
 
-            <label className={styles.field}>
-              <span className={styles.label}>
-                <Globe size={16} />
-                {t('settings.schoolYear')}
-              </span>
-              <input
-                value={form.year}
-                onChange={(event) => handleChange('year', event.target.value)}
-              />
-            </label>
+            <Input
+              label={t('settings.schoolYear')}
+              value={form.year}
+              onChange={(event) => handleChange('year', event.target.value)}
+              leftIcon={<School />}
+            />
           </div>
 
-          <label className={styles.field}>
-            <span className={styles.label}>
-              <Languages size={16} />
-              {t('settings.language')}
-            </span>
-            <select
-              value={form.language}
-              onChange={(event) =>
-                handleLanguageChange(event.target.value as DashboardLanguage)
-              }
-            >
-              <option value="en">{t('settings.english')}</option>
-              <option value="fr">{t('settings.french')}</option>
-            </select>
-          </label>
+          <div className="form-group fullWidth">
+            <label className="form-label">{t('settings.language')}</label>
 
-          <button className={styles.saveButton} type="submit">
+            <div className="input-wrapper">
+              <div className="input-left-icon">
+                <Languages size={16} />
+              </div>
+
+              <select
+                className="input has-left-icon"
+                value={form.language}
+                onChange={(event) =>
+                  handleLanguageChange(event.target.value as DashboardLanguage)
+                }
+              >
+                <option value="en">{t('settings.english')}</option>
+                <option value="fr">{t('settings.french')}</option>
+              </select>
+            </div>
+          </div>
+
+          <Button className={styles.saveButton} type="submit">
             {t('settings.save')}
-          </button>
+          </Button>
         </form>
 
         <aside className={styles.previewCard}>

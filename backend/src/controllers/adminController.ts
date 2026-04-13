@@ -149,7 +149,8 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
     (sum: number, yearGroup: any) =>
       sum +
       yearGroup.fees.reduce(
-        (feeSum: number, fee: any) => feeSum + fee.amount * yearGroup.students.length,
+        (feeSum: number, fee: any) =>
+          feeSum + fee.amount * yearGroup.students.length,
         0,
       ),
     0,
@@ -166,7 +167,8 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
 
   const yearGroupOutstanding = new Set<number>();
   for (const yearGroup of yearGroups) {
-    if (yearGroup.students.length === 0 || yearGroup.fees.length === 0) continue;
+    if (yearGroup.students.length === 0 || yearGroup.fees.length === 0)
+      continue;
     const settledStudentsByFee = new Map<number, Set<number>>();
 
     feePayments
@@ -176,13 +178,16 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
           payment.isFullyPaid || payment.amountPaid >= payment.fee.amount;
         if (!isSettled) return;
 
-        const current = settledStudentsByFee.get(payment.feeId) || new Set<number>();
+        const current =
+          settledStudentsByFee.get(payment.feeId) || new Set<number>();
         current.add(payment.studentId);
         settledStudentsByFee.set(payment.feeId, current);
       });
 
     const hasOutstanding = yearGroup.fees.some(
-      (fee) => (settledStudentsByFee.get(fee.id)?.size || 0) < yearGroup.students.length,
+      (fee) =>
+        (settledStudentsByFee.get(fee.id)?.size || 0) <
+        yearGroup.students.length,
     );
 
     if (hasOutstanding) {
@@ -215,7 +220,8 @@ export const GetAdminAnalytics = asyncHandler(async (req, res) => {
     (p: any) => p.isFullyPaid || p.amountPaid >= p.fee.amount,
   ).length;
   const partiallyPaidCount = feePayments.filter(
-    (p: any) => !p.isFullyPaid && p.amountPaid > 0 && p.amountPaid < p.fee.amount,
+    (p: any) =>
+      !p.isFullyPaid && p.amountPaid > 0 && p.amountPaid < p.fee.amount,
   ).length;
   const notPaidCount = Math.max(0, totalFeeItems - feePayments.length);
 
@@ -319,9 +325,7 @@ export const GetSchoolStructure = asyncHandler(async (req, res) => {
 
   if (defaultPeriods.length > 0) {
     for (const yg of yearGroups) {
-      const existingPeriodIds = new Set(
-        yg.timetables.map((t) => t.periodId),
-      );
+      const existingPeriodIds = new Set(yg.timetables.map((t) => t.periodId));
       const missingPeriods = defaultPeriods.filter(
         (p) => !existingPeriodIds.has(p.id),
       );
@@ -365,7 +369,7 @@ export const GetSchoolStructure = asyncHandler(async (req, res) => {
 });
 
 export const GetSchoolSettings = asyncHandler(async (_req, res) => {
-  await ensureSchoolSettingsTable();
+  // await ensureSchoolSettingsTable();
 
   const settings = await prisma.schoolSetting.upsert({
     where: { id: 1 },
@@ -373,6 +377,7 @@ export const GetSchoolSettings = asyncHandler(async (_req, res) => {
     create: {
       id: 1,
       name: "Sunridge International School",
+      description: "Where Eductation meets performance",
       term: "Term 2",
       year: "2026",
       language: "en",
@@ -385,15 +390,18 @@ export const GetSchoolSettings = asyncHandler(async (_req, res) => {
 
 export const UpdateSchoolSettings = asyncHandler(async (req, res) => {
   checkAdmin(req.user.role);
-  await ensureSchoolSettingsTable();
+  // await ensureSchoolSettingsTable();
 
-  const { name, term, year, language, logo } = req.body;
+  const { name, term, year, language, logo, description } = req.body;
 
   if (!name || typeof name !== "string" || !name.trim()) {
     throw new AppError("School name is required", 400);
   }
 
   if (!term || typeof term !== "string" || !term.trim()) {
+    throw new AppError("School term is required", 400);
+  }
+  if (!description || typeof description !== "string" || !description.trim()) {
     throw new AppError("School term is required", 400);
   }
 
@@ -411,6 +419,7 @@ export const UpdateSchoolSettings = asyncHandler(async (req, res) => {
       name: name.trim(),
       term: term.trim(),
       year: year.trim(),
+      description: description.trim(),
       language,
       logo: typeof logo === "string" && logo.trim() ? logo.trim() : "/logo.svg",
     },
@@ -418,6 +427,7 @@ export const UpdateSchoolSettings = asyncHandler(async (req, res) => {
       id: 1,
       name: name.trim(),
       term: term.trim(),
+      description: description.trim(),
       year: year.trim(),
       language,
       logo: typeof logo === "string" && logo.trim() ? logo.trim() : "/logo.svg",
@@ -470,7 +480,11 @@ export const CreateYearGroup = asyncHandler(async (req, res) => {
   }
 
   const normalizedSubjectIds = Array.isArray(subjectIds)
-    ? [...new Set(subjectIds.map((value) => Number(value)).filter(Number.isFinite))]
+    ? [
+        ...new Set(
+          subjectIds.map((value) => Number(value)).filter(Number.isFinite),
+        ),
+      ]
     : [];
 
   if (normalizedSubjectIds.length > 0) {
@@ -595,11 +609,15 @@ export const UpsertTimetableSlot = asyncHandler(async (req, res) => {
   const periodId = Number(req.body.periodId);
   const day = String(req.body.day || "");
   const subjectId =
-    req.body.subjectId === null || req.body.subjectId === undefined || req.body.subjectId === ""
+    req.body.subjectId === null ||
+    req.body.subjectId === undefined ||
+    req.body.subjectId === ""
       ? null
       : Number(req.body.subjectId);
   const teacherId =
-    req.body.teacherId === null || req.body.teacherId === undefined || req.body.teacherId === ""
+    req.body.teacherId === null ||
+    req.body.teacherId === undefined ||
+    req.body.teacherId === ""
       ? null
       : Number(req.body.teacherId);
 
@@ -643,19 +661,25 @@ export const UpsertTimetableSlot = asyncHandler(async (req, res) => {
 
   if (!yearGroup) throw new AppError("Year group not found", 404);
   if (!period) throw new AppError("Period not found", 404);
-  if (subjectId !== null && !subject) throw new AppError("Subject not found", 404);
-  if (teacherId !== null && !teacher) throw new AppError("Teacher not found", 404);
+  if (subjectId !== null && !subject)
+    throw new AppError("Subject not found", 404);
+  if (teacherId !== null && !teacher)
+    throw new AppError("Teacher not found", 404);
 
   if (
     subjectId !== null &&
-    !yearGroup.subjects.some((yearGroupSubject) => yearGroupSubject.id === subjectId)
+    !yearGroup.subjects.some(
+      (yearGroupSubject) => yearGroupSubject.id === subjectId,
+    )
   ) {
     throw new AppError("Subject is not linked to this year group", 400);
   }
 
   if (
     teacherId !== null &&
-    !yearGroup.teachers.some((yearGroupTeacher) => yearGroupTeacher.id === teacherId)
+    !yearGroup.teachers.some(
+      (yearGroupTeacher) => yearGroupTeacher.id === teacherId,
+    )
   ) {
     throw new AppError("Teacher is not assigned to this year group", 400);
   }
@@ -782,7 +806,7 @@ export const AssignPeriodToYearGroup = asyncHandler(async (req, res) => {
   // Or better, we just allow the frontend to upsert slots with any period.
   // Actually, if we want to 'add' a period to a year group's view,
   // we can just create one Timetable entry for it.
-  
+
   const timetable = await prisma.timetable.upsert({
     where: {
       yearGroupId_day_periodId: {
@@ -1046,9 +1070,13 @@ export const AdminUpdateUser = asyncHandler(async (req, res) => {
   }
 
   const parsedTeacher =
-    target.role === "TEACHER" ? AdminUpdateTeacherSchema.safeParse(req.body) : null;
+    target.role === "TEACHER"
+      ? AdminUpdateTeacherSchema.safeParse(req.body)
+      : null;
   const parsedStudent =
-    target.role === "STUDENT" ? AdminUpdateStudentSchema.safeParse(req.body) : null;
+    target.role === "STUDENT"
+      ? AdminUpdateStudentSchema.safeParse(req.body)
+      : null;
   const parsed = parsedTeacher ?? parsedStudent;
 
   if (!parsed?.success) {
@@ -1060,7 +1088,9 @@ export const AdminUpdateUser = asyncHandler(async (req, res) => {
   const emailNorm = data.email.trim().toLowerCase();
   const nameTrim = data.name.trim();
 
-  const emailOwner = await prisma.user.findUnique({ where: { email: emailNorm } });
+  const emailOwner = await prisma.user.findUnique({
+    where: { email: emailNorm },
+  });
   if (emailOwner && emailOwner.id !== id) {
     throw new AppError("That email is already registered", 409);
   }
@@ -1444,7 +1474,9 @@ export const UpdateFee = asyncHandler(async (req, res) => {
     data: {
       title: title ? title.trim() : undefined,
       description:
-        typeof description === "string" ? description.trim() || null : undefined,
+        typeof description === "string"
+          ? description.trim() || null
+          : undefined,
       amount: amount ? Number(amount) : undefined,
     },
   });

@@ -6,9 +6,9 @@ import {
   getRoleLabel,
 } from '#/components/constants/navigation'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
-import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 import useUserStore from '#/components/store/UserStore'
 import { NavItem } from '../NavItems/NavItems'
+import { useSchoolData } from '#/components/store/SchoolDatatStore'
 
 export default function Sidebar() {
   const user = useUserStore((state) => state.user)

@@ -41,9 +41,9 @@ import {
 } from 'recharts'
 import type { TooltipValueType } from 'recharts'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
-import { useSchoolData } from '#/components/providers/SchoolDataProvider'
 import { formatLocalizedFullDate } from '#/components/lib/formatLocalizedDate'
 import styles from './AdminOverview.module.scss'
+import { useSchoolData } from '#/components/store/SchoolDatatStore'
 
 const YG_ACCENTS = [
   {
@@ -544,11 +544,11 @@ export function AdminOverview() {
                       boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
                     }}
                   />
-                <Bar
-                  dataKey="students"
-                  fill="var(--accent)"
-                  radius={[4, 4, 0, 0]}
-                  barSize={30}
+                  <Bar
+                    dataKey="students"
+                    fill="var(--accent)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={30}
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -719,7 +719,8 @@ export function AdminOverview() {
                       <div style={{ minWidth: 0, flex: 1 }}>
                         <div className={styles.annTitle}>{ann.title}</div>
                         <div className={styles.annMeta}>
-                          {ann.author?.name ?? t('admin.overview.unknownAuthor')}{' '}
+                          {ann.author?.name ??
+                            t('admin.overview.unknownAuthor')}{' '}
                           ·{' '}
                           {new Date(ann.createdAt).toLocaleString('en-GB', {
                             day: 'numeric',
@@ -739,8 +740,7 @@ export function AdminOverview() {
                     </div>
                     <p className={styles.annExcerpt}>{ann.content}</p>
                     <span className={styles.targetPill}>
-                      {t('admin.overview.toLabel')}:{' '}
-                      {targetLabel(ann, t)}
+                      {t('admin.overview.toLabel')}: {targetLabel(ann, t)}
                     </span>
                   </div>
                 ))}
@@ -761,9 +761,10 @@ export function AdminOverview() {
                   </div>
                   <p className={styles.watchText}>
                     {overdueStudentCount > 0
-                      ? t(
-                          'admin.overview.feesBalancesIssue',
-                        ).replace('{count}', String(overdueStudentCount))
+                      ? t('admin.overview.feesBalancesIssue').replace(
+                          '{count}',
+                          String(overdueStudentCount),
+                        )
                       : t('admin.overview.feesBalancesClear')}
                   </p>
                 </div>
@@ -808,9 +809,7 @@ export function AdminOverview() {
                 </div>
               </div>
             </div>
-            <p className={styles.footerNote}>
-              {t('admin.overview.footerTip')}
-            </p>
+            <p className={styles.footerNote}>{t('admin.overview.footerTip')}</p>
           </Card>
         </div>
       </div>
