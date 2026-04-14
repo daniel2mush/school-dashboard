@@ -1,10 +1,9 @@
-@use "sass:color";
+@use 'sass:color';
 
 .view {
   display: flex;
   flex-direction: column;
   gap: 22px;
-  max-width: 1200px;
 }
 
 /* ── Loading ── */
@@ -95,8 +94,6 @@
   }
 }
 
-
-
 //
 
 .currencyTabs {
@@ -147,7 +144,7 @@
 }
 
 .hero::after {
-  content: "";
+  content: '';
   position: absolute;
   width: 420px;
   height: 420px;
@@ -243,7 +240,8 @@
 }
 
 @media (max-width: 900px) {
-  .insights, .overviewCharts {
+  .insights,
+  .overviewCharts {
     grid-template-columns: 1fr;
   }
 }
@@ -254,7 +252,9 @@
   border: 1px solid var(--border-light);
   background: var(--bg-primary);
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .insight:hover {
@@ -327,7 +327,10 @@
   border: 1px solid var(--border-light);
   background: var(--bg-primary);
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .statTile:hover {
@@ -425,13 +428,29 @@
   gap: 14px;
   padding: 14px 12px;
   border-radius: var(--radius-md);
-  border: 1px solid color-mix(in srgb, var(--yg-accent-text, var(--border-light)) 10%, transparent);
-  background: color-mix(in srgb, var(--yg-accent-surface, var(--bg-secondary)) 55%, var(--bg-primary));
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--yg-accent-text, var(--border-light)) 10%,
+      transparent
+    );
+  background: color-mix(
+    in srgb,
+    var(--yg-accent-surface, var(--bg-secondary)) 55%,
+    var(--bg-primary)
+  );
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .ygRow:hover {
-  border-color: color-mix(in srgb, var(--yg-accent-text, var(--accent)) 24%, var(--border-light));
+  border-color: color-mix(
+    in srgb,
+    var(--yg-accent-text, var(--accent)) 24%,
+    var(--border-light)
+  );
   background: var(--bg-primary);
   transform: translateY(-1px);
 }
@@ -441,7 +460,10 @@
   border-radius: 4px;
   align-self: stretch;
   min-height: 48px;
-  background: var(--yg-accent-bar, linear-gradient(180deg, var(--accent), var(--green)));
+  background: var(
+    --yg-accent-bar,
+    linear-gradient(180deg, var(--accent), var(--green))
+  );
 }
 
 .ygMain {
@@ -521,7 +543,9 @@
   padding: 12px 10px;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
   cursor: default;
 }
 

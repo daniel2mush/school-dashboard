@@ -158,7 +158,8 @@ const fr = {
       title: 'Fichiers partages pour votre classe',
       copy: 'Retrouvez les ressources deposees pour {yearGroup} et telechargez les documents utiles par matiere.',
       summaryTitle: 'Apercu du contenu',
-      summaryCopy: 'Ressources publiees par vos enseignants, filtrees uniquement pour votre classe.',
+      summaryCopy:
+        'Ressources publiees par vos enseignants, filtrees uniquement pour votre classe.',
       totalFiles: 'Total des fichiers',
       subjectsCovered: 'Matieres couvertes',
       latestUpload: 'Dernier depot',
@@ -168,8 +169,10 @@ const fr = {
       uploadedBy: 'Depose par {teacher}',
       uploadedOn: 'Ajoute le {date}',
       noDescription: 'Aucune description n a ete fournie pour ce fichier.',
-      noMaterials: 'Aucun contenu de classe n a encore ete depose pour votre niveau.',
-      missingClass: 'Vous n avez pas encore ete assigne a une classe, donc ce contenu est indisponible.',
+      noMaterials:
+        'Aucun contenu de classe n a encore ete depose pour votre niveau.',
+      missingClass:
+        'Vous n avez pas encore ete assigne a une classe, donc ce contenu est indisponible.',
       untitled: 'Ressource sans titre',
       unknownTeacher: 'Enseignant',
       unknownSubject: 'General',
@@ -495,10 +498,10 @@ const fr = {
         'Vous accompagnez {students} etudiants actifs dans {yearGroups} niveaux avec {teachers} enseignants et {subjects} matieres enregistres.',
       largestCohort: 'La plus grande cohorte est {name} ({count} etudiants).',
       latestBroadcast: 'Derniere diffusion {date}',
-      newAnnouncement: 'Nouvelle annonce',
+      feeManagement: 'Gestion de frais',
       yearGroups: 'Niveaux',
       analytics: 'Analyses',
-      curriculum: 'Programme',
+      staffAndStudent: 'Personnel et eleves',
       feeCollection: 'Collecte des frais',
       receivedSuffix: 'recus',
       outstandingAgainstFees:

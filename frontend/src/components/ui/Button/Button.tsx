@@ -1,22 +1,22 @@
-import { forwardRef } from "react";
+import { forwardRef } from 'react'
 
 interface ButtonTypes extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "danger" | "outline";
-  size?: "sm" | "md" | "lg";
-  fullWidth?: boolean;
-  loading?: boolean;
-  className?: string;
-  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'danger' | 'outline' | 'ghost'
+  size?: 'sm' | 'md' | 'lg'
+  fullWidth?: boolean
+  loading?: boolean
+  className?: string
+  children: React.ReactNode
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonTypes>(
   (
     {
-      variant = "primary",
-      size = "md",
+      variant = 'primary',
+      size = 'md',
       fullWidth,
       loading,
-      className = "",
+      className = '',
       children,
       disabled,
       ...props
@@ -24,15 +24,15 @@ export const Button = forwardRef<HTMLButtonElement, ButtonTypes>(
     ref,
   ) => {
     const buttonClasses = [
-      "btn",
+      'btn',
       `btn-${variant}`,
       `btn-${size}`,
-      fullWidth ? "fullWidth" : "",
-      loading ? "loading" : "",
+      fullWidth ? 'fullWidth' : '',
+      loading ? 'loading' : '',
       className,
     ]
       .filter(Boolean)
-      .join(" ");
+      .join(' ')
 
     return (
       <button
@@ -42,10 +42,10 @@ export const Button = forwardRef<HTMLButtonElement, ButtonTypes>(
         {...props}
       >
         {loading && <span className="btn-spinner" />}
-        <span className={loading ? "btn-content" : ""}>{children}</span>
+        <span className={loading ? 'btn-content' : ''}>{children}</span>
       </button>
-    );
+    )
   },
-);
+)
 
-Button.displayName = "Button";
+Button.displayName = 'Button'

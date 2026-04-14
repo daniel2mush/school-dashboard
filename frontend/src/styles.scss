@@ -260,8 +260,18 @@
   &.btn-ghost,
   &.ghost {
     background: transparent;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     border-color: transparent;
+    &:hover:not(:disabled) {
+      background: var(--bg-primary);
+      border-color: var(--border-hover);
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-card);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0) scale(0.98);
+    }
   }
 
   /* Sizes */

@@ -1,11 +1,12 @@
 .sidebar {
   width: 292px;
-  min-width: 292px;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  position: relative;
+  gap: 24px;
   padding: 24px 18px 20px;
+  overflow: visible;
   background:
     linear-gradient(180deg, rgba(79, 70, 229, 0.08), transparent 24%),
     var(--bg-primary);
@@ -13,10 +14,52 @@
   box-shadow: 14px 0 30px rgba(15, 23, 42, 0.04);
   position: sticky;
   top: 0;
-  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.collapsed {
+    width: 88px;
+    padding: 24px 12px 20px;
+    gap: 32px;
+
+    .sectionLabel {
+      display: none;
+    }
+
+    .brandFullContent {
+      opacity: 0;
+      width: 0;
+      transform: translateX(-10px);
+      pointer-events: none;
+    }
+
+    .miniLogo {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .profileDetails {
+      opacity: 0;
+      width: 0;
+      transform: translateX(-10px);
+      pointer-events: none;
+    }
+
+    .profileCard,
+    .brandCard {
+      padding: 10px;
+      justify-content: center;
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+    }
+  }
 }
 
 .brandCard {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 18px;
   border-radius: 20px;
   background:
@@ -24,6 +67,32 @@
     var(--bg-secondary);
   border: 1px solid rgba(79, 70, 229, 0.14);
   box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.miniLogo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--accent);
+  opacity: 0;
+  transition: all 0.3s ease;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-bg);
+  border-radius: 12px;
+}
+
+.brandFullContent {
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .brandEyebrow {
@@ -56,9 +125,9 @@
   gap: 6px;
   min-height: 0;
   overflow-y: auto;
-  padding-right: 4px; /* Space for scrollbar if needed */
+  overflow-x: hidden;
+  padding-right: 4px;
 
-  /* Scrollbar styles for better UI */
   &::-webkit-scrollbar {
     width: 5px;
   }
@@ -80,10 +149,8 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--text-tertiary);
-}
-
-.sectionLabel:first-child {
-  margin-top: 0;
+  transition: all 0.5s ease;
+  white-space: nowrap;
 }
 
 .profileCard {
@@ -95,10 +162,14 @@
   background: var(--bg-secondary);
   border: 1px solid var(--border-light);
   box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 .profileDetails {
   min-width: 0;
+  transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .profileName {
@@ -136,5 +207,42 @@
     box-shadow: none;
     border-right: none;
     border-bottom: 1px solid var(--border-light);
+  }
+}
+
+.toggleButton {
+  position: absolute;
+  top: 32px;
+  right: -18px;
+  width: 36px;
+  height: 36px;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  z-index: 110;
+  cursor: pointer;
+  background: var(--bg-primary) !important;
+  border: 1px solid var(--border-mid) !important;
+  border-radius: 50% !important;
+  color: var(--text-secondary) !important;
+  box-shadow:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+  transition: all 0.2s ease !important;
+
+  &:hover {
+    color: var(--accent) !important;
+    transform: scale(1.1);
+    box-shadow: var(--shadow-md) !important;
+    border-color: var(--accent-light) !important;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    transition: transform 0.3s ease;
   }
 }

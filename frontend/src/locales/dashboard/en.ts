@@ -158,7 +158,8 @@ const en = {
       title: 'Files shared for your class',
       copy: 'Find the learning materials uploaded for {yearGroup} and download what you need for each subject.',
       summaryTitle: 'Content overview',
-      summaryCopy: 'Published resources from your teachers, filtered to your class only.',
+      summaryCopy:
+        'Published resources from your teachers, filtered to your class only.',
       totalFiles: 'Total files',
       subjectsCovered: 'Subjects covered',
       latestUpload: 'Latest upload',
@@ -168,8 +169,10 @@ const en = {
       uploadedBy: 'Uploaded by {teacher}',
       uploadedOn: 'Uploaded {date}',
       noDescription: 'No description provided for this file.',
-      noMaterials: 'No class content has been uploaded for your year group yet.',
-      missingClass: 'You have not been assigned to a class yet, so class content is unavailable.',
+      noMaterials:
+        'No class content has been uploaded for your year group yet.',
+      missingClass:
+        'You have not been assigned to a class yet, so class content is unavailable.',
       untitled: 'Untitled resource',
       unknownTeacher: 'Teacher',
       unknownSubject: 'General',
@@ -492,10 +495,10 @@ const en = {
         'You are supporting {students} active students across {yearGroups} year groups with {teachers} teachers and {subjects} subjects on record.',
       largestCohort: 'The largest cohort is {name} ({count} students).',
       latestBroadcast: 'Latest broadcast {date}',
-      newAnnouncement: 'New announcement',
+      feeManagement: 'Fee Management',
       yearGroups: 'Year groups',
       analytics: 'Analytics',
-      curriculum: 'Curriculum',
+      staffAndStudent: 'Staff & students',
       feeCollection: 'Fee collection',
       receivedSuffix: 'received',
       outstandingAgainstFees:

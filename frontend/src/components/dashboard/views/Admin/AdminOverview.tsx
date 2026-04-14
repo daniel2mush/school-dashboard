@@ -7,7 +7,7 @@ import {
 import { useGetAnnouncements } from '#/components/query/AuthQuery'
 import { useCurrency } from '#/context/CurrencyContext'
 import type { CurrencyCode } from '#/context/CurrencyContext'
-import { Badge, Card, CardHeader, ProgressBar } from '#/components/ui'
+import { Badge, Button, Card, CardHeader, ProgressBar } from '#/components/ui'
 import type { Announcement } from '#/types/Types'
 import { useNavigate } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
@@ -132,7 +132,7 @@ function StatTile({
 }
 
 export function AdminOverview() {
-  const { currency, setCurrency, formatCurrency } = useCurrency()
+  const { formatCurrency } = useCurrency()
   const { t, language } = useDashboardTranslation()
   const { school } = useSchoolData()
   const [isMounted, setIsMounted] = useState(false)
@@ -181,30 +181,10 @@ export function AdminOverview() {
     analytics.totalExpectedRevenue - analytics.totalCollectedRevenue,
   )
 
-  const studentTeacherRatio =
-    analytics.teachers > 0
-      ? (analytics.students / analytics.teachers).toFixed(1)
-      : '—'
-
-  const avgStudentsPerYear =
-    analytics.yearGroups > 0
-      ? (analytics.students / analytics.yearGroups).toFixed(1)
-      : '0'
-
   const understaffedYears =
     structure?.filter((yg) => yg._count.teachers === 0) ?? []
 
   const overdueStudentCount = analytics.studentsWithOutstandingFees
-
-  const largestYear =
-    structure && structure.length > 0
-      ? structure.reduce((a, b) =>
-          b._count.students > a._count.students ? b : a,
-        )
-      : null
-
-  const totalSubjectLinks =
-    structure?.reduce((sum, yg) => sum + yg.subjects.length, 0) ?? 0
 
   const today = formatLocalizedFullDate(new Date(), language)
 
@@ -240,35 +220,7 @@ export function AdminOverview() {
               {school.name} · {t('admin.overview.eyebrow')}
             </div>
             <h1 className={styles.heroTitle}>{t('admin.overview.title')}</h1>
-            <div className={styles.currencyTabs}>
-              {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
-                (code) => (
-                  <button
-                    key={code}
-                    type="button"
-                    className={`${styles.currencyTab} ${currency === code ? styles.currencyTabActive : ''}`}
-                    onClick={() => setCurrency(code)}
-                  >
-                    {code}
-                  </button>
-                ),
-              )}
-            </div>
-            <p className={styles.heroLead}>
-              {t('admin.overview.heroLead')
-                .replace('{students}', String(analytics.students))
-                .replace('{yearGroups}', String(analytics.yearGroups))
-                .replace('{teachers}', String(analytics.teachers))
-                .replace('{subjects}', String(analytics.subjects))}
-              {largestYear ? (
-                <>
-                  {' '}
-                  {t('admin.overview.largestCohort')
-                    .replace('{name}', largestYear.name)
-                    .replace('{count}', String(largestYear._count.students))}
-                </>
-              ) : null}
-            </p>
+
             <div className={styles.heroMeta}>
               <span className={styles.metaChip}>
                 <CalendarDays size={12} strokeWidth={2} aria-hidden />
@@ -293,21 +245,27 @@ export function AdminOverview() {
             </div>
           </div>
           <div className={styles.heroActions}>
-            <button
-              type="button"
-              className="btn btn-primary"
-              onClick={() => navigate({ to: '/dashboard/admin/announcements' })}
+            <Button onClick={() => navigate({ to: '/dashboard/admin/fees' })}>
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Banknote size={15} strokeWidth={2} />
+                {t('admin.overview.feeManagement')}
+              </span>
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => navigate({ to: '/dashboard/admin/users' })}
             >
               <span
                 style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
               >
-                <Megaphone size={15} strokeWidth={2} />
-                {t('admin.overview.newAnnouncement')}
+                <Users size={15} strokeWidth={2} />{' '}
+                {t('admin.overview.staffAndStudent')}
               </span>
-            </button>
-            <button
-              type="button"
-              className="btn btn-secondary"
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => navigate({ to: '/dashboard/admin/yeargroups' })}
             >
               <span
@@ -316,10 +274,9 @@ export function AdminOverview() {
                 <Layers size={15} strokeWidth={2} />
                 {t('admin.overview.yearGroups')}
               </span>
-            </button>
-            <button
-              type="button"
-              className="btn btn btn-secondary"
+            </Button>
+            <Button
+              variant="secondary"
               onClick={() => navigate({ to: '/dashboard/admin/analytics' })}
             >
               <span
@@ -328,96 +285,10 @@ export function AdminOverview() {
                 <Sparkles size={15} strokeWidth={2} />
                 {t('admin.overview.analytics')}
               </span>
-            </button>
-            <button
-              type="button"
-              className="btn btn btn-secondary"
-              onClick={() => navigate({ to: '/dashboard/admin/curriculum' })}
-            >
-              <span
-                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
-              >
-                <BookText size={15} strokeWidth={2} />{' '}
-                {t('admin.overview.curriculum')}
-              </span>
-            </button>
+            </Button>
           </div>
         </div>
       </header>
-
-      <div className={styles.insights}>
-        <article className={styles.insight}>
-          <div className={styles.insightLabel}>
-            {t('admin.overview.feeCollection')}
-          </div>
-          <div className={styles.insightValue}>
-            {feeCollectionPct}% ·{' '}
-            {formatCurrency(analytics.totalCollectedRevenue)}{' '}
-            {t('admin.overview.receivedSuffix')}
-          </div>
-          <p className={styles.insightSub}>
-            {analytics.totalExpectedRevenue > 0
-              ? t('admin.overview.outstandingAgainstFees').replace(
-                  '{amount}',
-                  formatCurrency(outstandingCFA),
-                )
-              : t('admin.overview.noFeeRecords')}
-          </p>
-          <div className={styles.insightBar}>
-            <div
-              className={styles.insightBarFill}
-              style={{
-                width: `${feeCollectionPct}%`,
-                background:
-                  feeCollectionPct >= 80 ? 'var(--green)' : 'var(--amber)',
-              }}
-            />
-          </div>
-        </article>
-
-        <article className={styles.insight}>
-          <div className={styles.insightLabel}>
-            {t('admin.overview.peopleBalance')}
-          </div>
-          <div className={styles.insightValue}>
-            {studentTeacherRatio === '—'
-              ? t('admin.overview.addTeachersToSeeRatio')
-              : t('admin.overview.studentsPerTeacher').replace(
-                  '{ratio}',
-                  studentTeacherRatio,
-                )}
-          </div>
-          <p className={styles.insightSub}>
-            {t('admin.overview.averageClassLoad').replace(
-              '{avg}',
-              avgStudentsPerYear,
-            )}
-            {totalSubjectLinks > 0
-              ? ` · ${t('admin.overview.subjectYearLinks').replace('{count}', String(totalSubjectLinks))}`
-              : ''}
-            .
-          </p>
-        </article>
-
-        <article className={styles.insight}>
-          <div className={styles.insightLabel}>
-            {t('admin.overview.attendanceSignal')}
-          </div>
-          <div className={styles.insightValue}>
-            {analytics.attendancePresentPct === null
-              ? t('admin.overview.noMarksRecorded')
-              : t('admin.overview.presentPct').replace(
-                  '{pct}',
-                  String(analytics.attendancePresentPct),
-                )}
-          </div>
-          <p className={styles.insightSub}>
-            {analytics.attendancePresentPct === null
-              ? t('admin.overview.attendanceAwaiting')
-              : t('admin.overview.attendanceShare')}
-          </p>
-        </article>
-      </div>
 
       <div className={styles.statsGrid}>
         <StatTile
@@ -570,14 +441,13 @@ export function AdminOverview() {
               <div className={styles.emptyHint}>
                 {t('admin.overview.noYearGroupsHint')}
               </div>
-              <button
-                type="button"
+              <Button
                 className="btn btn-primary"
                 style={{ marginTop: 16 }}
                 onClick={() => navigate({ to: '/dashboard/admin/yeargroups' })}
               >
                 {t('admin.overview.setUpYearGroups')}
-              </button>
+              </Button>
             </div>
           ) : (
             <div className={styles.ygList}>
@@ -693,8 +563,7 @@ export function AdminOverview() {
                 <div className={styles.emptyHint}>
                   {t('admin.overview.noAnnouncementsHint')}
                 </div>
-                <button
-                  type="button"
+                <Button
                   className="btn btn-primary"
                   style={{ marginTop: 16 }}
                   onClick={() =>
@@ -702,7 +571,7 @@ export function AdminOverview() {
                   }
                 >
                   {t('admin.overview.writeAnnouncement')}
-                </button>
+                </Button>
               </div>
             ) : (
               <div className={styles.annList}>
