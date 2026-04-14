@@ -292,6 +292,7 @@ function ManagePeriodsModal({
         aria-modal="true"
         onClick={(event) => event.stopPropagation()}
       >
+        {/* Header */}
         <div className={styles.modalHeader}>
           <div>
             <div className={styles.modalEyebrow}>
@@ -312,39 +313,45 @@ function ManagePeriodsModal({
           </button>
         </div>
 
-        <div className={styles.periodList}>
-          <div className={styles.periodListHeader}>
-            <span>{t('admin.timetable.fieldLabel')}</span>
-            <span>{t('admin.timetable.fieldTimeBlock')}</span>
-            <span>{t('admin.timetable.fieldActions')}</span>
-          </div>
-          {currentPeriods.map((p) => (
-            <div key={p.id} className={styles.periodItem}>
-              <span className={styles.periodLabel}>{p.label}</span>
-              <span className={styles.periodTime}>
-                {p.startTime} - {p.endTime}
-              </span>
-              <div className={styles.periodActions}>
-                <button
-                  type="button"
-                  className={styles.deleteButton}
-                  onClick={() => deletePeriod(p.id)}
-                  disabled={isDeleting}
-                  title={t('admin.timetable.deletePeriod')}
-                  aria-label={t('admin.timetable.deletePeriod')}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+        {/* Scrollable period list */}
+        <div className={styles.periodScrollArea}>
+          {currentPeriods.length === 0 ? (
+            <div className={styles.periodEmpty}>
+              {t('admin.timetable.noPeriodsYet')}
             </div>
-          ))}
+          ) : (
+            <div className={styles.periodList}>
+              {currentPeriods.map((p, i) => (
+                <div key={p.id} className={styles.periodItem}>
+                  <div className={styles.periodIndex}>{i + 1}</div>
+                  <div className={styles.periodInfo}>
+                    <span className={styles.periodLabelText}>{p.label}</span>
+                    <span className={styles.periodTimeBadge}>
+                      {p.startTime} – {p.endTime}
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    className={styles.deleteButton}
+                    onClick={() => deletePeriod(p.id)}
+                    disabled={isDeleting}
+                    title={t('admin.timetable.deletePeriod')}
+                    aria-label={t('admin.timetable.deletePeriod')}
+                  >
+                    <Trash2 size={15} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
+        {/* Add Period Form — sticky footer */}
         <div className={styles.addPeriodForm}>
-          <div className={styles.modalEyebrow}>
+          <div className={styles.addPeriodLabel}>
             {t('admin.timetable.addPeriodTitle')}
           </div>
-          <div className={styles.modalGrid}>
+          <div className={styles.addPeriodRow}>
             <label className={styles.field}>
               <span>{t('admin.timetable.fieldLabel')}</span>
               <input
@@ -372,21 +379,20 @@ function ManagePeriodsModal({
                 onChange={(e) => setNewEnd(e.target.value)}
               />
             </label>
+            <button
+              type="button"
+              className={`btn btn-primary ${styles.addBtn}`}
+              onClick={handleAdd}
+              disabled={
+                isCreating || isAssigning || !newLabel || !newStart || !newEnd
+              }
+            >
+              <Plus size={16} />
+              {isCreating || isAssigning
+                ? t('admin.timetable.adding')
+                : t('admin.timetable.addPeriodToYearGroup')}
+            </button>
           </div>
-          <button
-            type="button"
-            className="btn btn-primary"
-            style={{ marginTop: '1rem', width: '100%' }}
-            onClick={handleAdd}
-            disabled={
-              isCreating || isAssigning || !newLabel || !newStart || !newEnd
-            }
-          >
-            <Plus size={16} />
-            {isCreating || isAssigning
-              ? t('admin.timetable.adding')
-              : t('admin.timetable.addPeriodToYearGroup')}
-          </button>
         </div>
 
         <div className={styles.modalActions}>
@@ -481,7 +487,7 @@ export function AdminTimetable() {
 
   return (
     <section className={styles.view}>
-      <header className={styles.pageHero}>
+      {/* <header className={styles.pageHero}>
         <div className={styles.heroContent}>
           <div className={styles.eyebrow}>
             <Sparkles size={14} />
@@ -500,7 +506,7 @@ export function AdminTimetable() {
             )}
           </span>
         </div>
-      </header>
+      </header> */}
 
       <section className={styles.summaryGrid}>
         <article className={styles.summaryCard}>

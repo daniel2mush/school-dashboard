@@ -14,6 +14,7 @@ import {
   useMoveStudentYearGroup,
   type AdminYearGroupStructure,
 } from '#/components/query/AdminQuery'
+import { BookOpen, DoorOpen, GraduationCap, Users } from 'lucide-react'
 
 export const YEAR_LEVEL_OPTIONS = [
   {
@@ -654,3 +655,140 @@ export function MoveStudentModal({
     </BaseModal>
   )
 }
+export function YearGroupDetailsModal({
+  yearGroup,
+  allUsers,
+  onClose,
+}: {
+  yearGroup: AdminYearGroupStructure
+  allUsers: User[]
+  onClose: () => void
+}) {
+  const { t } = useDashboardTranslation()
+  const [activeTab, setActiveTab] = useState<'students' | 'teachers'>('students')
+
+  // Filter students belonging to this year group
+  const students = allUsers.filter(
+    (u) =>
+      u.role === 'STUDENT' &&
+      u.status === 'Active' &&
+      u.enrolledYearGroupId === yearGroup.id,
+  )
+
+  return (
+    <BaseModal
+      title={yearGroup.name}
+      subtitle={`${formatLevel(yearGroup.level)} ${yearGroup.roomNumber ? `· ${yearGroup.roomNumber}` : ''}`}
+      onClose={onClose}
+    >
+      <div className={styles.detailsContent}>
+        {/* Tabs */}
+        <div className={styles.tabsRow}>
+          <button
+            type="button"
+            className={`${styles.tabBtn} ${activeTab === 'students' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('students')}
+          >
+            <Users size={14} />
+            {t('admin.yearGroups.students')}
+            <span className={styles.tabBadge}>{students.length}</span>
+          </button>
+          <button
+            type="button"
+            className={`${styles.tabBtn} ${activeTab === 'teachers' ? styles.tabBtnActive : ''}`}
+            onClick={() => setActiveTab('teachers')}
+          >
+            <GraduationCap size={14} />
+            {t('admin.yearGroups.teachers')}
+            <span className={styles.tabBadge}>{yearGroup.teachers.length}</span>
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className={styles.tabScrollArea}>
+          {activeTab === 'students' ? (
+            <div className={styles.detailsSection}>
+              {students.length === 0 ? (
+                <p className={styles.detailsEmpty}>
+                  {t('admin.yearGroups.modals.noStudentsEnrolled')}
+                </p>
+              ) : (
+                <div className={styles.detailsList}>
+                  {students.map((student) => (
+                    <div key={student.id} className={styles.detailsRow}>
+                      <div className={styles.detailsAvatar}>
+                        {student.name[0].toUpperCase()}
+                      </div>
+                      <div className={styles.detailsRowInfo}>
+                        <div className={styles.detailsRowName}>
+                          {student.name}
+                        </div>
+                        <div className={styles.detailsRowMeta}>
+                          {student.email}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className={styles.detailsSection}>
+              {yearGroup.teachers.length === 0 ? (
+                <p className={styles.detailsEmpty}>
+                  {t('admin.yearGroups.modals.noTeachersLinked')}
+                </p>
+              ) : (
+                <div className={styles.detailsList}>
+                  {yearGroup.teachers.map((teacher) => (
+                    <div key={teacher.id} className={styles.detailsRow}>
+                      <div className={styles.detailsAvatar}>
+                        {teacher.name[0].toUpperCase()}
+                      </div>
+                      <div className={styles.detailsRowInfo}>
+                        <div className={styles.detailsRowName}>
+                          {teacher.name}
+                        </div>
+                        <div className={styles.detailsRowMeta}>
+                          {teacher.specialization || 'Assigned Staff'}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Subjects Section (Footer-like or constant) */}
+        <div className={styles.detailsFooterSection}>
+          <div className={styles.detailsSectionHead}>
+            <BookOpen
+              size={14}
+              strokeWidth={2}
+              className={styles.detailsIcon}
+            />
+            <h3 className={styles.detailsSectionTitle}>
+              {t('admin.yearGroups.subjects')} ({yearGroup.subjects.length})
+            </h3>
+          </div>
+          {yearGroup.subjects.length === 0 ? (
+            <p className={styles.detailsEmpty}>
+              {t('admin.yearGroups.noSubjectsLinked')}
+            </p>
+          ) : (
+            <div className={styles.detailsChips}>
+              {yearGroup.subjects.map((sub) => (
+                <span key={sub.id} className={styles.detailsChip}>
+                  {sub.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </BaseModal>
+  )
+}
+

@@ -6,6 +6,7 @@ import {
   TeacherRosterModal,
   MoveStudentModal,
   YearGroupSubjectsModal,
+  YearGroupDetailsModal,
 } from './AdminYearGroupsModals'
 import {
   BookOpen,
@@ -74,6 +75,7 @@ export function AdminYearGroups() {
   const [moveForId, setMoveForId] = useState<number | null>(null)
   const [subjectsForId, setSubjectsForId] = useState<number | null>(null)
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null)
+  const [detailForId, setDetailForId] = useState<number | null>(null)
 
   useEffect(() => {
     if (menuOpenId === null) return
@@ -97,6 +99,10 @@ export function AdminYearGroups() {
   const editingYearGroup =
     editForId != null && yearGroups
       ? yearGroups.find((y) => y.id === editForId)
+      : undefined
+  const detailYearGroup =
+    detailForId != null && yearGroups
+      ? yearGroups.find((y) => y.id === detailForId)
       : undefined
 
   if (isLoading || usersLoading || !yearGroups || !allUsers) {
@@ -169,6 +175,7 @@ export function AdminYearGroups() {
               <article
                 key={yg.id}
                 className={styles.card}
+                onClick={() => setDetailForId(yg.id)}
                 style={
                   {
                     '--card-accent-bar': accent.top,
@@ -325,39 +332,6 @@ export function AdminYearGroups() {
                     </div>
                   </div>
                 </div>
-
-                <div className={styles.teachersBlock}>
-                  <div className={styles.blockLabel}>
-                    {t('admin.yearGroups.teachingTeam')}
-                  </div>
-                  {yg.teachers.length === 0 ? (
-                    <p className={styles.muted}>
-                      {t('admin.yearGroups.noTeachersAssigned')}
-                    </p>
-                  ) : (
-                    <div className={styles.teacherChips}>
-                      {yg.teachers.map((teacher) => {
-                        const initials = teacher.name
-                          .split(/\s+/)
-                          .map((p) => p[0])
-                          .join('')
-                          .slice(0, 2)
-                          .toUpperCase()
-                        return (
-                          <span key={teacher.id} className={styles.teacherChip}>
-                            <span className={styles.teacherChipAvatar}>
-                              {initials}
-                            </span>
-                            <span className={styles.teacherChipName}>
-                              {teacher.name}
-                            </span>
-                          </span>
-                        )
-                      })}
-                    </div>
-                  )}
-                </div>
-
                 <div className={styles.subjectsBlock}>
                   <div className={styles.blockLabel}>
                     {t('admin.yearGroups.curriculum')}
@@ -414,6 +388,14 @@ export function AdminYearGroups() {
           key={subjectYearGroup.id}
           yearGroup={subjectYearGroup}
           onClose={() => setSubjectsForId(null)}
+        />
+      ) : null}
+      {detailYearGroup ? (
+        <YearGroupDetailsModal
+          key={detailYearGroup.id}
+          yearGroup={detailYearGroup}
+          allUsers={allUsers}
+          onClose={() => setDetailForId(null)}
         />
       ) : null}
     </section>

@@ -355,7 +355,7 @@ export function AdminFees() {
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
             <div className={styles.eyebrow}>{t('admin.fees.eyebrow')}</div>
-            <h1 className={styles.title}>{t('admin.fees.title')}</h1>
+            {/* <h1 className={styles.title}>{t('admin.fees.title')}</h1> */}
             <div className={styles.currencyTabs}>
               {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
                 (code) => (
@@ -370,7 +370,7 @@ export function AdminFees() {
                 ),
               )}
             </div>
-            <p className={styles.copy}>{t('admin.fees.copy')}</p>
+            {/* <p className={styles.copy}>{t('admin.fees.copy')}</p> */}
           </div>
           <div className={styles.heroMeta}>
             <span className={styles.metaChip}>

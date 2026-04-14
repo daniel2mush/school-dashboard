@@ -1,5 +1,6 @@
 import {
   useGetAllUsers,
+  useGetSchoolStructure,
   useUpdateUserStatus,
   useDeleteAdminUser,
   useResetUserPassword,
@@ -64,14 +65,20 @@ function statusBadgeVariant(
   return 'gray'
 }
 
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+
 export function AdminUsers() {
   const { t, language } = useDashboardTranslation()
   const { user: me } = useUserStore()
   const { data: users, isLoading } = useGetAllUsers()
+  const { data: yearGroups } = useGetSchoolStructure()
   const { mutate: updateStatus } = useUpdateUserStatus()
   const { mutate: removeUser } = useDeleteAdminUser()
   const { mutate: resetPassword } = useResetUserPassword()
 
+  const [activeTab, setActiveTab] = useState<'students' | 'teachers'>(
+    'students',
+  )
   const [addTeacherOpen, setAddTeacherOpen] = useState(false)
   const [addStudentOpen, setAddStudentOpen] = useState(false)
   const [credentials, setCredentials] = useState<
@@ -86,6 +93,8 @@ export function AdminUsers() {
   )
   const [teacherSearch, setTeacherSearch] = useState('')
   const [studentSearch, setStudentSearch] = useState('')
+  const [yearGroupFilter, setYearGroupFilter] = useState<string>('all')
+  const [alphabetFilter, setAlphabetFilter] = useState<string>('all')
 
   useEffect(() => {
     if (menuUserId === null) return
@@ -100,6 +109,26 @@ export function AdminUsers() {
     const tLower = teacherSearch.toLowerCase()
     const sLower = studentSearch.toLowerCase()
 
+    const filteredStudents = users.filter((u) => {
+      if (u.role !== 'STUDENT') return false
+      if (
+        !u.name.toLowerCase().includes(sLower) &&
+        !u.email.toLowerCase().includes(sLower)
+      )
+        return false
+      if (
+        yearGroupFilter !== 'all' &&
+        String(u.enrolledYearGroupId) !== yearGroupFilter
+      )
+        return false
+      if (
+        alphabetFilter !== 'all' &&
+        !u.name.toUpperCase().startsWith(alphabetFilter)
+      )
+        return false
+      return true
+    })
+
     return {
       teachers: users.filter(
         (u) =>
@@ -107,15 +136,10 @@ export function AdminUsers() {
           (u.name.toLowerCase().includes(tLower) ||
             u.email.toLowerCase().includes(tLower)),
       ),
-      students: users.filter(
-        (u) =>
-          u.role === 'STUDENT' &&
-          (u.name.toLowerCase().includes(sLower) ||
-            u.email.toLowerCase().includes(sLower)),
-      ),
+      students: filteredStudents,
       admins: users.filter((u) => u.role === 'ADMIN'),
     }
-  }, [users, teacherSearch, studentSearch])
+  }, [users, teacherSearch, studentSearch, yearGroupFilter, alphabetFilter])
 
   const openResetPassword = (u: AdminDirectoryUser) => {
     if (
@@ -179,7 +203,7 @@ export function AdminUsers() {
         <div className={styles.metaCell}>
           {kind === 'student' ? (
             <span className={styles.placement}>
-              {u.enrolledYearGroup.name || t('admin.users.notAvailable')}
+              {u.enrolledYearGroup?.name || t('admin.users.notAvailable')}
             </span>
           ) : (
             <span className={styles.placement}>
@@ -270,7 +294,7 @@ export function AdminUsers() {
 
   return (
     <section className={styles.view}>
-      <header className={styles.hero}>
+      {/* <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div>
             <div className={styles.eyebrow}>{t('admin.users.eyebrow')}</div>
@@ -278,7 +302,7 @@ export function AdminUsers() {
             <p className={styles.copy}>{t('admin.users.copy')}</p>
           </div>
         </div>
-      </header>
+      </header> */}
 
       {admins.length > 0 ? (
         <div className={styles.adminStrip}>
@@ -297,115 +321,146 @@ export function AdminUsers() {
         </div>
       ) : null}
 
-      <div className={styles.twoCards}>
-        <article className={`${styles.card} ${styles.teacherCard}`}>
-          <div className={styles.cardHead}>
-            <div className={styles.cardTitleRow}>
-              <div className={styles.cardIcon}>
-                <GraduationCap size={20} strokeWidth={2} />
-              </div>
-              <div>
-                <h2 className={styles.cardTitle}>
-                  {t('admin.users.teachingStaff')}
-                </h2>
-                <p className={styles.cardSub}>
-                  {t('admin.users.teachersCount').replace(
-                    '{count}',
-                    String(teachers.length),
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className={styles.cardActions}>
-              <div className={styles.searchBox}>
-                <Search size={14} className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder={t('admin.users.searchStaff')}
-                  value={teacherSearch}
-                  onChange={(e) => setTeacherSearch(e.target.value)}
-                />
-              </div>
-              <button
-                type="button"
-                className={`btn btn-primary ${styles.cardCta}`}
-                onClick={() => setAddTeacherOpen(true)}
-              >
-                <Plus size={17} strokeWidth={2} />
-                {t('admin.users.addTeacher')}
-              </button>
-            </div>
+      {/* Single Tabbed Panel */}
+      <article
+        className={`${styles.card} ${activeTab === 'teachers' ? styles.teacherCard : styles.studentCard}`}
+      >
+        {/* Tab Switcher */}
+        <div className={styles.tabsBar}>
+          <div className={styles.tabsRow}>
+            <button
+              type="button"
+              className={`${styles.tabBtn} ${activeTab === 'students' ? styles.tabBtnActive : ''}`}
+              onClick={() => {
+                setActiveTab('students')
+                setTeacherSearch('')
+              }}
+            >
+              <Users size={15} />
+              {t('admin.users.students')}
+              <span className={styles.tabBadge}>
+                {users?.filter((u) => u.role === 'STUDENT').length ?? 0}
+              </span>
+            </button>
+            <button
+              type="button"
+              className={`${styles.tabBtn} ${activeTab === 'teachers' ? styles.tabBtnActive : ''}`}
+              onClick={() => {
+                setActiveTab('teachers')
+                setStudentSearch('')
+                setYearGroupFilter('all')
+                setAlphabetFilter('all')
+              }}
+            >
+              <GraduationCap size={15} />
+              {t('admin.users.teachingStaff')}
+              <span className={styles.tabBadge}>
+                {users?.filter((u) => u.role === 'TEACHER').length ?? 0}
+              </span>
+            </button>
           </div>
-          <div className={styles.table}>
-            <div className={styles.tableHead}>
-              <div>{t('admin.users.person')}</div>
-              <div>{t('admin.users.access')}</div>
-              <div>{t('admin.users.focus')}</div>
-              <div>{t('admin.users.joined')}</div>
-              <div />
-            </div>
-            {teachers.length === 0 ? (
-              <div className={styles.empty}>{t('admin.users.noTeachers')}</div>
-            ) : (
-              teachers.map((u) => renderRow(u, 'teacher'))
-            )}
-          </div>
-        </article>
+          <button
+            type="button"
+            className={`btn btn-primary ${styles.cardCta}`}
+            onClick={() =>
+              activeTab === 'students'
+                ? setAddStudentOpen(true)
+                : setAddTeacherOpen(true)
+            }
+          >
+            <Plus size={17} strokeWidth={2} />
+            {activeTab === 'students'
+              ? t('admin.users.addStudent')
+              : t('admin.users.addTeacher')}
+          </button>
+        </div>
 
-        <article className={`${styles.card} ${styles.studentCard}`}>
-          <div className={styles.cardHead}>
-            <div className={styles.cardTitleRow}>
-              <div className={styles.cardIconAlt}>
-                <Users size={20} strokeWidth={2} />
-              </div>
-              <div>
-                <h2 className={styles.cardTitle}>
-                  {t('admin.users.students')}
-                </h2>
-                <p className={styles.cardSub}>
-                  {t('admin.users.studentsCount').replace(
-                    '{count}',
-                    String(students.length),
-                  )}
-                </p>
-              </div>
-            </div>
-            <div className={styles.cardActions}>
-              <div className={styles.searchBox}>
-                <Search size={14} className={styles.searchIcon} />
-                <input
-                  type="text"
-                  placeholder={t('admin.users.searchStudents')}
-                  value={studentSearch}
-                  onChange={(e) => setStudentSearch(e.target.value)}
-                />
-              </div>
-              <button
-                type="button"
-                className={`btn btn-primary ${styles.cardCta}`}
-                onClick={() => setAddStudentOpen(true)}
-              >
-                <Plus size={17} strokeWidth={2} />
-                {t('admin.users.addStudent')}
-              </button>
-            </div>
+        {/* Filters Row */}
+        <div className={styles.filtersBar}>
+          <div className={styles.searchBox}>
+            <Search size={14} className={styles.searchIcon} />
+            <input
+              type="text"
+              placeholder={
+                activeTab === 'students'
+                  ? t('admin.users.searchStudents')
+                  : t('admin.users.searchStaff')
+              }
+              value={activeTab === 'students' ? studentSearch : teacherSearch}
+              onChange={(e) =>
+                activeTab === 'students'
+                  ? setStudentSearch(e.target.value)
+                  : setTeacherSearch(e.target.value)
+              }
+            />
           </div>
-          <div className={styles.table}>
-            <div className={styles.tableHead}>
-              <div>{t('admin.users.person')}</div>
-              <div>{t('admin.users.access')}</div>
-              <div>{t('admin.users.cohort')}</div>
-              <div>{t('admin.users.joined')}</div>
-              <div />
+          {activeTab === 'students' && (
+            <>
+              <select
+                className={styles.filterSelect}
+                value={yearGroupFilter}
+                onChange={(e) => setYearGroupFilter(e.target.value)}
+              >
+                <option value="all">All Year Groups</option>
+                {(yearGroups ?? []).map((yg) => (
+                  <option key={yg.id} value={String(yg.id)}>
+                    {yg.name}
+                  </option>
+                ))}
+              </select>
+              <div className={styles.alphabetStrip}>
+                <button
+                  type="button"
+                  className={`${styles.alphaBtn} ${alphabetFilter === 'all' ? styles.alphaBtnActive : ''}`}
+                  onClick={() => setAlphabetFilter('all')}
+                >
+                  All
+                </button>
+                {ALPHABET.map((letter) => (
+                  <button
+                    key={letter}
+                    type="button"
+                    className={`${styles.alphaBtn} ${alphabetFilter === letter ? styles.alphaBtnActive : ''}`}
+                    onClick={() =>
+                      setAlphabetFilter((prev) =>
+                        prev === letter ? 'all' : letter,
+                      )
+                    }
+                  >
+                    {letter}
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Table */}
+        <div className={styles.table}>
+          <div className={styles.tableHead}>
+            <div>{t('admin.users.person')}</div>
+            <div>{t('admin.users.access')}</div>
+            <div>
+              {activeTab === 'students'
+                ? t('admin.users.cohort')
+                : t('admin.users.focus')}
             </div>
-            {students.length === 0 ? (
+            <div>{t('admin.users.joined')}</div>
+            <div />
+          </div>
+          {activeTab === 'students' ? (
+            students.length === 0 ? (
               <div className={styles.empty}>{t('admin.users.noStudents')}</div>
             ) : (
               students.map((u) => renderRow(u, 'student'))
-            )}
-          </div>
-        </article>
-      </div>
+            )
+          ) : teachers.length === 0 ? (
+            <div className={styles.empty}>{t('admin.users.noTeachers')}</div>
+          ) : (
+            teachers.map((u) => renderRow(u, 'teacher'))
+          )}
+        </div>
+      </article>
 
       {addTeacherOpen ? (
         <AddTeacherModal

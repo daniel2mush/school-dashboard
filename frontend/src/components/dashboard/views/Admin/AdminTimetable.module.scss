@@ -213,43 +213,86 @@
   }
 }
 
-.periodList {
-  margin-top: 1.5rem;
+.periodScrollArea {
+  flex: 0 0 auto;
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0 22px;
   border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
-  overflow: hidden;
+
+  /* Custom scrollbar */
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-light);
+    border-radius: 10px;
+  }
 }
 
-.periodListHeader {
-  display: grid;
-  grid-template-columns: 1fr 1fr 80px;
-  padding: 8px 12px;
-  background: var(--bg-secondary);
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
+.periodEmpty {
+  padding: 24px 16px;
+  text-align: center;
+  font-size: 13px;
   color: var(--text-tertiary);
+  font-style: italic;
+}
+
+.periodList {
+  display: flex;
+  flex-direction: column;
 }
 
 .periodItem {
-  display: grid;
-  grid-template-columns: 1fr 1fr 80px;
-  padding: 10px 12px;
-  border-top: 1px solid var(--border-light);
-  font-size: 0.88rem;
+  display: flex;
   align-items: center;
+  gap: 12px;
+  padding: 11px 12px;
+  border-bottom: 1px solid var(--border-light);
+  transition: background 0.15s ease;
 
-  .periodLabel {
-    font-weight: 600;
-    color: var(--text-primary);
-  }
-  .periodTime {
-    color: var(--text-secondary);
-  }
-  .periodActions {
-    display: flex;
-    justify-content: flex-end;
-  }
+  &:last-child { border-bottom: none; }
+  &:hover { background: var(--bg-secondary); }
+}
+
+.periodIndex {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: var(--accent-bg);
+  color: var(--accent-text);
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.periodInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.periodLabelText {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.periodTimeBadge {
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 .deleteButton {
@@ -277,11 +320,55 @@
 }
 
 .addPeriodForm {
-  margin-top: 1.5rem;
-  padding: 1rem;
+  padding: 16px 22px 0;
+  border-top: 1px solid var(--border-light);
   background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-light);
+  flex-shrink: 0;
+}
+
+.addPeriodLabel {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 10px;
+}
+
+.addPeriodRow {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr auto;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.addBtn {
+  align-self: flex-end;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+}
+
+/* Adjust modal header & actions padding since card no longer has global padding */
+.modalHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 22px 14px;
+  flex-shrink: 0;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 14px 22px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  flex-shrink: 0;
 }
 
 .field input {
@@ -505,12 +592,15 @@
 }
 
 .modalCard {
-  width: min(100%, 720px);
+  width: min(100%, 680px);
+  max-height: min(88vh, 720px);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-light);
   background: linear-gradient(180deg, var(--bg-primary), var(--bg-secondary));
   box-shadow: var(--shadow-card);
-  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .modalHeader {
