@@ -80,6 +80,7 @@ const NAV_CONFIG: Record<UserRole, NavItem[]> = {
     { id: 'satt', label: 'Attendance', icon: <UserCheck size={20} /> },
     { id: 'stimetable', label: 'Timetable', icon: <CalendarDays size={20} /> },
     { id: 'sfees', label: 'Fee Status', icon: <Wallet size={20} /> },
+    { id: 'sann', label: 'Announcements', icon: <Megaphone size={20} /> },
   ],
 }
 

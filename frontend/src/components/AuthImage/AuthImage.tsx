@@ -1,7 +1,7 @@
 'use client'
 
 import styles from './AuthImage.module.scss'
-import { useSchoolData } from '#/components/store/SchoolDatatStore'
+import { useSchoolData } from '#/components/store/SchoolDataStore'
 
 export default function AuthImage() {
   const { school } = useSchoolData()

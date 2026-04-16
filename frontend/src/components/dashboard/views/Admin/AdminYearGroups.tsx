@@ -114,11 +114,6 @@ export function AdminYearGroups() {
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <div className={styles.eyebrow}>
-              {t('admin.yearGroups.eyebrow')}
-            </div>
-            <h1 className={styles.title}>{t('admin.yearGroups.title')}</h1>
-            <p className={styles.copy}>{t('admin.yearGroups.copy')}</p>
             <div className={styles.heroStats}>
               <span className={styles.heroStat}>
                 <LayoutGrid size={14} strokeWidth={2} aria-hidden />

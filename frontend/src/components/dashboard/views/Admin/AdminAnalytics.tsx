@@ -21,11 +21,15 @@ import {
   Search,
   Edit2,
   X,
+  ArrowUpDown,
+  ChevronUp,
+  ChevronDown,
+  Filter,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useCurrency } from '#/context/CurrencyContext'
 import type { CurrencyCode } from '#/context/CurrencyContext'
-import { Input } from '@/components/ui'
+import { Button, Input } from '@/components/ui'
 import {
   useGetAdminAnalytics,
   useUpsertFeePayment,
@@ -64,95 +68,141 @@ function StudentEditModal({
     })
   }
 
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
   return (
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalDialog} onClick={(e) => e.stopPropagation()}>
         <header className={styles.modalHead}>
-          <div>
-            <div className={styles.eyebrow}>
-              {t('admin.analytics.editStudentRecords')}
+          <div className={styles.modalHeadContent}>
+            <div className={styles.studentAvatar}>
+              {getInitials(student.name)}
             </div>
-            <h3 className={styles.modalTitle}>{student.name}</h3>
-            <p className={styles.modalSubtitle}>
-              {student.yearGroupName} · {student.email}
-            </p>
+            <div>
+              <div className={styles.eyebrow}>
+                {t('admin.analytics.editStudentRecords')}
+              </div>
+              <h3 className={styles.modalTitle}>{student.name}</h3>
+              <p className={styles.modalSubtitle}>
+                {student.yearGroupName} · {student.email}
+              </p>
+            </div>
           </div>
-          <button className={styles.modalClose} onClick={onClose}>
+          <Button className={styles.modalClose} onClick={onClose}>
             <X size={20} />
-          </button>
+          </Button>
         </header>
+
         <div className={styles.modalBody}>
-          <h4
-            style={{
-              fontSize: '0.9rem',
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              color: 'var(--text-tertiary)',
-            }}
-          >
-            {t('admin.analytics.feePayments')}
-          </h4>
-          {student.fees.map((f: any) => (
-            <div key={f.feeId} className={styles.feeItemRow}>
-              <div className={styles.feeItemHeader}>
-                <span className={styles.feeItemTitle}>{f.title}</span>
-                <span
-                  style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}
-                >
-                  Total: {formatCurrency(f.totalAmount)}
-                </span>
-              </div>
-              <div className={styles.feeItemInputGrid}>
-                <Input
-                  label={t('admin.analytics.paid')}
-                  value={drafts[f.feeId].amountPaid}
-                  onChange={(e) =>
-                    setDrafts((prev) => ({
-                      ...prev,
-                      [f.feeId]: {
-                        ...prev[f.feeId],
-                        amountPaid: e.target.value,
-                      },
-                    }))
-                  }
-                />
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    marginTop: 24,
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    checked={drafts[f.feeId].isFullyPaid}
-                    onChange={(e) =>
-                      setDrafts((prev) => ({
-                        ...prev,
-                        [f.feeId]: {
-                          ...prev[f.feeId],
-                          isFullyPaid: e.target.checked,
-                        },
-                      }))
-                    }
-                  />
-                  <span style={{ fontSize: '0.85rem' }}>
-                    {t('admin.analytics.fullyPaid')}
-                  </span>
+          <div className={styles.sectionHeader}>
+            <Wallet size={18} className={styles.sectionIcon} />
+            <h4>{t('admin.analytics.feePayments')}</h4>
+          </div>
+
+          <div className={styles.feeCardsGrid}>
+            {student.fees.map((f: any) => {
+              const draft = drafts[f.feeId]
+              const total = f.totalAmount
+              const paid = Number(draft.amountPaid)
+              const percent = Math.min(100, Math.round((paid / total) * 100))
+
+              return (
+                <div key={f.feeId} className={styles.feeCard}>
+                  <div className={styles.feeCardHeader}>
+                    <div>
+                      <span className={styles.feeCardTitle}>{f.title}</span>
+                      <div className={styles.feeCardAmount}>
+                        {formatCurrency(total)}
+                      </div>
+                    </div>
+                    <div
+                      className={`${styles.statusBadge} ${draft.isFullyPaid ? styles.statusPaid : styles.statusPending}`}
+                    >
+                      {draft.isFullyPaid
+                        ? t('admin.analytics.fullyPaid')
+                        : t('admin.analytics.partial')}
+                    </div>
+                  </div>
+
+                  <div className={styles.feeCardProgress}>
+                    <div className={styles.progressText}>
+                      <span>
+                        {percent}% {t('admin.analytics.paid')}
+                      </span>
+                      <span>
+                        {formatCurrency(total - paid)}{' '}
+                        {t('admin.analytics.outstanding')}
+                      </span>
+                    </div>
+                    <div className={styles.miniProgressBar}>
+                      <div
+                        className={styles.miniProgressFill}
+                        style={{
+                          width: `${percent}%`,
+                          backgroundColor: draft.isFullyPaid
+                            ? '#10b981'
+                            : '#f59e0b',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className={styles.feeCardControls}>
+                    <div className={styles.inputGroup}>
+                      <label>{t('admin.analytics.updatePayment')}</label>
+                      <div className={styles.inputWithAction}>
+                        <Input
+                          value={draft.amountPaid}
+                          onChange={(e) =>
+                            setDrafts((prev) => ({
+                              ...prev,
+                              [f.feeId]: {
+                                ...prev[f.feeId],
+                                amountPaid: e.target.value,
+                              },
+                            }))
+                          }
+                          className={styles.premiumInput}
+                        />
+                        <button
+                          className={styles.saveIconButton}
+                          onClick={() => savePayment(f.feeId)}
+                          disabled={upsertPayment.isPending}
+                          title={t('admin.analytics.save')}
+                        >
+                          <CheckCircle size={18} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <label className={styles.checkboxAction}>
+                      <input
+                        type="checkbox"
+                        checked={draft.isFullyPaid}
+                        onChange={(e) =>
+                          setDrafts((prev) => ({
+                            ...prev,
+                            [f.feeId]: {
+                              ...prev[f.feeId],
+                              isFullyPaid: e.target.checked,
+                            },
+                          }))
+                        }
+                      />
+                      <span>{t('admin.analytics.markAsFullyPaid')}</span>
+                    </label>
+                  </div>
                 </div>
-              </div>
-              <div className={styles.feeItemActions}>
-                <button
-                  className="btn btn-primary btn-sm"
-                  onClick={() => savePayment(f.feeId)}
-                  disabled={upsertPayment.isPending}
-                >
-                  {t('admin.analytics.save')}
-                </button>
-              </div>
-            </div>
-          ))}
+              )
+            })}
+          </div>
         </div>
       </div>
     </div>
@@ -172,8 +222,19 @@ export function AdminAnalytics() {
   const [selectedStatus, setSelectedStatus] = useState<
     'All' | 'Unpaid' | 'Paid'
   >('All')
-  const [activeTab, setActiveTab] = useState<'fees' | 'attendance'>('fees')
   const [editingStudent, setEditingStudent] = useState<any | null>(null)
+  const [sortConfig, setSortConfig] = useState<{
+    field: 'name' | 'yearGroupName' | 'balance'
+    direction: 'asc' | 'desc'
+  }>({ field: 'name', direction: 'asc' })
+
+  const handleSort = (field: typeof sortConfig.field) => {
+    setSortConfig((prev) => ({
+      field,
+      direction:
+        prev.field === field && prev.direction === 'asc' ? 'desc' : 'asc',
+    }))
+  }
 
   if (isLoading || !stats) {
     return (
@@ -210,7 +271,16 @@ export function AdminAnalytics() {
 
       return matchesSearch && matchesYearGroup && matchesStatus
     })
-    .sort((a, b) => a.yearGroupName.localeCompare(b.yearGroupName))
+    .sort((a, b) => {
+      const field = sortConfig.field
+      const dir = sortConfig.direction === 'asc' ? 1 : -1
+
+      if (field === 'balance') {
+        return (a.balance - b.balance) * dir
+      }
+
+      return a[field].localeCompare(b[field]) * dir
+    })
 
   const collectionRate =
     stats.totalExpectedRevenue > 0
@@ -276,8 +346,6 @@ export function AdminAnalytics() {
   return (
     <section className={styles.view}>
       <header className={styles.hero}>
-        <div className={styles.eyebrow}>{t('admin.analytics.eyebrow')}</div>
-        <h2 className={styles.title}>{t('admin.analytics.title')}</h2>
         <div className={styles.currencyTabs}>
           {(['XOF', 'NGN', 'GHS', 'EUR', 'USD'] as CurrencyCode[]).map(
             (code) => (
@@ -292,15 +360,6 @@ export function AdminAnalytics() {
             ),
           )}
         </div>
-        <p
-          style={{
-            marginTop: 12,
-            color: 'var(--text-secondary)',
-            maxWidth: 600,
-          }}
-        >
-          {t('admin.analytics.copy')}
-        </p>
       </header>
 
       <div className={styles.metricsGrid}>
@@ -600,61 +659,35 @@ export function AdminAnalytics() {
       </div>
 
       <div className={styles.tableCard}>
-        <div
-          className={styles.chartHeader}
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
-            gap: 16,
-          }}
-        >
+        <div className={styles.chartHeader}>
           <div>
             <h3 className={styles.chartTitle}>
               {t('admin.analytics.studentRegistry')}
             </h3>
-            <div className={styles.tabs}>
-              <div
-                className={`${styles.tab} ${activeTab === 'fees' ? styles.tabActive : ''}`}
-                onClick={() => setActiveTab('fees')}
-              >
-                {t('admin.analytics.feeManagement')}
-              </div>
-            </div>
+            <p className={styles.chartSub}>
+              {t('admin.analytics.manageStudentFeesAndRecords')}
+            </p>
           </div>
-          <div
-            style={{
-              display: 'flex',
-              gap: 12,
-              flexWrap: 'wrap',
-              alignItems: 'center',
-            }}
-          >
-            <div style={{ position: 'relative', width: '250px' }}>
-              <Search
-                size={18}
-                style={{
-                  position: 'absolute',
-                  left: 12,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: 'var(--text-tertiary)',
-                }}
-              />
-              <input
-                type="text"
-                placeholder={t('admin.analytics.searchStudents')}
-                className="input"
-                style={{ paddingLeft: 40, width: '100%' }}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
+        </div>
+      </div>
 
+      <div className={styles.filterBar}>
+        <div className={styles.searchWrapper}>
+          <Search className={styles.searchIcon} size={18} />
+          <input
+            type="text"
+            placeholder={t('admin.analytics.searchStudents')}
+            className={styles.premiumSearchInput}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+        <div className={styles.filterGroup}>
+          <div className={styles.filterSelectWrapper}>
+            <Filter size={14} className={styles.filterSelectIcon} />
             <select
-              className="select"
-              style={{ minWidth: 140 }}
+              className={styles.premiumSelect}
               value={selectedYearGroup}
               onChange={(e) => setSelectedYearGroup(e.target.value)}
             >
@@ -665,10 +698,12 @@ export function AdminAnalytics() {
                 </option>
               ))}
             </select>
+          </div>
 
+          <div className={styles.filterSelectWrapper}>
+            <CheckCircle size={14} className={styles.filterSelectIcon} />
             <select
-              className="select"
-              style={{ minWidth: 140 }}
+              className={styles.premiumSelect}
               value={selectedStatus}
               onChange={(e) =>
                 setSelectedStatus(e.target.value as 'All' | 'Unpaid' | 'Paid')
@@ -680,76 +715,124 @@ export function AdminAnalytics() {
             </select>
           </div>
         </div>
+      </div>
 
-        <div className={styles.tableWrapper}>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>{t('admin.analytics.student')}</th>
-                <th>{t('admin.analytics.cohort')}</th>
-                <th>{t('admin.analytics.feeItems')}</th>
-                <th>{t('admin.analytics.totalBilled')}</th>
-                <th>{t('admin.analytics.totalPaid')}</th>
-                <th>{t('admin.analytics.balance')}</th>
-                <th>{t('admin.analytics.action')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredStudents.map((student) => (
-                <tr key={student.studentId}>
-                  <td>
-                    <div style={{ fontWeight: 600 }}>{student.name}</div>
-                    <div
-                      style={{
-                        fontSize: '0.75rem',
-                        color: 'var(--text-tertiary)',
-                      }}
-                    >
-                      {student.email}
-                    </div>
-                  </td>
-                  <td>{student.yearGroupName}</td>
-                  <td>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                      {student.fees.map((f) => (
-                        <span
-                          key={f.feeId}
-                          className={styles.feeBadge}
-                          style={{
-                            background: f.isFullyPaid
-                              ? 'rgba(16, 185, 129, 0.1)'
-                              : 'rgba(239, 68, 68, 0.1)',
-                            color: f.isFullyPaid ? '#10b981' : '#ef4444',
-                          }}
-                        >
-                          {f.title}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td>{formatCurrency(student.totalBilled)}</td>
-                  <td>{formatCurrency(student.totalPaid)}</td>
-                  <td
+      <div className={styles.tableWrapper}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th
+                onClick={() => handleSort('name')}
+                className={styles.sortableHeader}
+              >
+                <div className={styles.headerWithIcon}>
+                  {t('admin.analytics.student')}
+                  {sortConfig.field === 'name' ? (
+                    sortConfig.direction === 'asc' ? (
+                      <ChevronUp size={14} />
+                    ) : (
+                      <ChevronDown size={14} />
+                    )
+                  ) : (
+                    <ArrowUpDown size={14} opacity={0.3} />
+                  )}
+                </div>
+              </th>
+              <th
+                onClick={() => handleSort('yearGroupName')}
+                className={styles.sortableHeader}
+              >
+                <div className={styles.headerWithIcon}>
+                  {t('admin.analytics.cohort')}
+                  {sortConfig.field === 'yearGroupName' ? (
+                    sortConfig.direction === 'asc' ? (
+                      <ChevronUp size={14} />
+                    ) : (
+                      <ChevronDown size={14} />
+                    )
+                  ) : (
+                    <ArrowUpDown size={14} opacity={0.3} />
+                  )}
+                </div>
+              </th>
+              <th>{t('admin.analytics.feeItems')}</th>
+              <th>{t('admin.analytics.totalBilled')}</th>
+              <th>{t('admin.analytics.totalPaid')}</th>
+              <th
+                onClick={() => handleSort('balance')}
+                className={styles.sortableHeader}
+              >
+                <div className={styles.headerWithIcon}>
+                  {t('admin.analytics.balance')}
+                  {sortConfig.field === 'balance' ? (
+                    sortConfig.direction === 'asc' ? (
+                      <ChevronUp size={14} />
+                    ) : (
+                      <ChevronDown size={14} />
+                    )
+                  ) : (
+                    <ArrowUpDown size={14} opacity={0.3} />
+                  )}
+                </div>
+              </th>
+              <th>{t('admin.analytics.action')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredStudents.map((student) => (
+              <tr key={student.studentId}>
+                <td>
+                  <div style={{ fontWeight: 600 }}>{student.name}</div>
+                  <div
                     style={{
-                      color: student.balance > 0 ? '#ef4444' : '#10b981',
-                      fontWeight: 600,
+                      fontSize: '0.75rem',
+                      color: 'var(--text-tertiary)',
                     }}
                   >
-                    {formatCurrency(student.balance)}
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => setEditingStudent(student)}
-                    >
-                      <Edit2 size={16} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                    {student.email}
+                  </div>
+                </td>
+                <td>{student.yearGroupName}</td>
+                <td>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                    {student.fees.map((f) => (
+                      <span
+                        key={f.feeId}
+                        className={styles.feeBadge}
+                        style={{
+                          background: f.isFullyPaid
+                            ? 'rgba(16, 185, 129, 0.1)'
+                            : 'rgba(239, 68, 68, 0.1)',
+                          color: f.isFullyPaid ? '#10b981' : '#ef4444',
+                        }}
+                      >
+                        {f.title}
+                      </span>
+                    ))}
+                  </div>
+                </td>
+                <td>{formatCurrency(student.totalBilled)}</td>
+                <td>{formatCurrency(student.totalPaid)}</td>
+                <td
+                  style={{
+                    color: student.balance > 0 ? '#ef4444' : '#10b981',
+                    fontWeight: 600,
+                  }}
+                >
+                  {formatCurrency(student.balance)}
+                </td>
+                <td>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setEditingStudent(student)}
+                  >
+                    <Edit2 size={16} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {editingStudent && (

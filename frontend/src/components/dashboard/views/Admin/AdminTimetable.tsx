@@ -487,27 +487,6 @@ export function AdminTimetable() {
 
   return (
     <section className={styles.view}>
-      {/* <header className={styles.pageHero}>
-        <div className={styles.heroContent}>
-          <div className={styles.eyebrow}>
-            <Sparkles size={14} />
-            {t('admin.timetable.eyebrow')}
-          </div>
-          <h2 className={styles.title}>{t('admin.timetable.title')}</h2>
-          <p className={styles.copy}>{t('admin.timetable.copy')}</p>
-        </div>
-
-        <div className={styles.heroBadge}>
-          <Layers3 size={18} />
-          <span>
-            {t('admin.timetable.classesCount').replace(
-              '{count}',
-              String(yearGroups.length),
-            )}
-          </span>
-        </div>
-      </header> */}
-
       <section className={styles.summaryGrid}>
         <article className={styles.summaryCard}>
           <div className={styles.summaryIcon}>

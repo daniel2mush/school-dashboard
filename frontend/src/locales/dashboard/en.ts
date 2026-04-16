@@ -57,6 +57,7 @@ const en = {
     satt: 'Attendance',
     stimetable: 'Timetable',
     sfees: 'Fee Status',
+    sann: 'Announcements',
   },
   settings: {
     title: 'School Settings',
@@ -745,6 +746,9 @@ const en = {
       feePayments: 'Fee Payments',
       paid: 'Paid',
       save: 'Save',
+      manageStudentFeesAndRecords: 'Manage student fees and records',
+      markAsFullyPaid: 'Mark as fully paid',
+      updatePayment: 'Update Payment',
     },
     curriculum: {
       loading: 'Loading curriculum…',

@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import type { ReactNode } from 'react'
 import { create } from 'zustand'
+import { useShallow } from 'zustand/react/shallow'
 import type { DashboardLanguage, SchoolSettings } from '#/types/Types'
 import i18n from '#/components/dashboard/i18n.instance'
 import { useGetSchoolSettings } from '#/components/query/AdminQuery'
@@ -40,7 +41,7 @@ const scoreLetter = (score: number) => {
   return 'F'
 }
 
-const STORAGE_KEY = SCHOOL.name
+const STORAGE_KEY = 'school_dashboard_state' // Normalized key
 
 const COLOR_PALETTE = [
   { color: 'var(--accent-text)', bg: 'var(--accent-bg)' },
@@ -670,11 +671,15 @@ export const useSchoolStore = create<SchoolStoreValue>((set, get) => {
  * By keeping this component, you avoid breaking changes in layout wrappers.
  */
 export function SchoolDataProvider({ children }: { children: ReactNode }) {
-  const init = useSchoolStore((state) => state.init)
-  const language = useSchoolStore((state) => state.school.language)
-  const updateSchoolSettings = useSchoolStore(
-    (state) => state.updateSchoolSettings,
+  const { init, language, updateSchoolSettings, schoolName } = useSchoolStore(
+    useShallow((state) => ({
+      init: state.init,
+      language: state.school.language,
+      updateSchoolSettings: state.updateSchoolSettings,
+      schoolName: state.school.name,
+    })),
   )
+
   const { data: schoolSettings } = useGetSchoolSettings()
 
   useEffect(() => {
@@ -696,9 +701,10 @@ export function SchoolDataProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof document !== 'undefined') {
       document.documentElement.lang = language
+      document.title = schoolName
     }
     void i18n.changeLanguage(language)
-  }, [language])
+  }, [language, schoolName])
 
   return <>{children}</>
 }

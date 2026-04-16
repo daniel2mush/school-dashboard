@@ -8,7 +8,7 @@ import {
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useUserStore from '#/components/store/UserStore'
 import { NavItem } from '../NavItems/NavItems'
-import { useSchoolData } from '#/components/store/SchoolDatatStore'
+import { useSchoolData } from '#/components/store/SchoolDataStore'
 import { useState } from 'react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 

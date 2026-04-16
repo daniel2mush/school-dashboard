@@ -29,6 +29,7 @@ import { Route as DashboardStudentSfeesRouteImport } from './routes/dashboard/st
 import { Route as DashboardStudentSdashRouteImport } from './routes/dashboard/student/sdash'
 import { Route as DashboardStudentScontentRouteImport } from './routes/dashboard/student/scontent'
 import { Route as DashboardStudentSattRouteImport } from './routes/dashboard/student/satt'
+import { Route as DashboardStudentSannRouteImport } from './routes/dashboard/student/sann'
 import { Route as DashboardAdminYeargroupsRouteImport } from './routes/dashboard/admin/yeargroups'
 import { Route as DashboardAdminUsersRouteImport } from './routes/dashboard/admin/users'
 import { Route as DashboardAdminTimetableRouteImport } from './routes/dashboard/admin/timetable'
@@ -180,6 +181,11 @@ const DashboardStudentScontentRoute =
 const DashboardStudentSattRoute = DashboardStudentSattRouteImport.update({
   id: '/student/satt',
   path: '/student/satt',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStudentSannRoute = DashboardStudentSannRouteImport.update({
+  id: '/student/sann',
+  path: '/student/sann',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardAdminYeargroupsRoute =
@@ -468,6 +474,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/sann': typeof DashboardStudentSannRoute
   '/dashboard/student/satt': typeof DashboardStudentSattRoute
   '/dashboard/student/scontent': typeof DashboardStudentScontentRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
@@ -536,6 +543,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/sann': typeof DashboardStudentSannRoute
   '/dashboard/student/satt': typeof DashboardStudentSattRoute
   '/dashboard/student/scontent': typeof DashboardStudentScontentRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
@@ -606,6 +614,7 @@ export interface FileRoutesById {
   '/dashboard/admin/timetable': typeof DashboardAdminTimetableRoute
   '/dashboard/admin/users': typeof DashboardAdminUsersRoute
   '/dashboard/admin/yeargroups': typeof DashboardAdminYeargroupsRoute
+  '/dashboard/student/sann': typeof DashboardStudentSannRoute
   '/dashboard/student/satt': typeof DashboardStudentSattRoute
   '/dashboard/student/scontent': typeof DashboardStudentScontentRoute
   '/dashboard/student/sdash': typeof DashboardStudentSdashRoute
@@ -677,6 +686,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/timetable'
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/sann'
     | '/dashboard/student/satt'
     | '/dashboard/student/scontent'
     | '/dashboard/student/sdash'
@@ -745,6 +755,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/timetable'
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/sann'
     | '/dashboard/student/satt'
     | '/dashboard/student/scontent'
     | '/dashboard/student/sdash'
@@ -814,6 +825,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/timetable'
     | '/dashboard/admin/users'
     | '/dashboard/admin/yeargroups'
+    | '/dashboard/student/sann'
     | '/dashboard/student/satt'
     | '/dashboard/student/scontent'
     | '/dashboard/student/sdash'
@@ -1015,6 +1027,13 @@ declare module '@tanstack/react-router' {
       path: '/student/satt'
       fullPath: '/dashboard/student/satt'
       preLoaderRoute: typeof DashboardStudentSattRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/student/sann': {
+      id: '/dashboard/student/sann'
+      path: '/student/sann'
+      fullPath: '/dashboard/student/sann'
+      preLoaderRoute: typeof DashboardStudentSannRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/admin/yeargroups': {
@@ -1361,6 +1380,7 @@ interface DashboardRouteChildren {
   DashboardAdminTimetableRoute: typeof DashboardAdminTimetableRoute
   DashboardAdminUsersRoute: typeof DashboardAdminUsersRoute
   DashboardAdminYeargroupsRoute: typeof DashboardAdminYeargroupsRoute
+  DashboardStudentSannRoute: typeof DashboardStudentSannRoute
   DashboardStudentSattRoute: typeof DashboardStudentSattRoute
   DashboardStudentScontentRoute: typeof DashboardStudentScontentRoute
   DashboardStudentSdashRoute: typeof DashboardStudentSdashRoute
@@ -1390,6 +1410,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdminTimetableRoute: DashboardAdminTimetableRoute,
   DashboardAdminUsersRoute: DashboardAdminUsersRoute,
   DashboardAdminYeargroupsRoute: DashboardAdminYeargroupsRoute,
+  DashboardStudentSannRoute: DashboardStudentSannRoute,
   DashboardStudentSattRoute: DashboardStudentSattRoute,
   DashboardStudentScontentRoute: DashboardStudentScontentRoute,
   DashboardStudentSdashRoute: DashboardStudentSdashRoute,

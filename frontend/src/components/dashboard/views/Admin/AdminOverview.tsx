@@ -43,7 +43,7 @@ import type { TooltipValueType } from 'recharts'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import { formatLocalizedFullDate } from '#/components/lib/formatLocalizedDate'
 import styles from './AdminOverview.module.scss'
-import { useSchoolData } from '#/components/store/SchoolDatatStore'
+import { useSchoolData } from '#/components/store/SchoolDataStore'
 
 const YG_ACCENTS = [
   {

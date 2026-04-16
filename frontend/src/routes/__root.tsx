@@ -13,7 +13,7 @@ import '../styles.scss'
 
 import type { QueryClient } from '@tanstack/react-query'
 import { Providers } from '#/components/client/QueryClient'
-import { SchoolDataProvider } from '#/components/store/SchoolDatatStore'
+import { SchoolDataProvider } from '#/components/store/SchoolDataStore'
 import { ThemeProvider } from '#/components/theme/ThemeProvider'
 import { CurrencyProvider } from '../context/CurrencyContext'
 
@@ -34,7 +34,34 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        name: 'description',
+        content:
+          'Premium School Management Dashboard - Empowering educators and students with state-of-the-art academic tools.',
+      },
+      {
+        name: 'keywords',
+        content:
+          'school management, academic dashboard, student information system, teacher portal, school analytics',
+      },
+      {
+        property: 'og:title',
+        content: 'Sunridge International School Dashboard',
+      },
+      {
+        property: 'og:description',
+        content:
+          'Manage classes, grades, and attendance with ease on our modern academic platform.',
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        title: 'Sunridge International School',
       },
     ],
   }),
@@ -54,11 +81,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="">
         <ThemeProvider>
-          <SchoolDataProvider>
-            <CurrencyProvider>
-              <Providers>{children}</Providers>
-            </CurrencyProvider>
-          </SchoolDataProvider>
+          <Providers>
+            <SchoolDataProvider>
+              <CurrencyProvider>{children}</CurrencyProvider>
+            </SchoolDataProvider>
+          </Providers>
         </ThemeProvider>
         <Toaster richColors={true} />
         <TanStackDevtools

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { DashboardLanguage } from '#/types/Types'
 import i18n from '#/components/dashboard/i18n.instance'
-import { useSchoolData } from '#/components/store/SchoolDatatStore'
+import { useSchoolData } from '#/components/store/SchoolDataStore'
 
 type DashboardTranslationOptions = Record<string, unknown>
 

@@ -31,11 +31,6 @@ export function AdminCurriculum() {
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <div className={styles.eyebrow}>
-              {t('admin.curriculum.eyebrow')}
-            </div>
-            <h1 className={styles.title}>{t('admin.curriculum.title')}</h1>
-            <p className={styles.copy}>{t('admin.curriculum.copy')}</p>
             <div className={styles.heroStats}>
               <span className={styles.heroStat}>
                 <BookText size={14} strokeWidth={2} aria-hidden />

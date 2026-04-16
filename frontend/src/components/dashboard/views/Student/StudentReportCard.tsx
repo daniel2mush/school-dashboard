@@ -2,7 +2,7 @@ import { Download } from 'lucide-react'
 import { useMemo, useRef } from 'react'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
-import { useSchoolData } from '#/components/store/SchoolDatatStore'
+import { useSchoolData } from '#/components/store/SchoolDataStore'
 import styles from './StudentReportCard.module.scss'
 import {
   GradeTable,

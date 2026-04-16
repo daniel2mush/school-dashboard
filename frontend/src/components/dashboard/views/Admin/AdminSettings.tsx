@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Languages, School } from 'lucide-react'
-import { useSchoolData } from '#/components/store/SchoolDatatStore'
+import { useSchoolData } from '#/components/store/SchoolDataStore'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import type { DashboardLanguage } from '#/types/Types'
 import styles from './AdminSettings.module.scss'
@@ -53,12 +53,6 @@ export function AdminSettings() {
 
   return (
     <div className={styles.view}>
-      <section className={styles.hero}>
-        <div className={styles.eyebrow}>{t('nav.settings')}</div>
-        <h1 className={styles.title}>{t('settings.title')}</h1>
-        <p className={styles.copy}>{t('settings.subtitle')}</p>
-      </section>
-
       <div className={styles.layout}>
         <form className={styles.formCard} onSubmit={handleSubmit}>
           <div className={styles.sectionHeading}>

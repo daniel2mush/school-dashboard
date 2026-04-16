@@ -1,69 +1,51 @@
 import { useState, useMemo } from 'react'
 import styles from '../Admin/AdminAnnouncements.module.scss'
-import { Badge, Button } from '@/components/ui'
+import { Badge } from '@/components/ui'
 import {
   Megaphone,
-  Plus,
+  Users,
+  AlertCircle,
   Info,
   Bell,
-  AlertCircle,
-  Users,
-  UserRound,
-  Filter,
   Clock,
 } from 'lucide-react'
 import { useGetAnnouncements } from '#/components/query/AuthQuery'
-import { useGetTeacherClasses } from '#/components/query/TeacherQuery'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
-import { TeachAnnouncementModal } from './TeachAnnouncementModals'
+import useCurrentStudent from '#/components/hooks/useCurrentStudent'
 
-type TabType = 'ALL' | 'FACULTY' | 'MY_CLASSES'
 type PriorityFilter = 'ALL' | 'Urgent' | 'Important' | 'Normal'
 
-export function TeachAnnouncements() {
+export function StudentAnnouncements() {
   const { t, language } = useDashboardTranslation()
-  const { data: announcements, isLoading: isAnnsLoading } = useGetAnnouncements()
-  const { data: classes, isLoading: isClassesLoading } = useGetTeacherClasses()
+  const { data: announcements, isLoading } = useGetAnnouncements()
+  const currentData = useCurrentStudent()
 
-  const teacherClasses = classes ?? []
-  const teacherClassIds = useMemo(
-    () => new Set(teacherClasses.map((c) => c.id)),
-    [teacherClasses],
-  )
-
-  const [activeTab, setActiveTab] = useState<TabType>('ALL')
   const [activePriority, setActivePriority] = useState<PriorityFilter>('ALL')
-  const [isModalOpen, setIsModalOpen] = useState(false)
 
   const filteredAnnouncements = useMemo(() => {
-    if (!announcements) return []
-    let filtered = announcements
+    if (!announcements || !currentData) return []
+    const studentYearGroupId = currentData.student.yearGroupId
 
-    // Role-based Audience Filter
-    if (activeTab === 'FACULTY') {
-      filtered = filtered.filter((a) => a.targetType === 'TEACHERS_ONLY')
-    } else if (activeTab === 'MY_CLASSES') {
-      filtered = filtered.filter(
-        (a) =>
-          a.targetType === 'YEAR_GROUP' &&
-          a.targetYearGroupId !== null &&
-          teacherClassIds.has(a.targetYearGroupId),
-      )
-    }
+    // First filter by eligibility
+    let filtered = announcements.filter((a) => {
+      if (a.targetType === 'ALL') return true
+      if (a.targetType === 'YEAR_GROUP' && a.targetYearGroupId === studentYearGroupId) return true
+      return false
+    })
 
-    // Combined Priority Filter
+    // Then filter by priority selection
     if (activePriority !== 'ALL') {
       filtered = filtered.filter((a) => a.priority === activePriority)
     }
 
     return filtered
-  }, [announcements, activeTab, activePriority, teacherClassIds])
+  }, [announcements, activePriority, currentData])
 
-  if (isAnnsLoading || isClassesLoading || !announcements) {
+  if (isLoading || !announcements || !currentData) {
     return (
       <div className={styles.loadingState}>
         <div className={styles.spinner}></div>
-        <p>{t('teacher.announcements.loading')}</p>
+        <p>{t('admin.announcements.loading')}</p>
       </div>
     )
   }
@@ -74,52 +56,18 @@ export function TeachAnnouncements() {
         <div className={styles.heroContent}>
           <div className={styles.eyebrow}>
             <Megaphone size={14} />
-            {t('teacher.announcements.eyebrow')}
+            {t('admin.announcements.communications')}
           </div>
-          <h1 className={styles.title}>{t('teacher.announcements.title')}</h1>
-          <p className={styles.subtitle}>{t('teacher.announcements.copy')}</p>
-        </div>
-        <div className={styles.btnContainer}>
-          <Button
-            className={styles.createTrigger}
-            onClick={() => setIsModalOpen(true)}
-            disabled={teacherClasses.length === 0}
-          >
-            <Plus size={18} />
-            {t('teacher.announcements.newClassAnnouncement')}
-          </Button>
+          <h1 className={styles.title}>{t('admin.announcements.schoolNotices')}</h1>
+          <p className={styles.subtitle}>
+            {t('student.dashboard.heroLead')
+              .replace('{count}', String(filteredAnnouncements.filter(a => a.priority === 'Urgent').length))
+              .replace('{attendance}', String(currentData.student.att))}
+          </p>
         </div>
       </header>
 
-      {isModalOpen && (
-        <TeachAnnouncementModal onClose={() => setIsModalOpen(false)} />
-      )}
-
       <div className={styles.filterContainer}>
-        <div className={styles.filterRow}>
-          <span className={styles.filterLabel}>{t('admin.announcements.targetAudience')}</span>
-          <div className={styles.tabsList}>
-            <TabButton
-              active={activeTab === 'ALL'}
-              onClick={() => setActiveTab('ALL')}
-              icon={<Users size={16} />}
-              label={t('teacher.announcements.allNotices')}
-            />
-            <TabButton
-              active={activeTab === 'FACULTY'}
-              onClick={() => setActiveTab('FACULTY')}
-              icon={<UserRound size={16} />}
-              label={t('teacher.announcements.facultyOnly')}
-            />
-            <TabButton
-              active={activeTab === 'MY_CLASSES'}
-              onClick={() => setActiveTab('MY_CLASSES')}
-              icon={<Filter size={16} />}
-              label={t('teacher.announcements.classUpdates')}
-            />
-          </div>
-        </div>
-
         <div className={styles.filterRow}>
           <span className={styles.filterLabel}>{t('admin.announcements.priorityLevel')}</span>
           <div className={styles.tabsList}>
@@ -209,16 +157,9 @@ function AnnouncementCard({ ann, t, language }: any) {
   const targetLabel =
     ann.targetType === 'YEAR_GROUP'
       ? t('admin.announcements.cohorts')
-      : ann.targetType === 'TEACHERS_ONLY'
-        ? t('teacher.announcements.facultyOnly')
-        : t('admin.announcements.everyone')
+      : t('admin.announcements.everyone')
 
-  const badgeVariant =
-    ann.targetType === 'ALL'
-      ? 'blue'
-      : ann.targetType === 'TEACHERS_ONLY'
-        ? 'purple'
-        : 'green'
+  const badgeVariant = ann.targetType === 'ALL' ? 'blue' : 'green'
 
   return (
     <article

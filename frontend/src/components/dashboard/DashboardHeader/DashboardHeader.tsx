@@ -9,7 +9,7 @@ import type { User } from '#/types/Types'
 import { SunMedium, MoonStar, LogOut } from 'lucide-react'
 import styles from './DashboardHeader.module.scss'
 import { DropdownMenu } from 'radix-ui'
-import { useSchoolData } from '#/components/store/SchoolDatatStore'
+import { useSchoolData } from '#/components/store/SchoolDataStore'
 
 type DashboardHeaderProps = {
   role: User['role']

@@ -57,6 +57,7 @@ const fr = {
     satt: 'Presence',
     stimetable: 'Emploi du temps',
     sfees: 'Etat des frais',
+    sann: 'Annonces',
   },
   settings: {
     title: "Parametres de l'ecole",
@@ -749,10 +750,13 @@ const fr = {
       fullyPaid: 'Entierement paye',
       partial: 'Partiel',
       unpaid: 'Impaye',
-      editStudentRecords: 'Modifier les dossiers eleves',
+      editStudentRecords: 'Modifier les dossiers élèves',
       feePayments: 'Paiements des frais',
-      paid: 'Paye',
+      paid: 'Payé',
       save: 'Enregistrer',
+      manageStudentFeesAndRecords: 'Gérer les frais et les dossiers des élèves',
+      markAsFullyPaid: 'Marquer comme entièrement payé',
+      updatePayment: 'Mettre à jour le paiement',
     },
     curriculum: {
       loading: 'Chargement du programme…',
