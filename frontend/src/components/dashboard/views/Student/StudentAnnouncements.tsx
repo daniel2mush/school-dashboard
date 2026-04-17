@@ -45,7 +45,7 @@ export function StudentAnnouncements() {
     return (
       <div className={styles.loadingState}>
         <div className={styles.spinner}></div>
-        <p>{t('admin.announcements.loading')}</p>
+        <p>{t('student.announcements.loading')}</p>
       </div>
     )
   }
@@ -56,9 +56,9 @@ export function StudentAnnouncements() {
         <div className={styles.heroContent}>
           <div className={styles.eyebrow}>
             <Megaphone size={14} />
-            {t('admin.announcements.communications')}
+            {t('student.announcements.communications')}
           </div>
-          <h1 className={styles.title}>{t('admin.announcements.schoolNotices')}</h1>
+          <h1 className={styles.title}>{t('student.announcements.schoolNotices')}</h1>
           <p className={styles.subtitle}>
             {t('student.dashboard.heroLead')
               .replace('{count}', String(filteredAnnouncements.filter(a => a.priority === 'Urgent').length))
@@ -69,37 +69,37 @@ export function StudentAnnouncements() {
 
       <div className={styles.filterContainer}>
         <div className={styles.filterRow}>
-          <span className={styles.filterLabel}>{t('admin.announcements.priorityLevel')}</span>
+          <span className={styles.filterLabel}>{t('student.announcements.priorityLevel')}</span>
           <div className={styles.tabsList}>
             <TabButton
               active={activePriority === 'ALL'}
               onClick={() => setActivePriority('ALL')}
-              label={t('admin.announcements.allBroadcasts')}
+              label={t('student.announcements.allAnnouncements')}
             />
             <TabButton
               active={activePriority === 'Urgent'}
               onClick={() => setActivePriority('Urgent')}
               icon={<AlertCircle size={14} style={{ color: '#ef4444' }} />}
-              label={t('admin.announcements.urgent')}
+              label={t('student.announcements.urgent')}
             />
             <TabButton
               active={activePriority === 'Important'}
               onClick={() => setActivePriority('Important')}
               icon={<Bell size={14} style={{ color: '#f59e0b' }} />}
-              label={t('admin.announcements.important')}
+              label={t('student.announcements.important')}
             />
             <TabButton
               active={activePriority === 'Normal'}
               onClick={() => setActivePriority('Normal')}
               icon={<Info size={14} style={{ color: 'var(--cyan)' }} />}
-              label={t('admin.announcements.normal')}
+              label={t('student.announcements.normal')}
             />
           </div>
         </div>
       </div>
 
       <div className={styles.statsCount}>
-        {t('admin.announcements.messagesFound').replace(
+        {t('student.announcements.announcementsFound').replace(
           '{count}',
           String(filteredAnnouncements.length),
         )}
@@ -149,15 +149,15 @@ function AnnouncementCard({ ann, t, language }: any) {
 
   const priorityLabel =
     ann.priority === 'Urgent'
-      ? t('admin.announcements.urgent')
+      ? t('student.announcements.urgent')
       : ann.priority === 'Important'
-        ? t('admin.announcements.important')
-        : t('admin.announcements.normal')
+        ? t('student.announcements.important')
+        : t('student.announcements.normal')
 
   const targetLabel =
     ann.targetType === 'YEAR_GROUP'
-      ? t('admin.announcements.cohorts')
-      : t('admin.announcements.everyone')
+      ? t('student.announcements.yearGroup')
+      : t('student.announcements.everyone')
 
   const badgeVariant = ann.targetType === 'ALL' ? 'blue' : 'green'
 
@@ -214,8 +214,8 @@ function EmptyState({ t }: any) {
   return (
     <div className={styles.emptyState}>
       <Bell size={48} />
-      <h3>{t('admin.announcements.noAnnouncements')}</h3>
-      <p>{t('admin.announcements.noAnnouncementsCopy')}</p>
+      <h3>{t('student.announcements.noAnnouncements')}</h3>
+      <p>{t('student.announcements.noAnnouncementsCopy')}</p>
     </div>
   )
 }

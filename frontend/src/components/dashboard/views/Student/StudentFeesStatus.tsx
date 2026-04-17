@@ -1,3 +1,15 @@
+import {
+  CreditCard,
+  CheckCircle2,
+  AlertCircle,
+  Receipt,
+  ArrowRight,
+  ShieldCheck,
+  TrendingUp,
+  Download,
+  Calendar,
+  FileText,
+} from 'lucide-react'
 import styles from './StudentFeesStatus.module.scss'
 import { useCurrency } from '#/context/CurrencyContext'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
@@ -11,108 +23,146 @@ export function StudentFeesStatus() {
   if (!currentData) return null
 
   const { student, yearGroup } = currentData
-  const { total, paid } = student.fees
-  const feeItems = student.fees.items
+  const { total, paid, items: feeItems } = student.fees
 
   const balance = total - paid
   const percentagePaid = total > 0 ? Math.round((paid / total) * 100) : 100
+  const isFullySettled = balance <= 0
 
   return (
     <section className={styles.view}>
-      <div className={styles.panel}>
-        <div className={styles.eyebrow}>{t('student.fees.eyebrow')}</div>
-        <h2 className={styles.title}>{t('student.fees.title')}</h2>
-        <p className={styles.copy}>
-          {t('student.fees.copy').replace('{yearGroup}', yearGroup.name)}
-        </p>
-      </div>
-
-      <div className={styles.feeCards}>
-        <div className={styles.card}>
-          <div className={styles.cardLabel}>
-            {t('student.fees.totalBilled')}
+      <header className={styles.pageHeader}>
+        <div className={styles.headerContent}>
+          <div className={styles.eyebrowBox}>
+            <ShieldCheck size={14} />
+            <span>{t('student.fees.eyebrow')}</span>
           </div>
-          <div className={styles.cardValue}>{formatCurrency(total)}</div>
+          <h1 className={styles.title}>{t('student.fees.title')}</h1>
+          <p className={styles.copy}>
+            {t('student.fees.copy').replace('{yearGroup}', yearGroup.name)}
+          </p>
+        </div>
+        <div className={styles.headerActions}>
+          <button className={styles.printBtn} onClick={() => window.print()}>
+            <Download size={18} />
+            <span>{t('student.fees.statement')}</span>
+          </button>
+        </div>
+      </header>
 
-          <div className={styles.progressContainer}>
-            <div className={styles.progressLabel}>
-              <span>
-                {t('student.fees.amountPaid')}: {formatCurrency(paid)}
-              </span>
-              <span>{percentagePaid}%</span>
+      <div className={styles.statusHero}>
+        <div className={styles.mainMetrics}>
+          <div className={styles.heroCard}>
+            <div className={styles.heroLabel}>
+              <TrendingUp size={16} />
+              {t('student.fees.totalBilled')}
             </div>
-            <div className={styles.progressBar}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${percentagePaid}%` }}
-              />
+            <div className={styles.heroValue}>{formatCurrency(total)}</div>
+            <div className={styles.heroSub}>
+              {t('student.fees.amountPaidLabel')}: {formatCurrency(paid)}
+            </div>
+          </div>
+
+          <div className={`${styles.heroCard} ${!isFullySettled ? styles.alert : styles.success}`}>
+            <div className={styles.heroLabel}>
+              {isFullySettled ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+              {t('student.fees.outstandingBalance')}
+            </div>
+            <div className={styles.heroValue}>{formatCurrency(balance)}</div>
+            <div className={styles.heroSub}>
+              {isFullySettled ? t('student.fees.settled') : t('student.fees.settleNotice')}
             </div>
           </div>
         </div>
 
-        <div className={`${styles.card} ${balance > 0 ? styles.debt : ''}`}>
-          <div className={styles.cardLabel}>
-            {t('student.fees.outstandingBalance')}
+        <div className={styles.progressSection}>
+          <div className={styles.progressHeader}>
+            <span>{t('student.fees.paymentProgress')}</span>
+            <strong>{percentagePaid}%</strong>
           </div>
-          <div className={styles.cardValue}>{formatCurrency(balance)}</div>
+          <div className={styles.progressTrack}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${percentagePaid}%` }}
+            />
+          </div>
+        </div>
+      </div>
 
-          {balance > 0 ? (
-            <p className={styles.cardNotice}>
-              {t('student.fees.settleNotice')}
-            </p>
+      <div className={styles.contentGrid}>
+        <div className={styles.ledgerSection}>
+          <div className={styles.sectionHeading}>
+            <Receipt size={20} />
+            <h3>{t('student.fees.expenseList')}</h3>
+          </div>
+
+          {feeItems.length === 0 ? (
+            <div className={styles.emptyState}>
+              <FileText size={48} />
+              <p>{t('student.fees.noItems')}</p>
+            </div>
           ) : (
-            <p className={styles.cardSuccess}>{t('student.fees.settled')}</p>
-          )}
-        </div>
-      </div>
-
-      <div className={styles.card}>
-        <div className={styles.cardLabel}>{t('student.fees.expenseList')}</div>
-        {feeItems.length === 0 ? (
-          <p className={styles.emptyText}>{t('student.fees.noItems')}</p>
-        ) : (
-          <div className={styles.expenseList}>
-            {feeItems.map((item: any) => (
-              <div key={item.id} className={styles.expenseItem}>
-                <div className={styles.expenseHeader}>
-                  <div>
-                    <div className={styles.expenseTitle}>{item.title}</div>
-                    <div className={styles.expenseDesc}>
-                      {item.description || t('student.fees.yearGroupFeeItem')}
+            <div className={styles.expenseList}>
+              {feeItems.map((item: any) => (
+                <div key={item.id} className={styles.expenseCard}>
+                  <div className={styles.expenseMain}>
+                    <div className={styles.expenseIcon}>
+                      <CreditCard size={20} />
+                    </div>
+                    <div className={styles.expenseDetails}>
+                      <div className={styles.expenseTop}>
+                        <h4>{item.title}</h4>
+                        <span className={`${styles.badge} ${item.isFullyPaid ? styles.paid : styles.pending}`}>
+                          {item.isFullyPaid ? t('student.fees.fullyPaid') : t('student.fees.pending')}
+                        </span>
+                      </div>
+                      <p>{item.description || t('student.fees.yearGroupFeeItem')}</p>
                     </div>
                   </div>
-                  <div
-                    className={`${styles.expenseStatus} ${
-                      item.isFullyPaid ? styles.paid : styles.pending
-                    }`}
-                  >
-                    {item.isFullyPaid
-                      ? t('student.fees.fullyPaid')
-                      : t('student.fees.pending')}
+
+                  <div className={styles.expenseFinancials}>
+                    <div className={styles.finRow}>
+                      <label>{t('student.fees.total')}</label>
+                      <span>{formatCurrency(item.amount)}</span>
+                    </div>
+                    <div className={styles.finRow}>
+                      <label>{t('student.fees.paid')}</label>
+                      <span>{formatCurrency(item.paid)}</span>
+                    </div>
+                    <div className={`${styles.finRow} ${styles.total}`}>
+                      <label>{t('student.fees.remaining')}</label>
+                      <span>{formatCurrency(item.remaining)}</span>
+                    </div>
                   </div>
+                  
+                  {item.amountInWords && (
+                    <div className={styles.wordAmount}>
+                      <ArrowRight size={12} />
+                      {item.amountInWords}
+                    </div>
+                  )}
                 </div>
-                <div className={styles.expenseGrid}>
-                  <span>
-                    {t('student.fees.total')}: {formatCurrency(item.amount)}
-                  </span>
-                  <span>
-                    {t('student.fees.paid')}: {formatCurrency(item.paid)}
-                  </span>
-                  <span>
-                    {t('student.fees.remaining')}:{' '}
-                    {formatCurrency(item.remaining)}
-                  </span>
-                </div>
-                {item.amountInWords ? (
-                  <div className={styles.amountInWords}>
-                    {t('student.fees.amountInWords')}: {item.amountInWords}
-                  </div>
-                ) : null}
-              </div>
-            ))}
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className={styles.sidebar}>
+          <div className={styles.infoBox}>
+            <Calendar size={20} />
+            <h4>{t('student.fees.paymentSchedule')}</h4>
+            <p>{t('student.fees.paymentScheduleCopy')}</p>
           </div>
-        )}
+
+          <div className={styles.supportBox}>
+            <AlertCircle size={20} />
+            <h4>{t('student.fees.needSupport')}</h4>
+            <p>{t('student.fees.needSupportCopy')}</p>
+            <button className={styles.contactBtn}>{t('student.fees.contactAccounts')}</button>
+          </div>
+        </div>
       </div>
     </section>
   )
 }
+

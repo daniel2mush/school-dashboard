@@ -1,221 +1,352 @@
-@use "sass:color";
-
 .view {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-.panel {
+  gap: 32px;
+  max-width: 1200px;
+  margin: 0 auto;
   width: 100%;
-  padding: 40px;
-  border-radius: 32px;
-  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0.02)),
-    var(--bg-primary);
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-card);
-  position: relative;
-  overflow: hidden;
-
-  &::after {
-    content: "";
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 400px;
-    height: 400px;
-    background: radial-gradient(circle, rgba(var(--accent-rgb), 0.15) 0%, transparent 70%);
-    border-radius: 50%;
-    z-index: 0;
-  }
 }
 
-.eyebrow {
-  position: relative;
-  z-index: 1;
-  font-size: 0.8rem;
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.eyebrowBox {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--accent-bg);
+  color: var(--accent-text);
+  border-radius: 999px;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--accent);
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
 }
 
 .title {
-  position: relative;
-  z-index: 1;
-  margin-top: 10px;
-  font-size: 1.9rem;
-  font-weight: 600;
-  letter-spacing: -0.04em;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
+  line-height: 1.1;
 }
 
 .copy {
-  position: relative;
-  z-index: 1;
-  margin-top: 8px;
+  margin-top: 10px;
   color: var(--text-secondary);
-  font-size: 0.95rem;
+  font-size: 1rem;
+  max-width: 600px;
 }
 
-.feeCards {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
+.headerActions {
+  display: flex;
+  gap: 12px;
 }
 
-.card {
+.printBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-mid);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+
+  &:hover {
+    background: var(--bg-secondary);
+    border-color: var(--border-hover);
+    transform: translateY(-1px);
+  }
+}
+
+.statusHero {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
-  border-radius: 24px;
+  border-radius: var(--radius-xl);
   padding: 40px;
-  position: relative;
-  overflow: hidden;
   box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
-  transition: transform 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-  }
-
-  &.debt {
-    border-color: var(--red);
-    .cardValue {
-      color: var(--red);
-    }
-  }
+  gap: 32px;
 }
 
-.cardNotice {
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  margin-top: 12px;
+.mainMetrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 32px;
 }
 
-.cardSuccess {
-  color: var(--green);
-  font-size: 0.85rem;
-  font-weight: 500;
-  margin-top: 12px;
-}
-
-.emptyText {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.expenseList {
+.heroCard {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-top: 16px;
-}
+  gap: 8px;
 
-.expenseItem {
-  padding: 20px 24px;
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  background: var(--bg-secondary);
-  transition: all 0.2s ease;
+  &.alert {
+    .heroValue { color: var(--red); }
+    .heroSub { color: var(--red-text); }
+  }
 
-  &:hover {
-    background: var(--bg-primary);
-    border-color: var(--accent-light);
-    transform: translateX(4px);
+  &.success {
+    .heroValue { color: var(--green); }
+    .heroSub { color: var(--green-text); }
   }
 }
 
-.expenseHeader {
+.heroLabel {
   display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: flex-start;
-}
-
-.expenseTitle {
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.expenseDesc {
-  color: var(--text-secondary);
+  align-items: center;
+  gap: 8px;
   font-size: 0.85rem;
-  margin-top: 4px;
-}
-
-.expenseStatus {
-  font-size: 0.82rem;
-  font-weight: 600;
-  &.paid {
-    color: var(--green);
-  }
-  &.pending {
-    color: var(--amber);
-  }
-}
-
-.expenseGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  gap: 10px;
-  margin-top: 12px;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-.amountInWords {
-  margin-top: 10px;
-  color: var(--text-tertiary);
-  font-size: 0.82rem;
-  font-style: italic;
-}
-
-.cardLabel {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 8px;
+  color: var(--text-tertiary);
 }
 
-.cardValue {
-  font-size: 3rem;
-  font-weight: 700;
+.heroValue {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
   color: var(--text-primary);
-  margin-bottom: 24px;
+  line-height: 1;
 }
 
-.progressContainer {
-  margin-top: auto;
+.heroSub {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-.progressLabel {
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progressHeader {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text-primary);
+  align-items: center;
+  font-size: 0.95rem;
+
+  span { color: var(--text-secondary); font-weight: 500; }
+  strong { color: var(--text-primary); font-weight: 800; }
 }
 
-.progressBar {
-  width: 100%;
+.progressTrack {
   height: 12px;
-  background: var(--bg-secondary);
-  border-radius: 10px;
+  background: var(--bg-tertiary);
+  border-radius: 999px;
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
-  background: var(--green);
-  border-radius: 10px;
-  transition: width 1s ease-out;
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  border-radius: 999px;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  &.debt {
-    background: var(--red);
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 32px;
+  align-items: flex-start;
+}
+
+.ledgerSection {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
+  padding: 32px;
+  box-shadow: var(--shadow-sm);
+}
+
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+
+  h3 { font-size: 1.25rem; font-weight: 800; }
+}
+
+.expenseList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.expenseCard {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--border-mid);
+    background: var(--bg-secondary);
   }
+}
+
+.expenseMain {
+  display: flex;
+  gap: 16px;
+}
+
+.expenseIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--bg-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.expenseDetails {
+  flex: 1;
+
+  h4 { font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  p { font-size: 0.9rem; color: var(--text-secondary); }
+}
+
+.expenseTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.badge {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+
+  &.paid { background: var(--green-bg); color: var(--green-text); }
+  &.pending { background: var(--amber-bg); color: var(--amber-text); }
+}
+
+.expenseFinancials {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+
+.finRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--text-tertiary); }
+  span { font-size: 0.95rem; font-weight: 600; color: var(--text-primary); }
+
+  &.total {
+    span { color: var(--accent); }
+  }
+}
+
+.wordAmount {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  font-style: italic;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-light);
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.infoBox, .supportBox {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+
+  h4 { font-size: 1rem; font-weight: 700; color: var(--text-primary); }
+  p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
+  svg { color: var(--accent); }
+}
+
+.supportBox {
+  background: var(--accent-bg);
+  border-color: var(--accent-light);
+}
+
+.contactBtn {
+  margin-top: 8px;
+  padding: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover { opacity: 0.9; }
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px;
+  color: var(--text-tertiary);
+  text-align: center;
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .contentGrid { grid-template-columns: 1fr; }
+  .sidebar { flex-direction: row; }
+  .infoBox, .supportBox { flex: 1; }
+}
+
+@media (max-width: 768px) {
+  .mainMetrics { grid-template-columns: 1fr; }
+  .sidebar { flex-direction: column; }
+  .pageHeader { flex-direction: column; align-items: flex-start; }
+}
+
+@media print {
+  .view { padding: 0; }
+  .headerActions, .sidebar, .contactBtn { display: none; }
+  .statusHero, .ledgerSection { border-radius: 0; box-shadow: none; border: 1px solid #eee; }
+  .progressFill { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }

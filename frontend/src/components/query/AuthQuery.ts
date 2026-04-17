@@ -8,6 +8,7 @@ import type {
   UserResponse,
   Announcement,
   Material,
+  User,
 } from '#/types/Types'
 import useUserStore from '../store/UserStore'
 
@@ -117,7 +118,9 @@ export const useGetUserProfile = (userId: number) => {
       const responseData = await res.json()
       if (!res.ok) {
         throw new Error(
-          responseData.message || responseData.error || 'Failed to fetch profile',
+          responseData.message ||
+            responseData.error ||
+            'Failed to fetch profile',
         )
       }
 

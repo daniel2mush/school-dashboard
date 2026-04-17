@@ -222,6 +222,13 @@ const en = {
       paid: 'Paid',
       remaining: 'Remaining',
       amountInWords: 'Amount in words',
+      paymentProgress: 'Payment progress',
+      contactAccounts: 'Contact Accounts',
+      paymentSchedule: 'Payment Schedule',
+      paymentScheduleCopy: 'All outstanding fees should be cleared by the end of the current term to ensure continuity in academic services.',
+      needSupport: 'Need Support?',
+      needSupportCopy: 'If you have any questions regarding your fee statement, please visit the accounts office or contact administration.',
+      statement: 'Statement',
     },
     report: {
       downloadPdf: 'Download PDF',
@@ -277,6 +284,21 @@ const en = {
       remarkNeedsWork:
         '{name} needs to put in more effort in the coming term to improve their overall standing.',
     },
+    announcements: {
+      loading: 'Loading announcements...',
+      communications: 'School Communications',
+      schoolNotices: 'School Announcements',
+      priorityLevel: 'Priority Level',
+      allAnnouncements: 'All Announcements',
+      urgent: 'Urgent',
+      important: 'Important',
+      normal: 'Normal',
+      announcementsFound: '{count} announcements found',
+      noAnnouncements: 'No announcements for you right now.',
+      noAnnouncementsCopy: 'No active announcements for you right now. Check back later!',
+      yearGroup: 'Your Year Group',
+      everyone: 'Everyone',
+    }
   },
   teacher: {
     yearGroups: {

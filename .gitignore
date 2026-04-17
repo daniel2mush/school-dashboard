@@ -56,3 +56,4 @@ coverage/
 logs/
 *.log
 .aider*
+.codex*
