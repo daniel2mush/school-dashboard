@@ -6,7 +6,7 @@ import {
   type TaughtYearGroupData,
 } from '#/components/query/TeacherQuery'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
-import styles from './TeacherSidebarTimetable.module.scss'
+import styles from './TeacherTimetable.module.scss'
 
 const SCHEDULE_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 const DAY_LABEL_KEYS = [
@@ -23,7 +23,7 @@ function getPeriodKey(slot: TimetableSlot) {
   return `${slot.periodId}`
 }
 
-export function TeacherSidebarTimetable() {
+export function TeacherTimetable() {
   const { t } = useDashboardTranslation()
   const user = useUserStore((state) => state.user)
   const { data: classes, isLoading, error } = useGetTeacherClasses()
@@ -106,27 +106,6 @@ export function TeacherSidebarTimetable() {
 
   return (
     <section className={styles.view}>
-      <header className={styles.hero}>
-        <div className={styles.heroCopy}>
-          <div className={styles.eyebrow}>
-            <Sparkles size={14} />
-            {t('teacher.sidebarTimetable.eyebrow')}
-          </div>
-          <h1 className={styles.title}>
-            {t('teacher.sidebarTimetable.title')}
-          </h1>
-          <p className={styles.copy}>{t('teacher.sidebarTimetable.copy')}</p>
-        </div>
-
-        <div className={styles.heroBadge}>
-          <Calendar size={16} />
-          <span>
-            {t('teacher.sidebarTimetable.activeDays')}:{' '}
-            {timetable.activeDays.size}
-          </span>
-        </div>
-      </header>
-
       <div className={styles.summaryGrid}>
         <div className={styles.summaryCard}>
           <div className={styles.summaryIcon}>

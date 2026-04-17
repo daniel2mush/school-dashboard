@@ -406,68 +406,26 @@ export function TeachAttendance() {
 
   return (
     <div className={styles.view}>
-      <header className={styles.hero}>
-        <div className={styles.heroCopy}>
-          <div className={styles.eyebrow}>Classroom</div>
-          <h2 className={styles.title}>Attendance Portal</h2>
-          <p className={styles.copy}>
-            Track daily presence, identify students who need support, and mark
-            attendance from a cleaner weekly view.
-          </p>
-          <div className={styles.heroMeta}>
-            <span>{classes.length} classes</span>
-            <span>{allStudents.length} students</span>
-            <span>{attendanceTotals.rate}% present</span>
-          </div>
+      <header className={styles.header}>
+        <div className={styles.headerLeft}>
+          <div className={styles.eyebrow}>{t('teacher.attendance.eyebrow')}</div>
+          <h2 className={styles.title}>{t('teacher.attendance.title')}</h2>
         </div>
-        <div className={styles.heroSide}>
-          <div className={styles.heroBadge}>
-            <CalendarIcon size={14} />
-            <span>{t('admin.attendance.overview')}</span>
-          </div>
-          <div className={styles.tabSwitcher}>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'overview' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('overview')}
-            >
-              <LayoutGrid size={16} /> {t('admin.attendance.overview')}
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'mark' ? styles.activeTab : ''}`}
-              onClick={() => setActiveTab('mark')}
-            >
-              <CalendarIcon size={16} /> {t('admin.attendance.markAttendance')}
-            </button>
-          </div>
+        <div className={styles.tabSwitcher}>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'overview' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('overview')}
+          >
+            <LayoutGrid size={16} /> {t('admin.attendance.overview')}
+          </button>
+          <button
+            className={`${styles.tabBtn} ${activeTab === 'mark' ? styles.activeTab : ''}`}
+            onClick={() => setActiveTab('mark')}
+          >
+            <CalendarIcon size={16} /> {t('admin.attendance.markAttendance')}
+          </button>
         </div>
       </header>
-
-      <div className={styles.summaryRail}>
-        <div className={styles.summaryChip}>
-          <span className={styles.statLabel}>
-            {t('admin.attendance.present')}
-          </span>
-          <strong className={styles.statValue}>
-            {attendanceTotals.present}
-          </strong>
-        </div>
-        <div className={styles.summaryChip}>
-          <span className={styles.statLabel}>
-            {t('admin.attendance.absent')}
-          </span>
-          <strong className={styles.statValue}>
-            {attendanceTotals.absent}
-          </strong>
-        </div>
-        <div className={styles.summaryChip}>
-          <span className={styles.statLabel}>{t('admin.attendance.late')}</span>
-          <strong className={styles.statValue}>{attendanceTotals.late}</strong>
-        </div>
-        <div className={styles.summaryChip}>
-          <span className={styles.statLabel}>Records</span>
-          <strong className={styles.statValue}>{attendanceTotals.total}</strong>
-        </div>
-      </div>
 
       {activeTab === 'overview' ? (
         <>
@@ -586,12 +544,17 @@ export function TeachAttendance() {
                       </span>
                     </div>
                     <div className={styles.riskBadge}>
-                      <AlertCircle size={12} /> {s.absentCount} Days
+                      <AlertCircle size={12} />{' '}
+                      {t('admin.attendance.absentDays', {
+                        count: s.absentCount,
+                      })}
                     </div>
                   </div>
                 ))}
                 {absenceList.length === 0 && (
-                  <p className={styles.emptyText}>All students on track.</p>
+                  <p className={styles.emptyText}>
+                    {t('teacher.attendance.emptyRisk')}
+                  </p>
                 )}
               </div>
             </div>
@@ -601,10 +564,11 @@ export function TeachAttendance() {
             <div className={styles.registryCard}>
               <div className={styles.registryHeader}>
                 <div className={styles.registryTitleBlock}>
-                  <div className={styles.registryLabel}>Student Registry</div>
+                  <div className={styles.registryLabel}>
+                    {t('teacher.attendance.studentRegistry')}
+                  </div>
                   <div className={styles.registryCopy}>
-                    Search and filter your classes, then open a student to mark
-                    or review attendance history.
+                    {t('teacher.attendance.registryDescription')}
                   </div>
                 </div>
                 <div className={styles.registryActions}>
@@ -612,7 +576,7 @@ export function TeachAttendance() {
                     <Search size={16} />
                     <input
                       type="text"
-                      placeholder="Find student..."
+                      placeholder={t('teacher.attendance.findStudent')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -623,7 +587,9 @@ export function TeachAttendance() {
                       value={classFilter}
                       onChange={(e) => setClassFilter(e.target.value)}
                     >
-                      <option value="All">All My Classes</option>
+                      <option value="All">
+                        {t('teacher.attendance.allClasses')}
+                      </option>
                       {classes.map((c) => (
                         <option key={c.id} value={c.id}>
                           {c.name} ({c.level})
@@ -638,10 +604,18 @@ export function TeachAttendance() {
                 <table className={styles.table}>
                   <thead>
                     <tr>
-                      <th className={styles.studentCol}>Student</th>
-                      <th className={styles.classCol}>Class</th>
-                      <th className={styles.attendanceCol}>Attendance</th>
-                      <th className={styles.recordsCol}>Records</th>
+                      <th className={styles.studentCol}>
+                        {t('admin.attendance.columnStudent')}
+                      </th>
+                      <th className={styles.classCol}>
+                        {t('admin.attendance.columnYear')}
+                      </th>
+                      <th className={styles.attendanceCol}>
+                        {t('admin.attendance.columnAttendance')}
+                      </th>
+                      <th className={styles.recordsCol}>
+                        {t('admin.attendance.columnRecords')}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -748,7 +722,7 @@ export function TeachAttendance() {
               ) : (
                 <div className={styles.noSelection}>
                   <CalendarIcon size={40} />
-                  <p>Select a student to view their attendance calendar.</p>
+                  <p>{t('teacher.attendance.selectStudent')}</p>
                 </div>
               )}
             </div>
@@ -759,7 +733,7 @@ export function TeachAttendance() {
           <div className={styles.markHeader}>
             <div className={styles.markControls}>
               <div className={styles.inputGroup}>
-                <label>Target Date</label>
+                <label>{t('admin.attendance.targetDate')}</label>
                 <input
                   type="date"
                   value={markDate}
@@ -767,12 +741,14 @@ export function TeachAttendance() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label>Filter Class</label>
+                <label>{t('teacher.attendance.filterClass')}</label>
                 <select
                   value={classFilter}
                   onChange={(e) => setClassFilter(e.target.value)}
                 >
-                  <option value="All">All My Classes</option>
+                  <option value="All">
+                    {t('teacher.attendance.allClasses')}
+                  </option>
                   {classes.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name} ({c.level})
@@ -793,10 +769,16 @@ export function TeachAttendance() {
             <table className={styles.markTable}>
               <thead>
                 <tr>
-                  <th className={styles.studentCol}>Student</th>
-                  <th className={styles.classCol}>Class</th>
-                  <th>Recent History</th>
-                  <th className={styles.center}>Status</th>
+                  <th className={styles.studentCol}>
+                    {t('admin.attendance.columnStudent')}
+                  </th>
+                  <th className={styles.classCol}>
+                    {t('admin.attendance.columnYear')}
+                  </th>
+                  <th>{t('admin.attendance.recentHistory')}</th>
+                  <th className={styles.center}>
+                    {t('admin.attendance.status')}
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -867,10 +849,7 @@ export function TeachAttendance() {
           title={t('admin.attendance.markAttendance')}
           subtitle={t('admin.attendance.markAsFor')
             .replace('{name}', modalStudent.name)
-            .replace(
-              '{date}',
-              new Date(modalDate).toLocaleDateString(),
-            )}
+            .replace('{date}', new Date(modalDate).toLocaleDateString())}
           onClose={closeMarkModal}
           footer={
             <div className={styles.modalFooterActions}>

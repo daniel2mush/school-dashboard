@@ -1,4 +1,4 @@
-import { Badge } from '#/components/ui'
+import { Badge, Button } from '#/components/ui'
 import styles from './TeachMyYearGroups.module.scss'
 import { useGetTeacherClasses } from '#/components/query/TeacherQuery.ts'
 import {
@@ -7,11 +7,17 @@ import {
   Users,
   DoorOpen,
   LayoutGrid,
+  User2,
+  UserCheck,
+  ClipboardCheck,
+  CalendarIcon,
+  CalendarDays,
 } from 'lucide-react'
 import { useState } from 'react'
 import type { CSSProperties } from 'react'
 import { TeacherTimetableModal } from './TeacherTimetableModal'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
+import { useRouter } from '@tanstack/react-router'
 
 const CARD_ACCENTS = [
   {
@@ -54,6 +60,7 @@ export function TeachMyYearGroups() {
   const { data: classes, isLoading, error } = useGetTeacherClasses()
   const [selectedYgId, setSelectedYgId] = useState<number | null>(null)
   const { t } = useDashboardTranslation()
+  const { navigate: Navigate } = useRouter()
 
   if (isLoading) {
     return (
@@ -86,30 +93,56 @@ export function TeachMyYearGroups() {
     <section className={styles.view}>
       <div className={styles.panel}>
         <div className={styles.panelCopy}>
-          <div className={styles.eyebrow}>
-            {t('teacher.yearGroups.eyebrow')}
+          <div>
+            <div className={styles.eyebrow}>
+              {t('teacher.yearGroups.eyebrow')}
+            </div>
+            <p className={styles.copy}>{t('teacher.yearGroups.copy')}</p>
+
+            <div className={styles.panelMeta}>
+              <span>
+                {t('teacher.yearGroups.yearGroupsCount').replace(
+                  '{count}',
+                  String(classes.length),
+                )}
+              </span>
+              <span>
+                {t('teacher.yearGroups.studentsCount').replace(
+                  '{count}',
+                  String(totalStudents),
+                )}
+              </span>
+              <span>
+                {t('teacher.yearGroups.subjectsCount').replace(
+                  '{count}',
+                  String(totalSubjects),
+                )}
+              </span>
+            </div>
           </div>
-          <h2 className={styles.title}>{t('teacher.yearGroups.title')}</h2>
-          <p className={styles.copy}>{t('teacher.yearGroups.copy')}</p>
-          <div className={styles.panelMeta}>
-            <span>
-              {t('teacher.yearGroups.yearGroupsCount').replace(
-                '{count}',
-                String(classes.length),
-              )}
-            </span>
-            <span>
-              {t('teacher.yearGroups.studentsCount').replace(
-                '{count}',
-                String(totalStudents),
-              )}
-            </span>
-            <span>
-              {t('teacher.yearGroups.subjectsCount').replace(
-                '{count}',
-                String(totalSubjects),
-              )}
-            </span>
+
+          <div className={styles.panelActions}>
+            <Button
+              variant="primary"
+              onClick={() => Navigate({ to: '/dashboard/teacher/tattend' })}
+            >
+              <UserCheck size={16} />
+              {t('teacher.yearGroups.markAttendance')}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => Navigate({ to: '/dashboard/teacher/tgrades' })}
+            >
+              <ClipboardCheck size={16} />
+              {t('teacher.yearGroups.grading')}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() => Navigate({ to: '/dashboard/teacher/ttimetable' })}
+            >
+              <CalendarDays size={16} />
+              {t('teacher.yearGroups.timetable')}
+            </Button>
           </div>
         </div>
       </div>

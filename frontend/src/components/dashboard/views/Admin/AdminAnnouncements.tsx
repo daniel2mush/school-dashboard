@@ -75,24 +75,34 @@ export function AdminAnnouncements() {
               variant={activeTab === 'ALL' ? 'primary' : 'ghost'}
               onClick={() => setActiveTab('ALL')}
             >
-              <span>
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
                 <Users size={16} />
+                {t('admin.announcements.allBroadcasts')}
               </span>
-              {t('admin.announcements.allBroadcasts')}
             </Button>
             <Button
               variant={activeTab === 'TEACHERS' ? 'primary' : 'ghost'}
               onClick={() => setActiveTab('TEACHERS')}
             >
-              <UserRound size={16} />
-              {t('admin.announcements.teachersOnly')}
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <UserRound size={16} />
+                {t('admin.announcements.teachersOnly')}
+              </span>
             </Button>
             <Button
               variant={activeTab === 'STUDENTS' ? 'primary' : 'ghost'}
               onClick={() => setActiveTab('STUDENTS')}
             >
-              <Filter size={16} />
-              {t('admin.announcements.studentUpdates')}
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Filter size={16} />
+                {t('admin.announcements.studentUpdates')}
+              </span>
             </Button>
           </div>
           <div className={styles.btnContainer}>
@@ -100,8 +110,12 @@ export function AdminAnnouncements() {
               className={styles.createTrigger}
               onClick={() => setIsModalOpen(true)}
             >
-              <Plus size={18} />
-              {t('admin.announcements.createAnnouncement')}
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Plus size={18} />
+                {t('admin.announcements.createAnnouncement')}
+              </span>
             </Button>
           </div>
         </div>
@@ -115,28 +129,44 @@ export function AdminAnnouncements() {
               variant={activePriority === 'ALL' ? 'primary' : 'ghost'}
               onClick={() => setActivePriority('ALL')}
             >
-              {t('admin.announcements.allBroadcasts')}
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                {t('admin.announcements.allBroadcasts')}
+              </span>
             </Button>
             <Button
               variant={activePriority === 'Urgent' ? 'primary' : 'ghost'}
               onClick={() => setActivePriority('Urgent')}
             >
-              <AlertCircle size={14} style={{ color: '#ef4444' }} />
-              {t('admin.announcements.urgent')}
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <AlertCircle size={14} style={{ color: '#ef4444' }} />
+                {t('admin.announcements.urgent')}
+              </span>
             </Button>
             <Button
               variant={activePriority === 'Important' ? 'primary' : 'ghost'}
               onClick={() => setActivePriority('Important')}
             >
-              <Bell size={14} style={{ color: '#f59e0b' }} />
-              {t('admin.announcements.important')}
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Bell size={14} style={{ color: '#f59e0b' }} />
+                {t('admin.announcements.important')}
+              </span>
             </Button>
             <Button
               variant={activePriority === 'Normal' ? 'primary' : 'ghost'}
               onClick={() => setActivePriority('Normal')}
             >
-              <Info size={14} style={{ color: 'var(--cyan)' }} />
-              {t('admin.announcements.normal')}
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Info size={14} style={{ color: 'var(--cyan)' }} />
+                {t('admin.announcements.normal')}
+              </span>
             </Button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-@use "sass:color";
+@use 'sass:color';
 
 .view {
   display: flex;
@@ -10,7 +10,8 @@
   width: 100%;
   padding: 32px;
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(217, 119, 6, 0.12), rgba(217, 119, 6, 0.02)),
+  background:
+    linear-gradient(135deg, rgba(217, 119, 6, 0.12), rgba(217, 119, 6, 0.02)),
     var(--bg-primary);
   border: 1px solid var(--border-light);
   box-shadow: var(--shadow-sm);
@@ -22,13 +23,17 @@
   gap: 24px;
 
   &::after {
-    content: "";
+    content: '';
     position: absolute;
     top: -50%;
     right: -10%;
     width: 300px;
     height: 300px;
-    background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, transparent 70%);
+    background: radial-gradient(
+      circle,
+      rgba(217, 119, 6, 0.15) 0%,
+      transparent 70%
+    );
     border-radius: 50%;
     z-index: 0;
   }
@@ -54,15 +59,13 @@
   gap: 4px;
   padding: 10px 14px;
   border-radius: 14px;
-  background: rgba(var(--amber-rgb), 0.08);
-  border: 1px solid rgba(var(--amber-rgb), 0.14);
+  background: rgba(217, 119, 6, 0.08);
+  border: 1px solid rgba(217, 119, 6, 0.14);
 }
 
 .heroNoteLabel,
 .metricLabel,
-.tableHeaderLabel,
-.avgLabel,
-.progressPreviewLabel {
+.tableHeaderLabel {
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -127,26 +130,6 @@
   color: var(--text-primary);
 }
 
-.addBtn {
-  background: var(--amber);
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  z-index: 1;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);
-  }
-}
-
 .tableContainer {
   background: var(--bg-primary);
   border: 1px solid var(--border-light);
@@ -176,10 +159,6 @@
   gap: 12px;
 }
 
-.filterWrap {
-  position: relative;
-}
-
 .filterSelect {
   padding: 10px 16px;
   border-radius: 12px;
@@ -194,11 +173,6 @@
 
   &:hover {
     border-color: var(--amber);
-  }
-
-  &:focus {
-    border-color: var(--amber);
-    box-shadow: 0 0 0 3px rgba(var(--amber-rgb), 0.12);
   }
 }
 
@@ -223,11 +197,11 @@
   background: var(--bg-secondary);
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
 
   &:focus {
     border-color: var(--amber);
-    box-shadow: 0 0 0 3px rgba(var(--amber-rgb), 0.12);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
   }
 }
 
@@ -239,7 +213,7 @@
   th {
     padding: 16px 24px;
     background: var(--bg-secondary);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -254,13 +228,19 @@
     color: var(--text-primary);
     vertical-align: middle;
   }
+}
 
-  tr:last-child td {
-    border-bottom: none;
-  }
+.clickableRow {
+  cursor: pointer;
+  transition: background-color 0.2s;
 
-  tr:hover td {
-    background: rgba(var(--amber-rgb), 0.02);
+  &:hover {
+    background-color: rgba(217, 119, 6, 0.03);
+
+    .gradeBtn {
+      background-color: var(--amber);
+      color: white;
+    }
   }
 }
 
@@ -271,7 +251,7 @@
 }
 
 .studentName {
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-primary);
 }
 
@@ -280,449 +260,392 @@
   color: var(--text-secondary);
 }
 
-.scoreValue {
-  font-weight: 600;
-  font-family: var(--font-mono, monospace);
+.classBadge {
+  opacity: 0.8;
 }
 
-.gradeBadge {
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.85rem;
+.avgProgressCell {
+  width: 160px;
 }
 
-.gradeGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.gradeCard {
-  min-width: 170px;
-  padding: 12px 14px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent), var(--bg-secondary);
-  border: 1px solid var(--border-light);
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, var(--amber), rgba(var(--amber-rgb), 0.25));
-  }
-}
-
-.gradeCardTitle {
-  font-size: 0.8rem;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 10px;
-}
-
-.gradeCardRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.gradeScore {
-  font-size: 0.95rem;
-  font-weight: 800;
-  color: var(--text-primary);
-}
-
-.gradeCardBar {
-  margin-top: 8px;
-}
-
-.avgBlock {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.summaryMeta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.summaryMetaLabel {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-}
-
-.summarySelect {
-  min-width: 110px;
-  padding: 10px 12px;
+.gradeBtn {
+  padding: 8px 16px;
   border-radius: 10px;
   border: 1px solid var(--border-light);
   background: var(--bg-secondary);
-  color: var(--text-primary);
-}
-
-.summaryField {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  label {
-    font-size: 0.82rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-  }
-
-  input,
-  textarea {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 12px;
-    border: 1px solid var(--border-light);
-    background: var(--bg-secondary);
-    color: var(--text-primary);
-    font-size: 0.9rem;
-    resize: vertical;
-
-    &:focus {
-      outline: none;
-      border-color: var(--amber);
-      box-shadow: 0 0 0 3px rgba(var(--amber-rgb), 0.12);
-    }
-  }
-}
-
-.summarySaveBtn {
-  align-self: flex-start;
-  background: rgba(var(--amber-rgb), 0.12);
-  color: var(--amber);
-  border: 1px solid rgba(var(--amber-rgb), 0.2);
-  padding: 10px 14px;
-  border-radius: 12px;
-  font-weight: 700;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.2s;
   cursor: pointer;
 
-  &:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
+  &:hover {
+    background-color: var(--amber);
+    color: white;
+    border-color: var(--amber);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
   }
-}
-
-.avgBadgeWrap {
-  display: flex;
-}
-
-.progressPreview {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding-top: 4px;
-}
-
-.emptyDash {
-  color: var(--text-secondary);
-  font-size: 1rem;
 }
 
 // Modal Styles
 .modalOverlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  padding: 24px;
 }
 
 .modalContent {
   background: var(--bg-primary);
   width: 100%;
-  max-width: 1040px;
-  border-radius: 24px;
-  padding: 32px;
+  max-width: 1100px;
+  border-radius: 32px;
+  border: 1px solid var(--border-light);
   box-shadow: var(--shadow-xl);
-  position: relative;
-  max-height: min(88vh, 940px);
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  max-height: 92vh;
+  overflow: hidden;
+  animation: modalEnter 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.modalGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 32px;
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .modalHeader {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border-light);
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 24px;
+  background: linear-gradient(to right, rgba(217, 119, 6, 0.05), transparent);
+}
+
+.studentHero {
+  display: flex;
+  align-items: center;
+  gap: 20px;
 
   h2 {
     font-size: 1.5rem;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--text-primary);
+    margin-bottom: 4px;
   }
+}
+
+.studentMeta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
 }
 
 .closeBtn {
-  background: none;
-  border: none;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-light);
   color: var(--text-secondary);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  padding: 4px;
-  border-radius: 50%;
   transition: all 0.2s;
 
   &:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+    background: var(--red-bg);
+    color: var(--red);
+    border-color: rgba(220, 38, 38, 0.2);
   }
 }
 
-.formGrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-.formGroup {
+.gradingWorkspace {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 40px;
+}
+
+.workspaceSection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sectionTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+  border-left: 3px solid var(--amber);
+  padding-left: 12px;
+}
+
+.scoresTableWrapper {
+  background: var(--bg-secondary);
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.scoresTable {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.02);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+  }
+
+  td {
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--border-light);
+    font-size: 0.9rem;
+    vertical-align: middle;
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.subjectNameCell {
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 25%;
+}
+
+.tableInput {
+  width: 60px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-primary);
+  text-align: center;
+  font-weight: 500;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: var(--text-secondary);
+    box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
+  }
+}
+
+.miniGradeBadge {
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+.evaluationGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.evalField {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
   label {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-secondary);
   }
 
-  select, input {
-    padding: 12px 16px;
-    border-radius: 12px;
+  textarea {
+    padding: 16px;
+    border-radius: 16px;
     border: 1px solid var(--border-light);
     background: var(--bg-secondary);
     color: var(--text-primary);
-    font-size: 0.95rem;
+    resize: none;
+    transition: all 0.2s;
 
     &:focus {
       outline: none;
       border-color: var(--amber);
+      background: var(--bg-primary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
   }
 }
 
-.fullWidth {
+.evalFooter {
   grid-column: span 2;
-}
-
-.subjectLabel {
-  display: block;
-  margin-bottom: 12px;
-}
-
-.modalActions {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  border-top: 1px dashed var(--border-light);
-  padding-top: 24px;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  background: rgba(217, 119, 6, 0.04);
+  border-radius: 20px;
+  border: 1px dashed rgba(217, 119, 6, 0.2);
+  margin-top: 8px;
 }
 
-.cancelBtn {
-  padding: 12px 24px;
-  border-radius: 12px;
-  border: 1px solid var(--border-light);
-  background: transparent;
-  color: var(--text-secondary);
-  font-weight: 600;
-  cursor: pointer;
+.overgradeBox {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 
-  &:hover {
-    background: var(--bg-secondary);
+  label {
+    font-weight: 700;
+    color: var(--text-primary);
   }
 }
 
-.submitBtn {
+.summarySelect {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+  min-width: 100px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: var(--amber);
+  }
+}
+
+.saveSummaryBtn {
   background: var(--amber);
   color: white;
   border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  font-weight: 600;
+  padding: 14px 28px;
+  border-radius: 14px;
+  font-weight: 700;
   cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.4);
+  }
 
   &:disabled {
     opacity: 0.5;
+    cursor: wait;
+  }
+}
+
+.modalActions {
+  padding: 24px 32px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-secondary);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.doneBtn {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-mid);
+  color: var(--text-primary);
+  padding: 12px 32px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: var(--bg-secondary);
+    border-color: var(--text-secondary);
   }
 }
 
 .scoreProgress {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: 140px;
+  gap: 10px;
+  width: 100%;
 }
 
 .scoreBar {
   flex: 1;
   height: 6px;
-  background: var(--bg-secondary);
-  border-radius: 3px;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
   overflow: hidden;
 }
 
 .scoreFill {
   height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s ease;
+  border-radius: 10px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .scorePercent {
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-secondary);
   min-width: 35px;
 }
 
-.subjectGrid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 16px;
-  max-height: 300px;
-  overflow-y: auto;
-  padding-right: 8px;
-}
-
-.noGradesText {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-}
-
-.emptyState {
-  text-align: center;
-  color: var(--text-secondary);
-  padding: 36px 24px;
-}
-
-.subjectItem {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  padding: 12px 16px;
-  cursor: pointer;
-  transition: all 0.2s;
-
-  &:hover {
-    border-color: var(--amber);
-    background: rgba(var(--amber-rgb), 0.05);
-  }
-
-  &.active {
-    border-color: var(--amber);
-    background: rgba(var(--amber-rgb), 0.08);
-  }
-}
-
-.subjectName {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--text-primary);
-}
-
-.subjectMeta {
-  font-size: 0.75rem;
-  color: var(--text-secondary);
-  margin-top: 4px;
-}
-
-.gradeForm {
-  background: var(--bg-secondary);
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid var(--border-light);
-}
-
-.gradeFormTitle {
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.autoGradePreview {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-}
-
-.subjectEmptyState {
-  height: 100%;
-  min-height: 240px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  border-radius: 16px;
-  border: 1px dashed var(--border-light);
-  color: var(--text-secondary);
-  text-align: center;
-  padding: 32px;
-}
-
-@media (max-width: 1100px) {
-  .metricGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 900px) {
-  .hero {
-    flex-direction: column;
-    align-items: flex-start;
+  .metricGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
-
-  .heroActions {
-    width: 100%;
-    align-items: flex-start;
+  .evaluationGrid {
+    grid-template-columns: 1fr;
   }
-
-  .tableHeader {
+  .evalFooter {
     flex-direction: column;
+    gap: 20px;
     align-items: stretch;
   }
-
-  .modalGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .searchWrap {
-    width: 100%;
+  .overgradeBox {
+    justify-content: space-between;
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 600px) {
   .metricGrid {
     grid-template-columns: 1fr;
   }
-
-  .gradeCard {
-    min-width: 100%;
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+  }
+  .heroActions {
+    align-items: center;
+  }
+  .modalOverlay {
+    padding: 0;
+  }
+  .modalContent {
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
   }
 }

@@ -79,16 +79,6 @@ export function TeachAnnouncements() {
           <h1 className={styles.title}>{t('teacher.announcements.title')}</h1>
           <p className={styles.subtitle}>{t('teacher.announcements.copy')}</p>
         </div>
-        <div className={styles.btnContainer}>
-          <Button
-            className={styles.createTrigger}
-            onClick={() => setIsModalOpen(true)}
-            disabled={teacherClasses.length === 0}
-          >
-            <Plus size={18} />
-            {t('teacher.announcements.newClassAnnouncement')}
-          </Button>
-        </div>
       </header>
 
       {isModalOpen && (
@@ -97,55 +87,108 @@ export function TeachAnnouncements() {
 
       <div className={styles.filterContainer}>
         <div className={styles.filterRow}>
-          <span className={styles.filterLabel}>{t('admin.announcements.targetAudience')}</span>
+          <span className={styles.filterLabel}>
+            {t('admin.announcements.targetAudience')}
+          </span>
           <div className={styles.tabsList}>
-            <TabButton
-              active={activeTab === 'ALL'}
+            <Button
+              variant={activeTab === 'ALL' ? 'primary' : 'ghost'}
               onClick={() => setActiveTab('ALL')}
-              icon={<Users size={16} />}
-              label={t('teacher.announcements.allNotices')}
-            />
-            <TabButton
-              active={activeTab === 'FACULTY'}
+            >
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Users size={16} />
+                {t('teacher.announcements.allNotices')}
+              </span>
+            </Button>
+            <Button
+              variant={activeTab === 'FACULTY' ? 'primary' : 'ghost'}
               onClick={() => setActiveTab('FACULTY')}
-              icon={<UserRound size={16} />}
-              label={t('teacher.announcements.facultyOnly')}
-            />
-            <TabButton
-              active={activeTab === 'MY_CLASSES'}
+            >
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <UserRound size={16} />
+                {t('teacher.announcements.facultyOnly')}
+              </span>
+            </Button>
+            <Button
+              variant={activeTab === 'MY_CLASSES' ? 'primary' : 'ghost'}
               onClick={() => setActiveTab('MY_CLASSES')}
-              icon={<Filter size={16} />}
-              label={t('teacher.announcements.classUpdates')}
-            />
+            >
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Filter size={16} />
+                {t('teacher.announcements.classUpdates')}
+              </span>
+            </Button>
+          </div>
+          <div className={styles.btnContainer}>
+            <Button
+              className={styles.createTrigger}
+              onClick={() => setIsModalOpen(true)}
+              disabled={teacherClasses.length === 0}
+            >
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Plus size={18} />
+                {t('teacher.announcements.newClassAnnouncement')}
+              </span>
+            </Button>
           </div>
         </div>
 
         <div className={styles.filterRow}>
-          <span className={styles.filterLabel}>{t('admin.announcements.priorityLevel')}</span>
+          <span className={styles.filterLabel}>
+            {t('admin.announcements.priorityLevel')}
+          </span>
           <div className={styles.tabsList}>
-            <TabButton
-              active={activePriority === 'ALL'}
+            <Button
+              variant={activePriority === 'ALL' ? 'primary' : 'ghost'}
               onClick={() => setActivePriority('ALL')}
-              label={t('admin.announcements.allBroadcasts')}
-            />
-            <TabButton
-              active={activePriority === 'Urgent'}
+            >
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                {t('admin.announcements.allBroadcasts')}
+              </span>
+            </Button>
+            <Button
+              variant={activePriority === 'Urgent' ? 'primary' : 'ghost'}
               onClick={() => setActivePriority('Urgent')}
-              icon={<AlertCircle size={14} style={{ color: '#ef4444' }} />}
-              label={t('admin.announcements.urgent')}
-            />
-            <TabButton
-              active={activePriority === 'Important'}
+            >
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <AlertCircle size={14} style={{ color: '#ef4444' }} />
+                {t('admin.announcements.urgent')}
+              </span>
+            </Button>
+            <Button
+              variant={activePriority === 'Important' ? 'primary' : 'ghost'}
               onClick={() => setActivePriority('Important')}
-              icon={<Bell size={14} style={{ color: '#f59e0b' }} />}
-              label={t('admin.announcements.important')}
-            />
-            <TabButton
-              active={activePriority === 'Normal'}
+            >
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Bell size={14} style={{ color: '#f59e0b' }} />
+                {t('admin.announcements.important')}
+              </span>
+            </Button>
+            <Button
+              variant={activePriority === 'Normal' ? 'primary' : 'ghost'}
               onClick={() => setActivePriority('Normal')}
-              icon={<Info size={14} style={{ color: 'var(--cyan)' }} />}
-              label={t('admin.announcements.normal')}
-            />
+            >
+              <span
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}
+              >
+                <Info size={14} style={{ color: 'var(--cyan)' }} />
+                {t('admin.announcements.normal')}
+              </span>
+            </Button>
           </div>
         </div>
       </div>
@@ -172,18 +215,6 @@ export function TeachAnnouncements() {
         )}
       </div>
     </section>
-  )
-}
-
-function TabButton({ active, onClick, icon, label }: any) {
-  return (
-    <button
-      className={`${styles.tabTrigger} ${active ? styles.active : ''}`}
-      onClick={onClick}
-    >
-      {icon}
-      {label}
-    </button>
   )
 }
 

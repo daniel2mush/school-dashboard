@@ -22,6 +22,7 @@ import {
   Trash2,
 } from 'lucide-react'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
+import { Button } from '#/components/ui'
 
 export function TeachSubjectsContent() {
   const { t, language } = useDashboardTranslation()
@@ -111,7 +112,9 @@ export function TeachSubjectsContent() {
     try {
       setDownloadingId(materialId)
 
-      const response = await fetch(`/api/teacher/materials/${materialId}/download`)
+      const response = await fetch(
+        `/api/teacher/materials/${materialId}/download`,
+      )
       if (!response.ok) {
         throw new Error('Failed to download file')
       }
@@ -156,17 +159,14 @@ export function TeachSubjectsContent() {
       <header className={styles.panel}>
         <div className={styles.heroContent}>
           <div className={styles.eyebrow}>{t('teacher.content.eyebrow')}</div>
-          <h2 className={styles.title}>{t('teacher.content.title')}</h2>
+
           <p className={styles.copy}>{t('teacher.content.copy')}</p>
         </div>
         <div className={styles.heroActions}>
-          <button
-            className={styles.uploadBtn}
-            onClick={() => setIsModalOpen(true)}
-          >
+          <Button variant="primary" onClick={() => setIsModalOpen(true)}>
             <Upload size={18} />
-            <span>{t('teacher.content.upload')}</span>
-          </button>
+            {t('teacher.content.upload')}
+          </Button>
         </div>
       </header>
 
@@ -181,10 +181,10 @@ export function TeachSubjectsContent() {
           />
         </div>
         <div className={styles.filters}>
-          <button className={styles.filterBtn}>
+          <Button variant="secondary" className={styles.filterBtn}>
             <Filter size={18} />
             <span>{t('teacher.content.filter')}</span>
-          </button>
+          </Button>
         </div>
       </div>
 

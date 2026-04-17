@@ -59,7 +59,6 @@ export function TeachAnnouncementModal({ onClose }: TeachAnnouncementModalProps)
           <div className={styles.formFieldGroup}>
             <div className={styles.formSection}>
               <label className={styles.label}>
-                <FileText size={14} style={{ marginRight: 6 }} />
                 {t('teacher.announcements.announcementTitle')}
               </label>
               <input
@@ -74,7 +73,6 @@ export function TeachAnnouncementModal({ onClose }: TeachAnnouncementModalProps)
             <div className={styles.formRow}>
               <div className={styles.formSection}>
                 <label className={styles.label}>
-                  <AlertCircle size={14} style={{ marginRight: 6 }} />
                   {t('teacher.announcements.priorityLevel')}
                 </label>
                 <select
@@ -82,15 +80,20 @@ export function TeachAnnouncementModal({ onClose }: TeachAnnouncementModalProps)
                   value={priority}
                   onChange={(e) => setPriority(e.target.value as any)}
                 >
-                  <option value="Normal">{t('teacher.announcements.normal')}</option>
-                  <option value="Important">{t('teacher.announcements.important')}</option>
-                  <option value="Urgent">{t('teacher.announcements.urgent')}</option>
+                  <option value="Normal">
+                    {t('teacher.announcements.normal')}
+                  </option>
+                  <option value="Important">
+                    {t('teacher.announcements.important')}
+                  </option>
+                  <option value="Urgent">
+                    {t('teacher.announcements.urgent')}
+                  </option>
                 </select>
               </div>
 
               <div className={styles.formSection}>
                 <label className={styles.label}>
-                  <Target size={14} style={{ marginRight: 6 }} />
                   {t('teacher.announcements.targetClass')}
                 </label>
                 <select
@@ -99,7 +102,9 @@ export function TeachAnnouncementModal({ onClose }: TeachAnnouncementModalProps)
                   onChange={(e) => setTargetYearGroupId(e.target.value)}
                   required
                 >
-                  <option value="">{t('teacher.announcements.selectClass')}</option>
+                  <option value="">
+                    {t('teacher.announcements.selectClass')}
+                  </option>
                   {teacherClasses?.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.name}

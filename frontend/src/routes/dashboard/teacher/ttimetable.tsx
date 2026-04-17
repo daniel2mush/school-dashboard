@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { TeacherSidebarTimetable } from '#/components/dashboard/Sidebar/TeacherSidebarTimetable.tsx'
+import { TeacherTimetable } from '#/components/dashboard/views/Teach/TeacherTimetable'
 
 export const Route = createFileRoute('/dashboard/teacher/ttimetable')({
   component: RouteComponent,
 })
 
 function RouteComponent() {
-  return <TeacherSidebarTimetable />
+  return <TeacherTimetable />
 }

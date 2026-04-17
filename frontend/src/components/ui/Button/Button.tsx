@@ -42,7 +42,16 @@ export const Button = forwardRef<HTMLButtonElement, ButtonTypes>(
         {...props}
       >
         {loading && <span className="btn-spinner" />}
-        <span className={loading ? 'btn-content' : ''}>{children}</span>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+          }}
+          className={loading ? 'btn-content' : ''}
+        >
+          {children}
+        </span>
       </button>
     )
   },

@@ -6,7 +6,7 @@ import {
   useSubmitGrade,
 } from '#/components/query/TeacherQuery.ts'
 import { Plus, X, Search } from 'lucide-react'
-import { Avatar, Badge } from '#/components/ui'
+import { Avatar, Badge, Button, Input } from '#/components/ui'
 import { toast } from 'sonner'
 
 type GradeScaleOption = {
@@ -112,17 +112,11 @@ export function TeachGrading() {
   const { mutate: submitGrade, isPending } = useSubmitGrade()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedClassId, setSelectedClassId] = useState('')
-  const [selectedStudentId, setSelectedStudentId] = useState('')
+  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(
+    null,
+  )
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedYearGroup, setSelectedYearGroup] = useState('All')
-  const [activeSubjectId, setActiveSubjectId] = useState<string | null>(null)
-  const [subjectScores, setSubjectScores] = useState({
-    midterm: '',
-    assignmentAvg: '',
-    projectFinal: '',
-    overall: '',
-  })
   const [summaryDrafts, setSummaryDrafts] = useState<
     Record<string, StudentSummaryDraft>
   >({})
@@ -130,10 +124,6 @@ export function TeachGrading() {
   if (isLoading || !classes) {
     return <div className={styles.view}>{t('teacher.grading.loading')}</div>
   }
-
-  const selectedClass = classes.find((c) => String(c.id) === selectedClassId)
-  const students = selectedClass?.students || []
-  const subjects = selectedClass?.subjects || []
 
   const studentsWithGrades: TeacherStudent[] = classes.flatMap((c) =>
     c.students.map((student) => ({
@@ -146,6 +136,14 @@ export function TeachGrading() {
       grades: (student.grades || []) as TeacherGradeRecord[],
     })),
   )
+
+  const selectedStudent = studentsWithGrades.find(
+    (s) => String(s.id) === selectedStudentId,
+  )
+  const selectedClass = classes.find(
+    (c) => c.name === selectedStudent?.className,
+  )
+  const classSubjects = selectedClass?.subjects || []
 
   const totalStudents = studentsWithGrades.length
   const totalGradeRecords = studentsWithGrades.reduce(
@@ -168,91 +166,9 @@ export function TeachGrading() {
     return matchesSearch && matchesYearGroup
   })
 
-  const getExistingGrade = (studentId: string, subjectId: string) => {
-    const student = studentsWithGrades.find(
-      (entry) => String(entry.id) === studentId,
-    )
-    return student?.grades.find((grade) => String(grade.subjectId) === subjectId)
-  }
-
-  const handleScoreChange = (
-    field: keyof typeof subjectScores,
-    value: string,
-  ) => {
-    const numericValue = Number(value)
-    if (
-      value === '' ||
-      (!Number.isNaN(numericValue) && numericValue >= 0 && numericValue <= 100)
-    ) {
-      setSubjectScores((prev) => ({ ...prev, [field]: value }))
-    }
-  }
-
-  const handleSubjectSelect = (subjectId: string) => {
-    setActiveSubjectId(subjectId)
-    const existing = getExistingGrade(selectedStudentId, subjectId)
-    if (existing) {
-      setSubjectScores({
-        midterm: existing.midterm?.toString() || '',
-        assignmentAvg: existing.assignmentAvg?.toString() || '',
-        projectFinal: existing.projectFinal?.toString() || '',
-        overall: existing.score?.toString() || '',
-      })
-      return
-    }
-
-    setSubjectScores({
-      midterm: '',
-      assignmentAvg: '',
-      projectFinal: '',
-      overall: '',
-    })
-  }
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setSelectedClassId('')
-    setSelectedStudentId('')
-    setActiveSubjectId(null)
-    setSubjectScores({
-      midterm: '',
-      assignmentAvg: '',
-      projectFinal: '',
-      overall: '',
-    })
-  }
-
-  const handleSubmitSubjectGrade = (event: React.FormEvent) => {
-    event.preventDefault()
-
-    if (!selectedStudentId || !activeSubjectId) {
-      toast.error(t('teacher.grading.selectStudentAndSubject'))
-      return
-    }
-
-    const overallScore = subjectScores.overall
-      ? Number(subjectScores.overall)
-      : undefined
-
-    submitGrade({
-      studentId: Number(selectedStudentId),
-      subjectId: Number(activeSubjectId),
-      score: overallScore,
-      grade:
-        overallScore !== undefined
-          ? calculateGradeLetter(overallScore)
-          : undefined,
-      midterm: subjectScores.midterm ? Number(subjectScores.midterm) : undefined,
-      assignmentAvg: subjectScores.assignmentAvg
-        ? Number(subjectScores.assignmentAvg)
-        : undefined,
-      projectFinal: subjectScores.projectFinal
-        ? Number(subjectScores.projectFinal)
-        : undefined,
-    })
-  }
-
-  const getStudentSummaryDraft = (student: TeacherStudent): StudentSummaryDraft => {
+  const getStudentSummaryDraft = (
+    student: TeacherStudent,
+  ): StudentSummaryDraft => {
     const existingDraft = summaryDrafts[String(student.id)]
     if (existingDraft) return existingDraft
 
@@ -261,25 +177,37 @@ export function TeachGrading() {
 
     return {
       overallGrade:
-        summarySource?.overallGrade ||
-        calculateGradeLetter(averageScore),
+        summarySource?.overallGrade || calculateGradeLetter(averageScore),
       performance: summarySource?.performance || '',
       teacherReport: summarySource?.teacherReport || '',
     }
   }
 
   const updateStudentSummaryDraft = (
-    student: TeacherStudent,
+    studentId: number,
     patch: Partial<StudentSummaryDraft>,
   ) => {
+    const student = studentsWithGrades.find((s) => s.id === studentId)
+    if (!student) return
+
     setSummaryDrafts((prev) => ({
       ...prev,
-      [String(student.id)]: {
+      [String(studentId)]: {
         ...getStudentSummaryDraft(student),
-        ...prev[String(student.id)],
+        ...prev[String(studentId)],
         ...patch,
       },
     }))
+  }
+
+  const handleOpenGrading = (studentId: number) => {
+    setSelectedStudentId(String(studentId))
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedStudentId(null)
   }
 
   const handleSaveStudentSummary = (student: TeacherStudent) => {
@@ -307,30 +235,6 @@ export function TeachGrading() {
 
   return (
     <div className={styles.view}>
-      <div className={styles.hero}>
-        <div className={styles.heroCopy}>
-          <div className={styles.eyebrow}>{t('teacher.grading.eyebrow')}</div>
-          <h2 className={styles.title}>{t('teacher.grading.title')}</h2>
-          <p className={styles.copy}>{t('teacher.grading.copy')}</p>
-        </div>
-        <div className={styles.heroActions}>
-          <div className={styles.heroNote}>
-            <span className={styles.heroNoteLabel}>
-              {t('teacher.grading.liveScope')}
-            </span>
-            <span className={styles.heroNoteValue}>
-              {t('teacher.grading.classesCount')
-                .replace('{count}', String(classCount))
-                .replace('{students}', String(totalStudents))}
-            </span>
-          </div>
-          <button className={styles.addBtn} onClick={() => setIsModalOpen(true)}>
-            <Plus size={20} />
-            {t('teacher.grading.addGrades')}
-          </button>
-        </div>
-      </div>
-
       <div className={styles.metricGrid}>
         <div className={styles.metricCard}>
           <span className={styles.metricLabel}>
@@ -406,18 +310,26 @@ export function TeachGrading() {
           <thead>
             <tr>
               <th>{t('teacher.grading.student')}</th>
-              <th>{t('teacher.grading.academicRecord')}</th>
-              <th>{t('teacher.grading.overallProgress')}</th>
+              <th>{t('teacher.grading.class')}</th>
+              <th>{t('teacher.grading.averagePerformance')}</th>
+              <th>{t('teacher.grading.status')}</th>
+              <th style={{ textAlign: 'right' }}>
+                {t('teacher.grading.actions')}
+              </th>
             </tr>
           </thead>
           <tbody>
             {filteredStudents.length > 0 ? (
               filteredStudents.map((student) => {
                 const averageScore = getAverageScore(student)
-                const summaryDraft = getStudentSummaryDraft(student)
+                const isGraded = student.grades.length > 0
                 return (
-                  <tr key={student.id}>
-                    <td style={{ verticalAlign: 'top' }}>
+                  <tr
+                    key={student.id}
+                    onClick={() => handleOpenGrading(student.id)}
+                    className={styles.clickableRow}
+                  >
+                    <td>
                       <div className={styles.studentInfo}>
                         <Avatar
                           initials={student.initials}
@@ -429,123 +341,42 @@ export function TeachGrading() {
                             {student.name}
                           </div>
                           <div className={styles.studentEmail}>
-                            {student.className}
+                            {t('teacher.grading.id')}: #{student.id}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td>
-                      <div className={styles.gradeGrid}>
-                        {student.grades.map((grade) => {
-                          const colors = getGradeColor(grade.grade || '')
-                          return (
-                            <div key={grade.id} className={styles.gradeCard}>
-                              <div className={styles.gradeCardTitle}>
-                                {grade.subject?.name || t('teacher.grading.subject')}
-                              </div>
-                              <div className={styles.gradeCardRow}>
-                                <span className={styles.gradeScore}>
-                                  {grade.score ?? 0}%
-                                </span>
-                                <span
-                                  className={styles.gradeBadge}
-                                  style={{
-                                    backgroundColor: colors.bg,
-                                    color: colors.color,
-                                  }}
-                                >
-                                  {grade.grade || calculateGradeLetter(grade.score || 0)}
-                                </span>
-                              </div>
-                              <div className={styles.gradeCardBar}>
-                                <ScoreProgressBar score={grade.score || 0} />
-                              </div>
-                            </div>
-                          )
-                        })}
-                        {student.grades.length === 0 && (
-                          <span className={styles.noGradesText}>
-                            {t('teacher.grading.noGradesRecorded')}
-                          </span>
-                        )}
+                      <Badge variant="ghost" className={styles.classBadge}>
+                        {student.className}
+                      </Badge>
+                    </td>
+                    <td>
+                      <div className={styles.avgProgressCell}>
+                        <ScoreProgressBar score={averageScore} />
                       </div>
                     </td>
                     <td>
-                      {student.grades.length > 0 ? (
-                        <div className={styles.avgBlock}>
-                          <div className={styles.avgLabel}>
-                            {t('teacher.grading.averagePerformance')}
-                          </div>
-                          <ScoreProgressBar score={averageScore} />
-                          <div className={styles.summaryMeta}>
-                            <span className={styles.summaryMetaLabel}>
-                              {t('teacher.grading.overallGrade')}
-                            </span>
-                            <select
-                              className={styles.summarySelect}
-                              value={summaryDraft.overallGrade}
-                              onChange={(e) =>
-                                updateStudentSummaryDraft(student, {
-                                  overallGrade: e.target.value,
-                                })
-                              }
-                            >
-                              {STANDARD_GRADE_SCALE.map((option) => (
-                                <option key={option.key} value={option.label}>
-                                  {t(`teacher.grading.gradeLetters.${option.key}`)}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                          <div className={styles.avgBadgeWrap}>
-                            <Badge variant={averageScore >= 70 ? 'green' : 'amber'}>
-                              {summaryDraft.overallGrade}
-                            </Badge>
-                          </div>
-                          <div className={styles.summaryField}>
-                            <label>{t('teacher.grading.performanceComment')}</label>
-                            <input
-                              type="text"
-                              placeholder={t(
-                                'teacher.grading.performancePlaceholder',
-                              )}
-                              value={summaryDraft.performance}
-                              onChange={(e) =>
-                                updateStudentSummaryDraft(student, {
-                                  performance: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <div className={styles.summaryField}>
-                            <label>{t('teacher.grading.teacherReport')}</label>
-                            <textarea
-                              rows={4}
-                              placeholder={t(
-                                'teacher.grading.teacherReportPlaceholder',
-                              )}
-                              value={summaryDraft.teacherReport}
-                              onChange={(e) =>
-                                updateStudentSummaryDraft(student, {
-                                  teacherReport: e.target.value,
-                                })
-                              }
-                            />
-                          </div>
-                          <button
-                            type="button"
-                            className={styles.summarySaveBtn}
-                            disabled={isPending}
-                            onClick={() => handleSaveStudentSummary(student)}
-                          >
-                            {isPending
-                              ? t('teacher.grading.saving')
-                              : t('teacher.grading.saveStudentSummary')}
-                          </button>
-                        </div>
+                      {isGraded ? (
+                        <Badge variant="green">
+                          {t('teacher.grading.graded')}
+                        </Badge>
                       ) : (
-                        <span className={styles.emptyDash}>-</span>
+                        <Badge variant="amber">
+                          {t('teacher.grading.pending')}
+                        </Badge>
                       )}
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <Button
+                        variant="secondary"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleOpenGrading(student.id)
+                        }}
+                      >
+                        {t('teacher.grading.gradeStudent')}
+                      </Button>
                     </td>
                   </tr>
                 )
@@ -561,218 +392,251 @@ export function TeachGrading() {
         </table>
       </div>
 
-      {isModalOpen ? (
+      {isModalOpen && selectedStudent ? (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
             <div className={styles.modalHeader}>
-              <div>
-                <h2>{t('teacher.grading.modalTitle')}</h2>
-                <p className={styles.copy}>
-                  {t('teacher.grading.modalDescription')}
-                </p>
+              <div className={styles.studentHero}>
+                <Avatar
+                  initials={selectedStudent.initials}
+                  size={64}
+                  fontSize={20}
+                />
+                <div>
+                  <h2>{selectedStudent.name}</h2>
+                  <div className={styles.studentMeta}>
+                    <Badge variant="ghost">{selectedStudent.className}</Badge>
+                    <span>
+                      {t('teacher.grading.studentId')}: #{selectedStudent.id}
+                    </span>
+                  </div>
+                </div>
               </div>
-              <button className={styles.closeBtn} onClick={handleCloseModal}>
+              <Button variant="ghost" onClick={handleCloseModal}>
                 <X size={24} />
-              </button>
+              </Button>
             </div>
 
-            <div className={styles.modalGrid}>
-              <div>
-                <div className={styles.formGroup}>
-                  <label>{t('teacher.grading.selectClass')}</label>
-                  <select
-                    value={selectedClassId}
-                    onChange={(e) => {
-                      setSelectedClassId(e.target.value)
-                      setSelectedStudentId('')
-                      setActiveSubjectId(null)
-                    }}
-                    required
-                  >
-                    <option value="">
-                      {t('teacher.grading.selectClassOption')}
-                    </option>
-                    {classes.map((yearGroup) => (
-                      <option key={yearGroup.id} value={yearGroup.id}>
-                        {yearGroup.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className={styles.formGroup}>
-                  <label>{t('teacher.grading.selectStudent')}</label>
-                  <select
-                    value={selectedStudentId}
-                    onChange={(e) => {
-                      setSelectedStudentId(e.target.value)
-                      setActiveSubjectId(null)
-                    }}
-                    disabled={!selectedClassId}
-                    required
-                  >
-                    <option value="">
-                      {t('teacher.grading.selectStudentOption')}
-                    </option>
-                    {students.map((student) => (
-                      <option key={student.id} value={student.id}>
-                        {student.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {selectedStudentId ? (
-                  <>
-                    <label className={styles.subjectLabel}>
-                      {t('teacher.grading.studentSubjects')}
-                    </label>
-                    <div className={styles.subjectGrid}>
-                      {subjects.map((subject) => {
-                        const grade = getExistingGrade(
-                          selectedStudentId,
-                          String(subject.id),
+            <div className={styles.gradingWorkspace}>
+              <div className={styles.workspaceSection}>
+                <h3 className={styles.sectionTitle}>
+                  {t('teacher.grading.academicPerformance')}
+                </h3>
+                <div className={styles.scoresTableWrapper}>
+                  <table className={styles.scoresTable}>
+                    <thead>
+                      <tr>
+                        <th>{t('teacher.grading.subject')}</th>
+                        <th>{t('teacher.grading.midterm')}</th>
+                        <th>{t('teacher.grading.assignments')}</th>
+                        <th>{t('teacher.grading.project')}</th>
+                        <th>{t('teacher.grading.overall')}</th>
+                        <th>{t('teacher.grading.grade')}</th>
+                        <th style={{ textAlign: 'right' }}>
+                          {t('teacher.grading.actions')}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {classSubjects.map((subject) => {
+                        const grade = selectedStudent.grades.find(
+                          (g) => g.subjectId === subject.id,
                         )
+                        const score = grade?.score ?? 0
+                        const colors = getGradeColor(
+                          grade?.grade || calculateGradeLetter(score),
+                        )
+
                         return (
-                          <div
-                            key={subject.id}
-                            className={`${styles.subjectItem} ${
-                              activeSubjectId === String(subject.id)
-                                ? styles.active
-                                : ''
-                            }`}
-                            onClick={() => handleSubjectSelect(String(subject.id))}
-                          >
-                            <div className={styles.subjectName}>
+                          <tr key={subject.id}>
+                            <td className={styles.subjectNameCell}>
                               {subject.name}
-                            </div>
-                            <div className={styles.subjectMeta}>
-                              {grade
-                                ? t('teacher.grading.currentGrade')
-                                    .replace('{score}', String(grade.score ?? 0))
-                                    .replace('{grade}', grade.grade || '')
-                                : t('teacher.grading.notGradedYet')}
-                            </div>
-                          </div>
+                            </td>
+                            <td>
+                              <Input
+                                type="tel"
+                                className={styles.tableInput}
+                                placeholder="--"
+                                defaultValue={grade?.midterm}
+                                onBlur={(e) => {
+                                  const val = e.target.value
+                                  if (val !== String(grade?.midterm)) {
+                                    submitGrade({
+                                      studentId: selectedStudent.id,
+                                      subjectId: subject.id,
+                                      midterm: val ? Number(val) : undefined,
+                                    })
+                                  }
+                                }}
+                              />
+                            </td>
+                            <td>
+                              <Input
+                                type="tel"
+                                className={styles.tableInput}
+                                placeholder="--"
+                                defaultValue={grade?.assignmentAvg}
+                                onBlur={(e) => {
+                                  const val = e.target.value
+                                  if (val !== String(grade?.assignmentAvg)) {
+                                    submitGrade({
+                                      studentId: selectedStudent.id,
+                                      subjectId: subject.id,
+                                      assignmentAvg: val
+                                        ? Number(val)
+                                        : undefined,
+                                    })
+                                  }
+                                }}
+                              />
+                            </td>
+                            <td>
+                              <Input
+                                type="tel"
+                                className={styles.tableInput}
+                                placeholder="--"
+                                defaultValue={grade?.projectFinal}
+                                onBlur={(e) => {
+                                  const val = e.target.value
+                                  if (val !== String(grade?.projectFinal)) {
+                                    submitGrade({
+                                      studentId: selectedStudent.id,
+                                      subjectId: subject.id,
+                                      projectFinal: val
+                                        ? Number(val)
+                                        : undefined,
+                                    })
+                                  }
+                                }}
+                              />
+                            </td>
+                            <td>
+                              <Input
+                                type="tel"
+                                className={styles.tableInput}
+                                style={{
+                                  fontWeight: 700,
+                                  color: 'var(--amber)',
+                                }}
+                                placeholder="--"
+                                defaultValue={grade?.score}
+                                onBlur={(e) => {
+                                  const val = e.target.value
+                                  if (val !== String(grade?.score)) {
+                                    const scoreNum = val ? Number(val) : 0
+                                    submitGrade({
+                                      studentId: selectedStudent.id,
+                                      subjectId: subject.id,
+                                      score: scoreNum,
+                                      grade: calculateGradeLetter(scoreNum),
+                                    })
+                                  }
+                                }}
+                              />
+                            </td>
+                            <td>
+                              <span
+                                className={styles.miniGradeBadge}
+                                style={{
+                                  backgroundColor: colors.bg,
+                                  color: colors.color,
+                                }}
+                              >
+                                {grade?.grade || calculateGradeLetter(score)}
+                              </span>
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              <Badge
+                                variant={grade ? 'green' : 'ghost'}
+                                size="sm"
+                              >
+                                {grade
+                                  ? t('teacher.grading.saved')
+                                  : t('teacher.grading.unsaved')}
+                              </Badge>
+                            </td>
+                          </tr>
                         )
                       })}
-                    </div>
-                  </>
-                ) : null}
+                    </tbody>
+                  </table>
+                </div>
               </div>
 
-              <div>
-                {activeSubjectId ? (
-                  <form
-                    onSubmit={handleSubmitSubjectGrade}
-                    className={styles.gradeForm}
-                  >
-                    <div className={styles.gradeFormTitle}>
-                      <Badge variant="amber">
-                        {t('teacher.grading.marking')}
-                      </Badge>
-                      {
-                        subjects.find(
-                          (subject) => String(subject.id) === activeSubjectId,
-                        )?.name
+              <div className={styles.workspaceSection}>
+                <h3 className={styles.sectionTitle}>
+                  {t('teacher.grading.finalEvaluation')}
+                </h3>
+                <div className={styles.evaluationGrid}>
+                  <div className={styles.evalField}>
+                    <label>{t('teacher.grading.performanceSummary')}</label>
+                    <textarea
+                      rows={3}
+                      placeholder={t('teacher.grading.enterPerformanceNotes')}
+                      value={
+                        getStudentSummaryDraft(selectedStudent).performance
                       }
-                    </div>
-
-                    <div className={styles.formGrid}>
-                      <div className={styles.formGroup}>
-                        <label>{t('teacher.grading.midtermScore')}</label>
-                        <input
-                          type="number"
-                          placeholder="0-100"
-                          value={subjectScores.midterm}
-                          onChange={(e) =>
-                            handleScoreChange('midterm', e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className={styles.formGroup}>
-                        <label>{t('teacher.grading.assignmentAvg')}</label>
-                        <input
-                          type="number"
-                          placeholder="0-100"
-                          value={subjectScores.assignmentAvg}
-                          onChange={(e) =>
-                            handleScoreChange('assignmentAvg', e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className={styles.formGroup}>
-                        <label>{t('teacher.grading.projectFinal')}</label>
-                        <input
-                          type="number"
-                          placeholder="0-100"
-                          value={subjectScores.projectFinal}
-                          onChange={(e) =>
-                            handleScoreChange('projectFinal', e.target.value)
-                          }
-                        />
-                      </div>
-
-                      <div className={styles.formGroup}>
-                        <label>{t('teacher.grading.overallScore')}</label>
-                        <input
-                          type="number"
-                          placeholder="0-100"
-                          value={subjectScores.overall}
-                          onChange={(e) =>
-                            handleScoreChange('overall', e.target.value)
-                          }
-                          required
-                        />
-                      </div>
-
-                      {subjectScores.overall ? (
-                        <div className={styles.progressPreview}>
-                          <div className={styles.progressPreviewLabel}>
-                            {t('teacher.grading.visualProgress')}
-                          </div>
-                          <ScoreProgressBar score={Number(subjectScores.overall)} />
-                          <div className={styles.autoGradePreview}>
-                            {t('teacher.grading.autoGrade')}{' '}
-                            <strong>
-                              {calculateGradeLetter(Number(subjectScores.overall))}
-                            </strong>
-                          </div>
-                        </div>
-                      ) : null}
-                    </div>
-
-                    <div className={styles.modalActions} style={{ marginTop: 24 }}>
-                      <button
-                        type="submit"
-                        className={styles.submitBtn}
-                        style={{ width: '100%' }}
-                        disabled={isPending}
-                      >
-                        {isPending
-                          ? t('teacher.grading.saving')
-                          : t('teacher.grading.saveSubjectGrade')}
-                      </button>
-                    </div>
-                  </form>
-                ) : (
-                  <div className={styles.subjectEmptyState}>
-                    {t('teacher.grading.selectSubjectToMark')}
+                      onChange={(e) =>
+                        updateStudentSummaryDraft(selectedStudent.id, {
+                          performance: e.target.value,
+                        })
+                      }
+                    />
                   </div>
-                )}
+                  <div className={styles.evalField}>
+                    <label>{t('teacher.grading.teacherReport')}</label>
+                    <textarea
+                      rows={3}
+                      placeholder={t('teacher.grading.enterReportDetails')}
+                      value={
+                        getStudentSummaryDraft(selectedStudent).teacherReport
+                      }
+                      onChange={(e) =>
+                        updateStudentSummaryDraft(selectedStudent.id, {
+                          teacherReport: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className={styles.evalFooter}>
+                    <div className={styles.overgradeBox}>
+                      <label>{t('teacher.grading.overallGrade')}</label>
+                      <select
+                        value={
+                          getStudentSummaryDraft(selectedStudent).overallGrade
+                        }
+                        onChange={(e) =>
+                          updateStudentSummaryDraft(selectedStudent.id, {
+                            overallGrade: e.target.value,
+                          })
+                        }
+                        className={styles.summarySelect}
+                      >
+                        {STANDARD_GRADE_SCALE.map((option) => (
+                          <option key={option.key} value={option.label}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <Button
+                      variant="secondary"
+                      disabled={isPending}
+                      onClick={() => handleSaveStudentSummary(selectedStudent)}
+                    >
+                      {isPending
+                        ? t('teacher.grading.saving')
+                        : t('teacher.grading.saveOverallEvaluation')}
+                    </Button>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className={styles.modalActions}>
-              <button
-                type="button"
-                className={styles.cancelBtn}
-                onClick={handleCloseModal}
-              >
+              <Button onClick={handleCloseModal}>
                 {t('teacher.grading.doneMarking')}
-              </button>
+              </Button>
             </div>
           </div>
         </div>
