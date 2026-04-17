@@ -1,8 +1,10 @@
-import { Download } from 'lucide-react'
+import { Download, Loader2 } from 'lucide-react'
 import { useMemo, useRef } from 'react'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 import { useSchoolData } from '#/components/store/SchoolDataStore'
+import useUserStore from '#/components/store/UserStore'
+import { useGetUserProfile } from '#/components/query/AuthQuery'
 import styles from './StudentReportCard.module.scss'
 import {
   GradeTable,
@@ -20,14 +22,18 @@ export function StudentReportCard({
 }: {
   printMode?: boolean
 }) {
-  const currentData = useCurrentStudent()
+  const user = useUserStore().user
+  const { data: freshUser, isLoading } = useGetUserProfile(user?.id || 0)
+  const currentData = useCurrentStudent(freshUser)
   const { t } = useDashboardTranslation()
   const { school } = useSchoolData()
   const reportRef = useRef<HTMLDivElement>(null)
 
-  if (!currentData) return null
+  const studentGrades = currentData?.studentGrades || []
+  const student = currentData?.student
+  const yearGroup = currentData?.yearGroup
+  const reportSummary = currentData?.reportSummary
 
-  const { student, studentGrades, yearGroup, reportSummary } = currentData
   const grades = useMemo(
     () =>
       studentGrades.map((grade: any) => ({
@@ -53,6 +59,23 @@ export function StudentReportCard({
   const handleDownload = () => {
     const printUrl = '/student-report-print'
     window.open(printUrl, '_blank', 'noopener,noreferrer')
+  }
+
+  if (isLoading) {
+    return (
+      <div className={styles.loadingState}>
+        <Loader2 className={styles.spinner} />
+        <span>{t('student.report.loadingReport')}</span>
+      </div>
+    )
+  }
+
+  if (!currentData || !student || !yearGroup) {
+    return (
+      <div className={styles.emptyState}>
+        <p>{t('student.report.noDataAvailable')}</p>
+      </div>
+    )
   }
 
   return (
