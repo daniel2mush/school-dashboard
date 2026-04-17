@@ -1,5 +1,5 @@
 import { Download, Loader2 } from 'lucide-react'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useCallback, useState } from 'react'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 import { useSchoolData } from '#/components/store/SchoolDataStore'
@@ -16,6 +16,7 @@ import {
 } from './StudentReportCard.sections'
 import { getGradeLetter } from './StudentReportCard.utils'
 import type { GradeRecord } from './StudentReportCard.utils'
+import { useReactToPrint } from 'react-to-print'
 
 export function StudentReportCard({
   printMode = false,
@@ -28,6 +29,8 @@ export function StudentReportCard({
   const { t } = useDashboardTranslation()
   const { school } = useSchoolData()
   const reportRef = useRef<HTMLDivElement>(null)
+
+  const [pdfGenerating, setPdfGenerating] = useState(false)
 
   const studentGrades = currentData?.studentGrades || []
   const student = currentData?.student
@@ -56,10 +59,29 @@ export function StudentReportCard({
   const teacherReport = reportSummary?.teacherComment || null
   const averageGrade = summaryGrade || getGradeLetter(averageScore)
 
-  const handleDownload = () => {
-    const printUrl = '/student-report-print'
-    window.open(printUrl, '_blank', 'noopener,noreferrer')
-  }
+  // ---------------------------------------------------------------------------
+  // PDF / Print handling
+  // ---------------------------------------------------------------------------
+  const handlePrint = useReactToPrint({
+    content: () => reportRef.current,
+    documentTitle: `${student?.name ?? 'Student'}-Report`,
+    onBeforePrint: () => setPdfGenerating(true),
+    onAfterPrint: () => setPdfGenerating(false),
+    removeAfterPrint: true,
+  })
+
+  const handleDownload = useCallback(() => {
+    // If the app already has a dedicated print route we keep it as a fallback,
+    // otherwise we use the client‑side print (which can be saved as PDF by the browser).
+    if (typeof window !== 'undefined' && window?.matchMedia?.('(prefers-color-scheme)')) {
+      handlePrint()
+    } else {
+      const printUrl = '/student-report-print'
+      window.open(printUrl, '_blank', 'noopener,noreferrer')
+    }
+  }, [handlePrint])
+
+  // ---------------------------------------------------------------------------
 
   if (isLoading) {
     return (
@@ -80,14 +102,24 @@ export function StudentReportCard({
 
   return (
     <div className={printMode ? styles.printPage : styles.view}>
-      {!printMode ? (
+      {!printMode && (
         <div className={styles.actionsRow}>
-          <button className={styles.downloadBtn} onClick={handleDownload}>
-            <Download size={20} />
-            {t('student.report.downloadPdf')}
+          <button
+            className={styles.downloadBtn}
+            onClick={handleDownload}
+            disabled={pdfGenerating}
+          >
+            {pdfGenerating ? (
+              <Loader2 className={styles.spinner} size={16} />
+            ) : (
+              <Download size={20} />
+            )}
+            {pdfGenerating
+              ? t('student.report.generatingPdf')
+              : t('student.report.downloadPdf')}
           </button>
         </div>
-      ) : null}
+      )}
 
       <article className={styles.reportCard} ref={reportRef}>
         <ReportHeader
