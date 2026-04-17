@@ -16,7 +16,6 @@ import {
 } from './StudentReportCard.sections'
 import { getGradeLetter } from './StudentReportCard.utils'
 import type { GradeRecord } from './StudentReportCard.utils'
-import { useReactToPrint } from 'react-to-print'
 
 export function StudentReportCard({
   printMode = false,
@@ -62,24 +61,31 @@ export function StudentReportCard({
   // ---------------------------------------------------------------------------
   // PDF / Print handling
   // ---------------------------------------------------------------------------
-  const handlePrint = useReactToPrint({
-    content: () => reportRef.current,
-    documentTitle: `${student?.name ?? 'Student'}-Report`,
-    onBeforePrint: () => setPdfGenerating(true),
-    onAfterPrint: () => setPdfGenerating(false),
-    removeAfterPrint: true,
-  })
+  // const handlePrint = useReactToPrint({
+  //   content: () => reportRef.current,
+  //   documentTitle: `${student?.name ?? 'Student'}-Report`,
+  //   onBeforePrint: () => setPdfGenerating(true),
+  //   onAfterPrint: () => setPdfGenerating(false),
+  //   removeAfterPrint: true,
+  // })
 
   const handleDownload = useCallback(() => {
-    // If the app already has a dedicated print route we keep it as a fallback,
-    // otherwise we use the client‑side print (which can be saved as PDF by the browser).
-    if (typeof window !== 'undefined' && window?.matchMedia?.('(prefers-color-scheme)')) {
-      handlePrint()
-    } else {
-      const printUrl = '/student-report-print'
-      window.open(printUrl, '_blank', 'noopener,noreferrer')
-    }
-  }, [handlePrint])
+    setPdfGenerating(true)
+    const printUrl = '/student-report-print'
+    const printWindow = window.open(printUrl, '_blank', 'noopener,noreferrer')
+
+    const timer = setInterval(() => {
+      if (printWindow?.closed) {
+        setPdfGenerating(false)
+        clearInterval(timer)
+      }
+    }, 500)
+
+    setTimeout(() => {
+      setPdfGenerating(false)
+      clearInterval(timer)
+    }, 10000)
+  }, [])
 
   // ---------------------------------------------------------------------------
 
@@ -125,6 +131,7 @@ export function StudentReportCard({
         <ReportHeader
           schoolName={school.name || 'School'}
           termLabel={school.term || 'Current Term'}
+          logo={school.logo}
         />
 
         <div className={styles.cardBody}>

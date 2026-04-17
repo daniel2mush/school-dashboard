@@ -1,8 +1,9 @@
 import useUserStore from '#/components/store/UserStore.ts'
-import type { Timetable, YearGroup } from '#/types/Types.ts'
+import type { Timetable, YearGroup, User } from '#/types/Types.ts'
 
-export default function useCurrentStudent() {
-  const user = useUserStore().user
+export default function useCurrentStudent(providedUser?: User | null) {
+  const storedUser = useUserStore().user
+  const user = providedUser || storedUser
 
   // We strictly rely on backend data now.
   if (!user || user.role !== 'STUDENT') {

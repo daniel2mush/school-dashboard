@@ -1,31 +1,56 @@
-import { Badge } from '@/components/ui'
 import styles from './StudentSubjects.module.scss'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
+import {
+  BookOpen,
+  User,
+  Search,
+  ChevronRight,
+  FlaskConical,
+  Calculator,
+  Languages,
+  Palette,
+  Music,
+  Dna,
+  Globe2,
+  History,
+} from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
+import { getDashboardHref } from '#/components/constants/navigation'
 
-// Simple user icon SVG
-const UserIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-    <circle cx="12" cy="7" r="4"></circle>
-  </svg>
-)
+const SUBJECT_ICONS: Record<string, React.ReactNode> = {
+  Mathematics: <Calculator />,
+  Math: <Calculator />,
+  Science: <FlaskConical />,
+  Physics: <FlaskConical />,
+  Chemistry: <FlaskConical />,
+  Biology: <Dna />,
+  English: <Languages />,
+  French: <Languages />,
+  Spanish: <Languages />,
+  History: <History />,
+  Geography: <Globe2 />,
+  Art: <Palette />,
+  Music: <Music />,
+  Literature: <BookOpen />,
+}
 
 export function StudentSubjects() {
   const currentData = useCurrentStudent()
   const { t } = useDashboardTranslation()
+  const navigate = useNavigate()
 
   if (!currentData) return null
 
-  const { studentGrades, yearGroup, teachers } = currentData
+  const { yearGroup, teachers } = currentData
+
+  const handleNavigate = (page: string) => {
+    navigate({ to: getDashboardHref('STUDENT', page) })
+  }
+
+  const getSubjectIcon = (name: string) => {
+    return SUBJECT_ICONS[name] || <BookOpen />
+  }
 
   return (
     <section className={styles.view}>
@@ -39,25 +64,26 @@ export function StudentSubjects() {
 
       {yearGroup.subjects.length === 0 ? (
         <div className={styles.emptyState}>
-          {t('student.subjects.noSubjects')}
+          <Search />
+          <p>{t('student.subjects.noSubjects')}</p>
         </div>
       ) : (
         <div className={styles.grid}>
           {yearGroup.subjects.map((subjectName) => {
-            const gradeInfo = studentGrades.find(
-              (g) => g.subject === subjectName,
-            )
             const teacher = teachers.find((candidate: any) =>
-              candidate.specialization?.includes(subjectName),
+              candidate.specialization?.toLowerCase().includes(subjectName.toLowerCase()),
             )
 
             return (
               <div key={subjectName} className={styles.card}>
                 <div className={styles.cardHeader}>
-                  <div>
+                  <div className={styles.iconWrapper}>
+                    {getSubjectIcon(subjectName)}
+                  </div>
+                  <div className={styles.subjectContent}>
                     <h3 className={styles.subjectName}>{subjectName}</h3>
-                    <div className={styles.teacherName}>
-                      <UserIcon />
+                    <div className={styles.teacherInfo}>
+                      <User size={16} />
                       {teacher
                         ? teacher.name
                         : t('student.subjects.teacherToBeAssigned')}
@@ -65,15 +91,24 @@ export function StudentSubjects() {
                   </div>
                 </div>
 
-                <div className={styles.cardFooter}>
-                  <span className={styles.gradeLabel}>
-                    {t('student.subjects.currentStanding')}
-                  </span>
-                  {gradeInfo ? (
-                    <Badge variant="blue">{gradeInfo.grade}</Badge>
-                  ) : (
-                    <Badge variant="gray">{t('student.subjects.noData')}</Badge>
-                  )}
+                <div className={styles.cardBody}>
+                  <p className={styles.subjectDescription}>
+                    Deep dive into the core concepts of {subjectName} this term. 
+                    Explore advanced topics and practical applications.
+                  </p>
+                  <div className={styles.tags}>
+                    <span className={styles.tag}>Core Subject</span>
+                    <span className={styles.tag}>Full Term</span>
+                  </div>
+                </div>
+
+                <div className={styles.cardAction}>
+                  <div 
+                    className={styles.actionText}
+                    onClick={() => handleNavigate('scontent')}
+                  >
+                    View Materials <ChevronRight size={16} />
+                  </div>
                 </div>
               </div>
             )

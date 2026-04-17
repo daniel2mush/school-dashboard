@@ -55,3 +55,4 @@ coverage/
 # Optional: backend logs or temp
 logs/
 *.log
+.aider*

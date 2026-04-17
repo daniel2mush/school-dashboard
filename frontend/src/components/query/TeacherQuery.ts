@@ -81,9 +81,12 @@ export const useSubmitGrade = () => {
       }
       return responseData
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       toast.success('Grade submitted successfully')
       queryClient.invalidateQueries({ queryKey: ['teacher', 'classes'] })
+      queryClient.invalidateQueries({
+        queryKey: ['auth', 'user', variables.studentId],
+      })
     },
     onError: (error: Error) => {
       toast.error(error.message)

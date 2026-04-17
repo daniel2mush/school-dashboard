@@ -3,7 +3,6 @@ import {
   Card,
   CardHeader,
   ProgressBar,
-  GradeRing,
 } from '@/components/ui'
 import styles from './StudentDashboard.module.scss'
 
@@ -16,19 +15,24 @@ import {
   UserCheck,
   TrendingUp,
   Clock,
-  ArrowRight,
   Zap,
-  Award,
-  Star,
-  Target,
+  User,
+  Calendar,
+  CreditCard,
+  ChevronRight,
+  Sparkles,
+  Search,
+  FileText,
 } from 'lucide-react'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
-import { useGetAnnouncements } from '#/components/query/AuthQuery.ts'
+import { useGetAnnouncements, useGetStudentMaterials } from '#/components/query/AuthQuery.ts'
 import { useCurrency } from '#/context/CurrencyContext.tsx'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import { useSchoolData } from '#/components/store/SchoolDataStore'
 import { formatLocalizedFullDate } from '#/components/lib/formatLocalizedDate'
 import { useMemo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
+import { getDashboardHref } from '#/components/constants/navigation'
 
 const PERIODS = [
   { label: 'Period 1', time: '7:30 – 8:30', start: '07:30', end: '08:30' },
@@ -39,24 +43,26 @@ const PERIODS = [
   { label: 'Period 5', time: '12:00 – 13:00', start: '12:00', end: '13:00' },
 ]
 
-interface StudentDashboardProps {
-  onNavigate?: (page: string) => void
-}
-
-export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
+export function StudentDashboard() {
   const currentData = useCurrentStudent()
   const { data: announcements } = useGetAnnouncements()
+  const { data: materials } = useGetStudentMaterials()
   const { formatCurrency } = useCurrency()
   const { t, language } = useDashboardTranslation()
   const { school } = useSchoolData()
+  const navigate = useNavigate()
 
   if (!currentData) return null
 
-  const { student, yearGroup, studentGrades, studentTimetable } = currentData
+  const { student, yearGroup, studentTimetable } = currentData
 
   const feePct = Math.round((student.fees.paid / student.fees.total) * 100)
   const todayLessons = Object.values(studentTimetable)[0] || []
   const today = formatLocalizedFullDate(new Date(), language)
+
+  const handleNavigate = (page: string) => {
+    navigate({ to: getDashboardHref('STUDENT', page) })
+  }
 
   // Calculate Next Class logic
   const nextClass = useMemo(() => {
@@ -80,19 +86,18 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
     return null
   }, [todayLessons])
 
-  // Sort grades for the "Recent Performance" section
-  const recentGrades = useMemo(() => {
-    return [...studentGrades].slice(0, 4)
-  }, [studentGrades])
-
   return (
     <section className={styles.view}>
       <header className={styles.hero}>
         <div className={styles.heroInner}>
           <div className={styles.heroCopy}>
-            <div className={styles.eyebrow}>{yearGroup.name}</div>
+            <div className={styles.eyebrow}>
+              <Sparkles size={12} style={{ marginRight: 6 }} />
+              {yearGroup.name}
+            </div>
             <h1 className={styles.heroTitle}>
-              {t('student.dashboard.welcomeBack')}, {student.name.split(' ')[0]}
+              {t('student.dashboard.welcomeBack')}, <br />
+              {student.name.split(' ')[0]}!
             </h1>
             <p className={styles.heroLead}>
               {nextClass ? (
@@ -109,11 +114,11 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
             </p>
             <div className={styles.heroMeta}>
               <span className={styles.metaChip}>
-                <CalendarDays size={14} className="text-accent" />
+                <CalendarDays size={16} className="text-accent" />
                 {today}
               </span>
               <span className={styles.metaChip}>
-                <School size={14} className="text-accent" />
+                <School size={16} className="text-accent" />
                 {school.term} · {school.year}
               </span>
             </div>
@@ -121,89 +126,139 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
           <div className={styles.heroActions}>
             <button
               className="btn btn-primary lg"
-              onClick={() => onNavigate?.('stimetable')}
+              onClick={() => handleNavigate('stimetable')}
             >
-              <Clock size={18} /> {t('student.dashboard.myTimetable')}
+              <Clock size={20} /> {t('student.dashboard.myTimetable')}
             </button>
             <button
               className="btn btn-secondary lg"
-              onClick={() => onNavigate?.('sreport')}
+              onClick={() => handleNavigate('sreport')}
             >
-              <TrendingUp size={18} /> {t('student.dashboard.reportCard')}
+              <TrendingUp size={20} /> {t('student.dashboard.reportCard')}
             </button>
           </div>
         </div>
       </header>
 
       <div className={styles.metricsGrid}>
-        <div className={`${styles.coloredStat} ${styles.indigo}`}>
-          <div className={styles.statIcon}><GraduationCap size={24} /></div>
-          <div className={styles.statValue}>{yearGroup.name}</div>
-          <div className={styles.statLabel}>{yearGroup.level}</div>
+        <div 
+          className={`${styles.coloredStat} ${styles.indigo}`}
+          onClick={() => handleNavigate('ssubjects')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className={styles.statIcon}><GraduationCap /></div>
+          <div className={styles.statContent}>
+            <div className={styles.statValue}>{yearGroup.name}</div>
+            <div className={styles.statLabel}>{yearGroup.level}</div>
+          </div>
         </div>
-        <div className={`${styles.coloredStat} ${styles.teal}`}>
-          <div className={styles.statIcon}><UserCheck size={24} /></div>
-          <div className={styles.statValue}>{student.att}%</div>
-          <div className={styles.statLabel}>{t('student.dashboard.attendance')}</div>
+        <div 
+          className={`${styles.coloredStat} ${styles.teal}`}
+          onClick={() => handleNavigate('satt')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className={styles.statIcon}><UserCheck /></div>
+          <div className={styles.statContent}>
+            <div className={styles.statValue}>{student.att}%</div>
+            <div className={styles.statLabel}>{t('student.dashboard.attendance')}</div>
+          </div>
         </div>
-        <div className={`${styles.coloredStat} ${styles.amber}`}>
-          <div className={styles.statIcon}><Banknote size={24} /></div>
-          <div className={styles.statValue}>{feePct}%</div>
-          <div className={styles.statLabel}>{t('student.dashboard.feesStatus')}</div>
+        <div 
+          className={`${styles.coloredStat} ${styles.amber}`}
+          onClick={() => handleNavigate('sfees')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className={styles.statIcon}><Banknote /></div>
+          <div className={styles.statContent}>
+            <div className={styles.statValue}>{feePct}%</div>
+            <div className={styles.statLabel}>{t('student.dashboard.feesStatus')}</div>
+          </div>
         </div>
-        <div className={`${styles.coloredStat} ${styles.purple}`}>
-          <div className={styles.statIcon}><BookOpen size={24} /></div>
-          <div className={styles.statValue}>{todayLessons.filter(s => s !== '-').length}</div>
-          <div className={styles.statLabel}>{t('student.dashboard.classesToday')}</div>
+        <div 
+          className={`${styles.coloredStat} ${styles.purple}`}
+          onClick={() => handleNavigate('stimetable')}
+          style={{ cursor: 'pointer' }}
+        >
+          <div className={styles.statIcon}><BookOpen /></div>
+          <div className={styles.statContent}>
+            <div className={styles.statValue}>{todayLessons.filter(s => s !== '-').length}</div>
+            <div className={styles.statLabel}>{t('student.dashboard.classesToday')}</div>
+          </div>
         </div>
       </div>
 
       <div className={styles.twoCol}>
         <div className={styles.mainContent}>
-          <Card>
-            <CardHeader
-              title="Academic Performance"
-              action={t('student.dashboard.details')}
-              onAction={() => onNavigate?.('sreport')}
-            >
-              <Target size={18} className="text-accent" />
-            </CardHeader>
-            <div className={styles.performanceList}>
-              {recentGrades.map((g, idx) => (
-                <div key={`${g.subject}-${idx}`} className={styles.performanceRow}>
-                  <GradeRing 
-                    letter={g.grade} 
-                    bg="var(--accent-bg)" 
-                    textColor="var(--accent)" 
-                    size={44} 
-                  />
-                  <div className={styles.perfInfo}>
-                    <div className={styles.perfSubject}>{g.subject}</div>
-                    <div className={styles.perfTeacher}>{g.teacher}</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32 }}>
+            <Card>
+              <CardHeader title="Recent Materials" action="View all" onAction={() => handleNavigate('scontent')}>
+                <FileText size={20} className="text-accent" />
+              </CardHeader>
+              <div className={styles.materialsList}>
+                {materials?.slice(0, 3).map((mat) => (
+                  <div key={mat.id} className={styles.materialItem} onClick={() => handleNavigate('scontent')}>
+                    <div className={styles.matIcon}>
+                      <FileText size={20} />
+                    </div>
+                    <div className={styles.matInfo}>
+                      <div className={styles.matTitle}>{mat.title}</div>
+                      <div className={styles.matMeta}>{mat.subject.name} • {mat.teacher?.name}</div>
+                    </div>
                   </div>
-                  <div className={styles.perfScore}>
-                    <div className={styles.scoreValue}>{g.score}%</div>
-                    <Badge variant={g.score >= 70 ? 'green' : 'amber'}>
-                      {g.performance || 'Good Progress'}
-                    </Badge>
+                ))}
+                {(!materials || materials.length === 0) && (
+                  <div className={styles.emptyState} style={{ padding: '20px' }}>
+                    <Search size={24} style={{ opacity: 0.1, marginBottom: 8 }} />
+                    <p style={{ fontSize: '0.8rem' }}>No new materials</p>
                   </div>
-                </div>
-              ))}
-              {recentGrades.length === 0 && (
-                <div className={styles.emptyState}>
-                  No recent grades available. Keep pushing!
-                </div>
-              )}
-            </div>
-          </Card>
+                )}
+              </div>
+            </Card>
+
+            <Card>
+              <CardHeader 
+                title={t('student.dashboard.schoolAnnouncements')}
+                action="View all"
+                onAction={() => handleNavigate('sann')}
+              >
+                <Sparkles size={20} className="text-accent" />
+              </CardHeader>
+              <div className={styles.annList}>
+                {announcements?.slice(0, 3).map((ann) => (
+                  <div key={ann.id} className={styles.annAnnouncementRow} onClick={() => handleNavigate('sann')}>
+                    <div className={`${styles.annDot} ${ann.priority === 'Urgent' ? styles.urgent : styles.normal}`} />
+                    <div className={styles.announcementInfo}>
+                      <div className={styles.annTitle}>{ann.title}</div>
+                      <div className={styles.annMeta}>
+                        <Calendar size={12} />
+                        {new Date(ann.createdAt).toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-GB', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
+                        <span>•</span>
+                        <User size={12} />
+                        {ann.author?.name || 'School Admin'}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {(!announcements || announcements.length === 0) && (
+                  <div className={styles.emptyState} style={{ padding: '20px' }}>
+                    <Search size={24} style={{ opacity: 0.1, marginBottom: 8 }} />
+                    <p style={{ fontSize: '0.8rem' }}>{t('student.dashboard.noActiveAnnouncements')}</p>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
 
           <Card>
             <CardHeader
               title={t('student.dashboard.feeOverview')}
               action={t('student.dashboard.payFees')}
-              onAction={() => onNavigate?.('sfees')}
+              onAction={() => handleNavigate('sfees')}
             >
-              <Zap size={18} className="text-amber" />
+              <CreditCard size={20} className="text-amber" />
             </CardHeader>
             <div className={styles.feePreview}>
               <div className={styles.feeInfo}>
@@ -216,11 +271,15 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
                   </div>
                 </div>
                 <div className={styles.feeProgress}>
-                  <div className={styles.progressLabel} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{t('student.dashboard.paymentProgress')}</span>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{feePct}%</span>
+                  <div className={styles.progressLabel} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-secondary)' }}>
+                      {t('student.dashboard.paymentProgress')}
+                    </span>
+                    <span style={{ fontSize: '0.9rem', fontWeight: 800, color: 'var(--accent)' }}>
+                      {feePct}%
+                    </span>
                   </div>
-                  <ProgressBar pct={feePct} color="var(--accent)" height={10} />
+                  <ProgressBar pct={feePct} color="var(--accent)" height={12} />
                 </div>
               </div>
             </div>
@@ -230,24 +289,19 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
         <div className={styles.sidebar}>
           <Card>
             <CardHeader title={t('student.dashboard.todaysSchedule')}>
-              <CalendarDays size={18} className="text-accent" />
+              <Calendar size={20} className="text-accent" />
             </CardHeader>
             <div className={styles.timeline}>
               {PERIODS.map((p, index) => {
-                // todayLessons covers periods 1,2,3,4,5. Index 3 is Break.
                 let lesson = null
                 if (!p.isBreak) {
                   const lessonIdx = index > 3 ? index - 1 : index
                   lesson = todayLessons[lessonIdx]
                 }
-
                 if (lesson === '-' && !p.isBreak) return null
-
+                const isActive = nextClass?.period.label === p.label
                 return (
-                  <div 
-                    key={p.label} 
-                    className={`${styles.timelineItem} ${nextClass?.period.label === p.label ? styles.active : ''}`}
-                  >
+                  <div key={p.label} className={`${styles.timelineItem} ${isActive ? styles.active : ''}`} onClick={() => handleNavigate('stimetable')} style={{ cursor: 'pointer' }}>
                     <div className={styles.timelineDot} />
                     <div className={styles.timelineContent}>
                       <div className={styles.timelineInfo}>
@@ -263,52 +317,21 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
           </Card>
 
           <Card>
-            <CardHeader title={t('student.dashboard.schoolAnnouncements')}>
-              <Award size={18} className="text-accent" />
-            </CardHeader>
-            <div className={styles.annList}>
-              {announcements?.slice(0, 3).map((ann) => (
-                <div key={ann.id} className={styles.annAnnouncementRow}>
-                  <div
-                    className={`${styles.annDot} ${
-                      ann.priority === 'Urgent' ? styles.urgent : styles.normal
-                    }`}
-                  />
-                  <div className={styles.announcementInfo}>
-                    <div className={styles.annTitle}>{ann.title}</div>
-                    <div className={styles.annMeta}>
-                      {new Date(ann.createdAt).toLocaleDateString('en-GB', {
-                        day: 'numeric',
-                        month: 'short',
-                      })} · {ann.author?.name || 'School Admin'}
-                    </div>
-                  </div>
-                </div>
-              ))}
-              {(!announcements || announcements.length === 0) && (
-                <div className={styles.emptyState}>
-                  {t('student.dashboard.noActiveAnnouncements')}
-                </div>
-              )}
-            </div>
-          </Card>
-
-          <Card>
             <CardHeader title="Quick Actions">
-              <Star size={18} className="text-accent" />
+              <Zap size={20} className="text-accent" />
             </CardHeader>
             <div className={styles.actions}>
               {[
-                ['sreport', t('student.dashboard.viewReport')],
-                ['stimetable', t('student.dashboard.weeklyTimetable')],
-                ['sfees', t('student.dashboard.feesAndFinances')],
-              ].map(([page, label]) => (
-                <button
-                  key={page}
-                  className={styles.actionBtn}
-                  onClick={() => onNavigate?.(page)}
-                >
-                  {label} <ArrowRight size={16} />
+                { page: 'sreport', label: t('student.dashboard.viewReport'), icon: <TrendingUp size={18} /> },
+                { page: 'stimetable', label: t('student.dashboard.weeklyTimetable'), icon: <Calendar size={18} /> },
+                { page: 'sfees', label: t('student.dashboard.feesAndFinances'), icon: <CreditCard size={18} /> },
+              ].map((action) => (
+                <button key={action.page} className={styles.actionBtn} onClick={() => handleNavigate(action.page)}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <div className={styles.actionIcon}>{action.icon}</div>
+                    {action.label}
+                  </div>
+                  <ChevronRight size={18} style={{ opacity: 0.4 }} />
                 </button>
               ))}
             </div>

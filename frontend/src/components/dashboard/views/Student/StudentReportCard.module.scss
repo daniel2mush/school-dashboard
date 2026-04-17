@@ -1,202 +1,314 @@
 .view {
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  padding: 22px;
+  gap: 28px;
+  padding: 32px;
+  background: var(--bg-secondary);
+  min-height: calc(100vh - 80px);
+}
+
+.loadingState,
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+  color: var(--text-secondary);
+  background: var(--bg-primary);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-mid);
+  box-shadow: var(--shadow-sm);
+}
+
+.spinner {
+  animation: rotate 2s linear infinite;
+  color: var(--amber);
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .printPage {
   min-height: 100vh;
-  padding: 24px;
-  background: #f5f1e8;
+  padding: 0;
+  background: var(--bg-tertiary);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
 .actionsRow {
   display: flex;
   justify-content: flex-end;
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .downloadBtn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 22px;
+  gap: 12px;
+  padding: 14px 28px;
   border: none;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: var(--amber);
-  color: var(--bg-primary);
+  color: #fff;
   font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    opacity 0.2s ease;
+  box-shadow: 0 8px 20px rgba(var(--amber-rgb), 0.25);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
-  &:hover {
-    opacity: 0.95;
-    transform: translateY(-1px);
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 25px rgba(var(--amber-rgb), 0.35);
+    filter: brightness(1.05);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 }
 
 .reportCard {
-  background:
-    linear-gradient(180deg, rgba(180, 136, 44, 0.06), transparent 180px),
-    var(--bg-primary);
+  background: var(--bg-primary);
   border: 1px solid var(--border-mid);
-  border-radius: 28px;
-  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card);
   color: var(--text-primary);
   overflow: hidden;
-  max-width: 980px;
+  width: 100%;
+  max-width: 1000px;
   margin: 0 auto;
+  position: relative;
+
+  &::before {
+    content: 'OFFICIAL ACADEMIC RECORD';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 6rem;
+    font-weight: 900;
+    color: var(--border-light);
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 0;
+    width: 200%;
+    text-align: center;
+    opacity: 0.2;
+  }
 }
 
 .reportHeader {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
-  gap: 24px;
-  padding: 32px;
-  border-bottom: 2px solid var(--border-mid);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 48px 60px;
+  border-bottom: 2px solid var(--border-light);
+  background: linear-gradient(to right, var(--bg-secondary), var(--bg-primary));
+  position: relative;
+  z-index: 1;
 }
 
 .schoolIdentity {
   display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.logoWrapper {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  border-radius: var(--radius-lg);
+  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border-light);
+}
+
+.schoolLogo {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.identityText {
+  display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .kicker {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--amber-text);
+  color: var(--amber);
 }
 
 .schoolName {
   margin: 0;
-  font-size: clamp(1.8rem, 3vw, 2.5rem);
-  line-height: 1.05;
+  font-size: 2.2rem;
+  line-height: 1.1;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
 .schoolMeta {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 0.96rem;
+  font-size: 0.95rem;
+  font-weight: 500;
 }
 
 .reportTitle {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   align-items: flex-end;
-  gap: 12px;
-  text-align: right;
+  gap: 16px;
+}
+
+.titleBadge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
 
   strong {
     font-size: 1.2rem;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
+    color: var(--text-primary);
+    font-weight: 900;
   }
 
   span {
-    color: var(--text-secondary);
-    font-weight: 600;
+    color: var(--amber);
+    font-weight: 700;
+    font-size: 1rem;
   }
 }
 
 .metaChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: flex-end;
-
   span {
     display: inline-flex;
     align-items: center;
-    padding: 8px 12px;
-    border: 1px solid var(--border-mid);
-    border-radius: 999px;
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    font-size: 0.78rem;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    background: var(--green-bg);
+    color: var(--green-text);
+    font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--border-light);
   }
 }
 
 .cardBody {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 28px 32px 32px;
+  gap: 40px;
+  padding: 48px 60px 60px;
+  position: relative;
+  z-index: 1;
 }
 
 .overviewGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.9fr);
-  gap: 22px;
-  align-items: start;
+  grid-template-columns: 1.4fr 0.9fr;
+  gap: 32px;
 }
 
 .panel,
 .tablePanel,
-.metricsPanel {
-  border: 1px solid var(--border-mid);
-  border-radius: 22px;
+.metricsPanel,
+.remarksPanel {
   background: var(--bg-primary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  break-inside: avoid;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: var(--border-mid);
+    box-shadow: var(--shadow-sm);
+  }
 }
 
 .panel,
-.tablePanel {
-  padding: 22px;
+.tablePanel,
+.remarksPanel {
+  padding: 32px;
 }
 
 .sectionHeading {
+  margin-bottom: 28px;
+}
+
+.iconHeading {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 18px;
+  align-items: flex-start;
+  gap: 16px;
+}
 
-  h2 {
-    margin: 0;
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
+.headingIcon {
+  color: var(--amber);
+  margin-top: 2px;
+}
 
-  p {
-    margin: 0;
-    color: var(--text-secondary);
-    line-height: 1.5;
-  }
+.sectionHeading h2 {
+  margin: 0;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.sectionHeading p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .studentDetails {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 22px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px 32px;
 }
 
 .detailItem {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding-bottom: 12px;
-  border-bottom: 1px dashed var(--border-mid);
 }
 
 .detailItem label {
-  font-size: 0.78rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   font-weight: 700;
   letter-spacing: 0.08em;
-  color: var(--text-secondary);
+  color: var(--text-tertiary);
 }
 
 .detailItem span {
@@ -205,46 +317,79 @@
   color: var(--text-primary);
 }
 
+.statusVerified {
+  display: inline-flex;
+  align-items: center;
+  color: var(--green) !important;
+}
+
 .metricsPanel {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
 }
 
 .metricCard {
+  flex: 1;
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border-light);
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 20px 22px;
-  border-bottom: 1px solid var(--border-mid);
+  gap: 16px;
 
   &:last-child {
     border-bottom: none;
   }
+}
 
+.metricHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metricLabel {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-tertiary);
+}
+
+.metricIconBox {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  box-shadow: var(--shadow-sm);
+}
+
+.metricValue {
   strong {
-    font-size: 2rem;
+    font-size: 2.4rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    display: block;
     line-height: 1;
+    margin-bottom: 4px;
   }
 
   p {
     margin: 0;
+    font-size: 0.85rem;
+    font-weight: 600;
     color: var(--text-secondary);
-    line-height: 1.5;
   }
 }
 
-.metricLabel {
-  color: var(--text-secondary);
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
 .tableShell {
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--border-mid);
-  border-radius: 18px;
 }
 
 .reportTable {
@@ -252,260 +397,315 @@
   border-collapse: collapse;
 }
 
-.reportTable th,
-.reportTable td {
-  padding: 16px 14px;
-  text-align: left;
-  border-bottom: 1px solid var(--border-mid);
-}
-
 .reportTable th {
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  font-size: 0.78rem;
+  background: var(--bg-tertiary);
+  padding: 16px 24px;
+  text-align: left;
+  font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border-light);
 }
 
 .reportTable td {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-size: 0.94rem;
-  vertical-align: top;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border-light);
 }
 
-.reportTable tbody tr:nth-child(even) td {
-  background: rgba(0, 0, 0, 0.015);
+.gradeRow:hover td {
+  background: var(--bg-secondary);
 }
 
-.gradePill {
-  display: inline-flex;
+.subjectInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    font-size: 1rem;
+    color: var(--text-primary);
+  }
+
+  span {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
+}
+
+.scoreValue {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  min-width: 42px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: var(--green-bg);
-  color: var(--green-text);
-  font-weight: 800;
+  gap: 12px;
+
+  strong {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+  }
 }
 
-.performanceLabel {
-  margin-bottom: 8px;
-  font-size: 0.84rem;
+.gradeBadge {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  border: 1px solid var(--border-mid);
+}
+
+.performanceWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.performanceText {
+  font-size: 0.85rem;
+  font-weight: 600;
   color: var(--text-secondary);
 }
 
-.performanceLine {
-  height: 8px;
-  background: var(--bg-secondary);
+.performanceTrack {
+  height: 6px;
+  background: var(--bg-tertiary);
   border-radius: 999px;
   overflow: hidden;
+  width: 100%;
 }
 
-.fill {
+.performanceFill {
   height: 100%;
   background: linear-gradient(90deg, var(--amber), var(--green));
   border-radius: 999px;
 }
 
-.emptyRow {
-  padding: 22px;
-  color: var(--text-secondary);
-  text-align: center;
+.remarksBody {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.remarksBody {
-  border-left: 4px solid var(--amber);
-  padding-left: 16px;
+.summaryBadge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  background: var(--amber-bg);
+  color: var(--amber-text);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.remarkQuote {
+  margin: 0;
+  padding: 0;
+  position: relative;
 
   p {
-    margin: 0;
-    color: var(--text-secondary);
-    line-height: 1.75;
-  }
-}
-
-.performanceSummary {
-  margin-bottom: 12px !important;
-  color: var(--text-primary) !important;
-}
-
-@media print {
-  .printPage {
-    padding: 0;
-    background: #fff;
-  }
-
-  .reportCard {
-    max-width: none;
-    border-radius: 0;
-    box-shadow: none;
-    border: 1px solid #d6d3d1;
-    background: #fff;
-  }
-
-  .panel,
-  .tablePanel,
-  .metricsPanel {
-    border-radius: 0;
-  }
-
-  .tableShell {
-    border-radius: 0;
-  }
-
-  @page {
-    size: A4;
-    margin: 12mm;
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+    font-style: italic;
+    font-weight: 500;
   }
 }
 
 .reportFooter {
+  padding: 60px;
+  background: var(--bg-secondary);
+  border-top: 2px solid var(--border-light);
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  padding: 24px 32px 32px;
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border-mid);
-  break-inside: avoid;
+  gap: 48px;
+  position: relative;
+  z-index: 1;
 }
 
-.footerNote {
-  color: var(--text-secondary);
-  font-size: 0.92rem;
+.footerSeal {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.sealCircle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-primary);
+  border: 2px dashed var(--amber);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--amber);
+  opacity: 0.6;
+}
+
+.sealText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  strong {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-primary);
+  }
+
+  span {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+  }
 }
 
 .signatures {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 24px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 60px;
 }
 
 .signature {
-  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
 }
 
-.line {
+.signatureLine {
+  width: 100%;
   height: 1px;
   background: var(--border-mid);
-  margin-bottom: 10px;
 }
 
 .signature span {
-  display: block;
-  color: var(--text-secondary);
-  font-size: 0.92rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
 }
 
-@media (max-width: 960px) {
-  .reportHeader,
-  .overviewGrid {
-    grid-template-columns: 1fr;
+.copyright {
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
+@media (max-width: 900px) {
+  .reportHeader {
+    flex-direction: column;
+    gap: 32px;
+    padding: 40px;
   }
 
   .reportTitle {
     align-items: flex-start;
-    text-align: left;
   }
 
-  .metaChips {
-    justify-content: flex-start;
+  .cardBody {
+    padding: 40px;
+  }
+
+  .overviewGrid {
+    grid-template-columns: 1fr;
   }
 
   .signatures {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 640px) {
-  .view {
-    padding: 16px;
-  }
-
-  .reportHeader,
-  .cardBody,
-  .reportFooter {
-    padding-left: 18px;
-    padding-right: 18px;
-  }
-
-  .panel,
-  .tablePanel {
-    padding: 18px;
-  }
-
-  .studentDetails {
-    grid-template-columns: 1fr;
-  }
-
-  .reportTable th,
-  .reportTable td {
-    padding: 12px 10px;
-    font-size: 0.88rem;
+    gap: 40px;
   }
 }
 
 @media print {
   @page {
     size: A4 portrait;
-    margin: 12mm;
+    margin: 0;
   }
 
-  .view {
+  body {
+    background: #fff !important;
+  }
+
+  .printPage {
+    background: #fff !important;
     padding: 0;
-    gap: 0;
-    background: #fff;
-  }
-
-  .actionsRow {
-    display: none;
+    min-height: auto;
   }
 
   .reportCard {
-    border: none;
+    max-width: 100%;
     border-radius: 0;
+    border: none;
     box-shadow: none;
-    background: #fff;
-  }
-
-  .reportHeader,
-  .cardBody,
-  .reportFooter {
-    padding-left: 0;
-    padding-right: 0;
+    margin: 0;
+    background: #fff !important;
+    color: #000 !important;
   }
 
   .reportHeader {
-    padding-top: 0;
+    padding: 40px 60px;
+    background: #fff !important;
+    border-bottom: 2px solid #000;
+  }
+
+  .cardBody {
+    padding: 40px 60px;
+    background: #fff !important;
+  }
+
+  .reportFooter {
+    padding: 40px 60px;
+    background: #fff !important;
+    border-top: 2px solid #000;
   }
 
   .panel,
   .tablePanel,
   .metricsPanel,
-  .tableShell {
-    border-color: #d4d4d4;
+  .remarksPanel {
+    border-radius: 0;
+    border: 1px solid #eee;
+    background: #fff !important;
+    break-inside: avoid;
   }
 
-  .reportTable th {
-    background: #f5f5f5;
-    color: #222;
+  .metricIconBox {
+    border: 1px solid #eee;
+    box-shadow: none;
+    background: #fff !important;
   }
 
-  .reportTable td,
-  .reportTable tbody tr:nth-child(even) td {
-    background: #fff;
+  .performanceFill {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
-  .kicker,
+  .downloadBtn {
+    display: none;
+  }
+
+  .reportCard::before {
+    color: rgba(0, 0, 0, 0.03) !important;
+    opacity: 1 !important;
+  }
+
   .schoolName,
-  .metricCard strong {
-    color: #111;
-  }
-
-  .metaChips span,
-  .remarksBody {
-    background: #fff;
+  .titleBadge strong,
+  .sectionHeading h2,
+  .detailItem span,
+  .metricValue strong,
+  .subjectInfo strong,
+  .scoreValue strong,
+  .remarkQuote p,
+  .sealText strong {
+    color: #000 !important;
   }
 }

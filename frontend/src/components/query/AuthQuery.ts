@@ -109,6 +109,24 @@ export const useGetStudentMaterials = () => {
 //   });
 // };
 
+export const useGetUserProfile = (userId: number) => {
+  return useQuery({
+    queryKey: ['auth', 'user', userId],
+    queryFn: async () => {
+      const res = await fetch(`/api/user/${userId}`)
+      const responseData = await res.json()
+      if (!res.ok) {
+        throw new Error(
+          responseData.message || responseData.error || 'Failed to fetch profile',
+        )
+      }
+
+      return responseData.data as User
+    },
+    enabled: !!userId,
+  })
+}
+
 export const useLogout = () => {
   const navigate = useNavigate()
   const { clearUser } = useUserStore()
