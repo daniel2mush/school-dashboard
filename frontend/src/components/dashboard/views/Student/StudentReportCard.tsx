@@ -107,13 +107,36 @@ export function StudentReportCard({
   }
 
   return (
-    <div className={printMode ? styles.printPage : styles.view}>
+    <div
+      className={printMode ? styles.printPage : styles.view}
+      style={{
+        background: 'linear-gradient(to bottom, #f9f9f9, #e9e9e9)',
+        padding: '20px',
+        borderRadius: '10px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+      }}
+    >
       {!printMode && (
         <div className={styles.actionsRow}>
           <button
             className={styles.downloadBtn}
             onClick={handleDownload}
             disabled={pdfGenerating}
+            style={{
+              backgroundColor: '#007BFF',
+              color: '#fff',
+              border: 'none',
+              borderRadius: '5px',
+              padding: '10px 20px',
+              cursor: 'pointer',
+              transition: 'background-color 0.3s ease',
+            }}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = '#0056b3')
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = '#007BFF')
+            }
           >
             {pdfGenerating ? (
               <Loader2 className={styles.spinner} size={16} />
@@ -134,7 +157,15 @@ export function StudentReportCard({
           logo={school.logo}
         />
 
-        <div className={styles.cardBody}>
+        <div
+          className={styles.cardBody}
+          style={{
+            padding: '20px',
+            backgroundColor: '#fff',
+            borderRadius: '10px',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+          }}
+        >
           <div className={styles.overviewGrid}>
             <StudentDetailsCard
               studentName={student.name}
@@ -153,7 +184,15 @@ export function StudentReportCard({
             />
           </div>
 
-          <GradeTable grades={grades} />
+          <GradeTable
+            grades={grades}
+            style={{
+              marginTop: '20px',
+              border: '1px solid #ddd',
+              borderRadius: '5px',
+              overflow: 'hidden',
+            }}
+          />
 
           <TeacherRemarks
             studentName={student.name}
