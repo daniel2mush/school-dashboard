@@ -1,4 +1,5 @@
 import { Download, Loader2 } from 'lucide-react'
+import { Button } from '#/components/ui/Button/Button'
 import { useMemo, useRef, useCallback, useState } from 'react'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent.ts'
@@ -110,43 +111,29 @@ export function StudentReportCard({
     <div
       className={printMode ? styles.printPage : styles.view}
       style={{
-        background: 'linear-gradient(to bottom, #f9f9f9, #e9e9e9)',
-        padding: '20px',
-        borderRadius: '10px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        background: 'var(--color-background-gradient)',
+        padding: 'var(--spacing-large)',
+        borderRadius: 'var(--radius-medium)',
+        boxShadow: 'var(--shadow-elevation-medium)',
       }}
     >
       {!printMode && (
         <div className={styles.actionsRow}>
-          <button
-            className={styles.downloadBtn}
+          <Button
+            variant="primary"
+            size="md"
             onClick={handleDownload}
             disabled={pdfGenerating}
-            style={{
-              backgroundColor: '#007BFF',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '5px',
-              padding: '10px 20px',
-              cursor: 'pointer',
-              transition: 'background-color 0.3s ease',
-            }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = '#0056b3')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = '#007BFF')
-            }
+            loading={pdfGenerating}
+            fullWidth={false}
           >
-            {pdfGenerating ? (
-              <Loader2 className={styles.spinner} size={16} />
-            ) : (
-              <Download size={20} />
+            {pdfGenerating ? t('student.report.generatingPdf') : (
+              <>
+                <Download size={20} />
+                {t('student.report.downloadPdf')}
+              </>
             )}
-            {pdfGenerating
-              ? t('student.report.generatingPdf')
-              : t('student.report.downloadPdf')}
-          </button>
+          </Button>
         </div>
       )}
 
@@ -160,10 +147,10 @@ export function StudentReportCard({
         <div
           className={styles.cardBody}
           style={{
-            padding: '20px',
-            backgroundColor: '#fff',
-            borderRadius: '10px',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            padding: 'var(--spacing-large)',
+            backgroundColor: 'var(--color-surface)',
+            borderRadius: 'var(--radius-medium)',
+            boxShadow: 'var(--shadow-elevation-low)',
           }}
         >
           <div className={styles.overviewGrid}>
@@ -187,9 +174,9 @@ export function StudentReportCard({
           <GradeTable
             grades={grades}
             style={{
-              marginTop: '20px',
-              border: '1px solid #ddd',
-              borderRadius: '5px',
+              marginTop: 'var(--spacing-large)',
+              border: '1px solid var(--color-border)',
+              borderRadius: 'var(--radius-small)',
               overflow: 'hidden',
             }}
           />
