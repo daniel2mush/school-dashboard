@@ -31,25 +31,6 @@ export function StudentFeesStatus() {
 
   return (
     <section className={styles.view}>
-      <header className={styles.pageHeader}>
-        <div className={styles.headerContent}>
-          <div className={styles.eyebrowBox}>
-            <ShieldCheck size={14} />
-            <span>{t('student.fees.eyebrow')}</span>
-          </div>
-          <h1 className={styles.title}>{t('student.fees.title')}</h1>
-          <p className={styles.copy}>
-            {t('student.fees.copy').replace('{yearGroup}', yearGroup.name)}
-          </p>
-        </div>
-        <div className={styles.headerActions}>
-          <button className={styles.printBtn} onClick={() => window.print()}>
-            <Download size={18} />
-            <span>{t('student.fees.statement')}</span>
-          </button>
-        </div>
-      </header>
-
       <div className={styles.statusHero}>
         <div className={styles.mainMetrics}>
           <div className={styles.heroCard}>
@@ -63,14 +44,22 @@ export function StudentFeesStatus() {
             </div>
           </div>
 
-          <div className={`${styles.heroCard} ${!isFullySettled ? styles.alert : styles.success}`}>
+          <div
+            className={`${styles.heroCard} ${!isFullySettled ? styles.alert : styles.success}`}
+          >
             <div className={styles.heroLabel}>
-              {isFullySettled ? <CheckCircle2 size={16} /> : <AlertCircle size={16} />}
+              {isFullySettled ? (
+                <CheckCircle2 size={16} />
+              ) : (
+                <AlertCircle size={16} />
+              )}
               {t('student.fees.outstandingBalance')}
             </div>
             <div className={styles.heroValue}>{formatCurrency(balance)}</div>
             <div className={styles.heroSub}>
-              {isFullySettled ? t('student.fees.settled') : t('student.fees.settleNotice')}
+              {isFullySettled
+                ? t('student.fees.settled')
+                : t('student.fees.settleNotice')}
             </div>
           </div>
         </div>
@@ -112,11 +101,17 @@ export function StudentFeesStatus() {
                     <div className={styles.expenseDetails}>
                       <div className={styles.expenseTop}>
                         <h4>{item.title}</h4>
-                        <span className={`${styles.badge} ${item.isFullyPaid ? styles.paid : styles.pending}`}>
-                          {item.isFullyPaid ? t('student.fees.fullyPaid') : t('student.fees.pending')}
+                        <span
+                          className={`${styles.badge} ${item.isFullyPaid ? styles.paid : styles.pending}`}
+                        >
+                          {item.isFullyPaid
+                            ? t('student.fees.fullyPaid')
+                            : t('student.fees.pending')}
                         </span>
                       </div>
-                      <p>{item.description || t('student.fees.yearGroupFeeItem')}</p>
+                      <p>
+                        {item.description || t('student.fees.yearGroupFeeItem')}
+                      </p>
                     </div>
                   </div>
 
@@ -134,7 +129,7 @@ export function StudentFeesStatus() {
                       <span>{formatCurrency(item.remaining)}</span>
                     </div>
                   </div>
-                  
+
                   {item.amountInWords && (
                     <div className={styles.wordAmount}>
                       <ArrowRight size={12} />
@@ -158,11 +153,12 @@ export function StudentFeesStatus() {
             <AlertCircle size={20} />
             <h4>{t('student.fees.needSupport')}</h4>
             <p>{t('student.fees.needSupportCopy')}</p>
-            <button className={styles.contactBtn}>{t('student.fees.contactAccounts')}</button>
+            <button className={styles.contactBtn}>
+              {t('student.fees.contactAccounts')}
+            </button>
           </div>
         </div>
       </div>
     </section>
   )
 }
-

@@ -108,15 +108,7 @@ export function StudentReportCard({
   }
 
   return (
-    <div
-      className={printMode ? styles.printPage : styles.view}
-      style={{
-        background: 'var(--color-background-gradient)',
-        padding: 'var(--spacing-large)',
-        borderRadius: 'var(--radius-medium)',
-        boxShadow: 'var(--shadow-elevation-medium)',
-      }}
-    >
+    <div className={printMode ? styles.printPage : styles.view}>
       {!printMode && (
         <div className={styles.actionsRow}>
           <Button
@@ -127,7 +119,9 @@ export function StudentReportCard({
             loading={pdfGenerating}
             fullWidth={false}
           >
-            {pdfGenerating ? t('student.report.generatingPdf') : (
+            {pdfGenerating ? (
+              t('student.report.generatingPdf')
+            ) : (
               <>
                 <Download size={20} />
                 {t('student.report.downloadPdf')}
@@ -171,15 +165,7 @@ export function StudentReportCard({
             />
           </div>
 
-          <GradeTable
-            grades={grades}
-            style={{
-              marginTop: 'var(--spacing-large)',
-              border: '1px solid var(--color-border)',
-              borderRadius: 'var(--radius-small)',
-              overflow: 'hidden',
-            }}
-          />
+          <GradeTable grades={grades} />
 
           <TeacherRemarks
             studentName={student.name}

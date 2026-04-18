@@ -1,14 +1,7 @@
 import { useState, useMemo } from 'react'
 import styles from '../Admin/AdminAnnouncements.module.scss'
 import { Badge } from '@/components/ui'
-import {
-  Megaphone,
-  Users,
-  AlertCircle,
-  Info,
-  Bell,
-  Clock,
-} from 'lucide-react'
+import { Megaphone, Users, AlertCircle, Info, Bell, Clock } from 'lucide-react'
 import { useGetAnnouncements } from '#/components/query/AuthQuery'
 import { useDashboardTranslation } from '#/components/dashboard/i18n'
 import useCurrentStudent from '#/components/hooks/useCurrentStudent'
@@ -24,12 +17,16 @@ export function StudentAnnouncements() {
 
   const filteredAnnouncements = useMemo(() => {
     if (!announcements || !currentData) return []
-    const studentYearGroupId = currentData.student.yearGroupId
+    const studentYearGroupId = currentData.student.enrolledYearGroupId
 
     // First filter by eligibility
     let filtered = announcements.filter((a) => {
       if (a.targetType === 'ALL') return true
-      if (a.targetType === 'YEAR_GROUP' && a.targetYearGroupId === studentYearGroupId) return true
+      if (
+        a.targetType === 'YEAR_GROUP' &&
+        a.targetYearGroupId === studentYearGroupId
+      )
+        return true
       return false
     })
 
@@ -52,24 +49,11 @@ export function StudentAnnouncements() {
 
   return (
     <section className={styles.view}>
-      <header className={styles.heroSection}>
-        <div className={styles.heroContent}>
-          <div className={styles.eyebrow}>
-            <Megaphone size={14} />
-            {t('student.announcements.communications')}
-          </div>
-          <h1 className={styles.title}>{t('student.announcements.schoolNotices')}</h1>
-          <p className={styles.subtitle}>
-            {t('student.dashboard.heroLead')
-              .replace('{count}', String(filteredAnnouncements.filter(a => a.priority === 'Urgent').length))
-              .replace('{attendance}', String(currentData.student.att))}
-          </p>
-        </div>
-      </header>
-
       <div className={styles.filterContainer}>
         <div className={styles.filterRow}>
-          <span className={styles.filterLabel}>{t('student.announcements.priorityLevel')}</span>
+          <span className={styles.filterLabel}>
+            {t('student.announcements.priorityLevel')}
+          </span>
           <div className={styles.tabsList}>
             <TabButton
               active={activePriority === 'ALL'}

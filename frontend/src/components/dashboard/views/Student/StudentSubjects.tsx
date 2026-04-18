@@ -54,14 +54,6 @@ export function StudentSubjects() {
 
   return (
     <section className={styles.view}>
-      <div className={styles.panel}>
-        <div className={styles.eyebrow}>{t('student.subjects.eyebrow')}</div>
-        <h2 className={styles.title}>{t('student.subjects.title')}</h2>
-        <p className={styles.copy}>
-          {t('student.subjects.copy').replace('{yearGroup}', yearGroup.name)}
-        </p>
-      </div>
-
       {yearGroup.subjects.length === 0 ? (
         <div className={styles.emptyState}>
           <Search />
@@ -71,7 +63,9 @@ export function StudentSubjects() {
         <div className={styles.grid}>
           {yearGroup.subjects.map((subjectName) => {
             const teacher = teachers.find((candidate: any) =>
-              candidate.specialization?.toLowerCase().includes(subjectName.toLowerCase()),
+              candidate.specialization
+                ?.toLowerCase()
+                .includes(subjectName.toLowerCase()),
             )
 
             return (
@@ -93,7 +87,7 @@ export function StudentSubjects() {
 
                 <div className={styles.cardBody}>
                   <p className={styles.subjectDescription}>
-                    Deep dive into the core concepts of {subjectName} this term. 
+                    Deep dive into the core concepts of {subjectName} this term.
                     Explore advanced topics and practical applications.
                   </p>
                   <div className={styles.tags}>
@@ -103,7 +97,7 @@ export function StudentSubjects() {
                 </div>
 
                 <div className={styles.cardAction}>
-                  <div 
+                  <div
                     className={styles.actionText}
                     onClick={() => handleNavigate('scontent')}
                   >

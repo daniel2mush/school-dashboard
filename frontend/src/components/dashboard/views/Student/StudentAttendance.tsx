@@ -141,12 +141,6 @@ export function StudentAttendance() {
 
   return (
     <section className={styles.view}>
-      <div className={styles.panel}>
-        <div className={styles.eyebrow}>{t('student.attendance.eyebrow')}</div>
-        <h2 className={styles.title}>{t('student.attendance.title')}</h2>
-        <p className={styles.copy}>{t('student.attendance.copy')}</p>
-      </div>
-
       <div className={styles.statsRow}>
         <div className={styles.statCard}>
           <div className={styles.statValue}>{student.att}%</div>
@@ -175,13 +169,13 @@ export function StudentAttendance() {
       <div className={styles.calendarContainer}>
         <div className={styles.calendarHeader}>
           <div className={styles.monthDisplay}>
-            <Button variant="ghost" size="icon" onClick={handlePrevMonth}>
+            <Button variant="ghost" onClick={handlePrevMonth}>
               <ChevronLeft size={20} />
             </Button>
             <h3 className={styles.monthTitle}>
               {months[currentMonth]} {currentYear}
             </h3>
-            <Button variant="ghost" size="icon" onClick={handleNextMonth}>
+            <Button variant="ghost" onClick={handleNextMonth}>
               <ChevronRight size={20} />
             </Button>
           </div>

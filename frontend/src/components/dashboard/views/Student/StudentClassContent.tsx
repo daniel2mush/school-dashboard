@@ -57,14 +57,6 @@ export function StudentClassContent() {
 
   return (
     <section className={styles.view}>
-      <div className={styles.panel}>
-        <div className={styles.eyebrow}>{t('student.content.eyebrow')}</div>
-        <h2 className={styles.title}>{t('student.content.title')}</h2>
-        <p className={styles.copy}>
-          {t('student.content.copy').replace('{yearGroup}', yearGroup.name)}
-        </p>
-      </div>
-
       <div className={styles.metrics}>
         <div className={styles.metric}>
           <FolderOpen size={18} />
@@ -100,7 +92,9 @@ export function StudentClassContent() {
       ) : isLoading ? (
         <div className={styles.emptyState}>Loading class content...</div>
       ) : materials.length === 0 ? (
-        <div className={styles.emptyState}>{t('student.content.noMaterials')}</div>
+        <div className={styles.emptyState}>
+          {t('student.content.noMaterials')}
+        </div>
       ) : (
         <div className={styles.grid}>
           {materials.map((material) => {

@@ -82,21 +82,6 @@ export function StudentTimetable() {
 
   return (
     <section className={styles.view}>
-      <header className={styles.hero}>
-        <div className={styles.heroCopy}>
-          <div className={styles.eyebrow}>{t('student.timetable.eyebrow')}</div>
-          <h2 className={styles.title}>{t('student.timetable.title')}</h2>
-          <p className={styles.copy}>
-            {t('student.timetable.copy').replace('{yearGroup}', yearGroup.name)}
-          </p>
-        </div>
-
-        <div className={styles.heroBadge}>
-          <Sparkles size={18} />
-          <span>{t('student.timetable.weeklyRhythm')}</span>
-        </div>
-      </header>
-
       <section className={styles.summaryGrid}>
         <article className={styles.summaryCard}>
           <div className={styles.summaryIcon}>
