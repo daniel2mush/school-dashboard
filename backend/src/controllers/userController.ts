@@ -303,6 +303,7 @@ export const GetSchoolSettings = asyncHandler(async (_req, res) => {
     create: {
       id: 1,
       name: "Sunridge International School",
+      description: "Where Eductation meets performance",
       term: "Term 2",
       year: "2026",
       language: "en",
