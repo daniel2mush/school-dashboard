@@ -9,7 +9,8 @@ export default defineConfig({
     seed: "tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env["DATABASE_URL"], // This should be the pooler URL
-    shadowDatabaseUrl: process.env["DIRECT_URL"], // Use this instead of hardcoding
+    url: process.env["DIRECT_URL"], // This should be the pooler URL
+    // url: process.env["DATABASE_URL"], // This should be the pooler URL
+    // shadowDatabaseUrl: process.env["DIRECT_URL"], // Use this instead of hardcoding
   },
 });
